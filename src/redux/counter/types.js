@@ -1,0 +1,5 @@
+export const COUNTER = {
+  ADD: "COUNTER_ADD",
+  SUBTRACT: "COUNTER_SUBTRACT",
+  RESET: "COUNTER_RESET"
+};
