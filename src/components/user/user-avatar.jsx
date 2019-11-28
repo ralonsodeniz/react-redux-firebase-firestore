@@ -102,6 +102,7 @@ const UserAvatar = () => {
 
   return (
     <UserAvatarContainer>
+      {console.log("AVATAR RENDER")}
       <AvatarContainer>
         {loading ? (
           <CircularProgressContainer>

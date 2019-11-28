@@ -40,33 +40,33 @@ const App = () => {
   //   dispatch(checkUserSessionStart());
   // }, [dispatch]);
 
-  return userAuthIsLoaded ? (
+  return (
     <AppContainer>
+      {console.log("APP RENDER")}
       <GlobalStyles />
       <header>
         <AppLogo />
       </header>
-      {!userAuthIsEmpty && userEmailVerified ? (
-        <section>
-          <User />
-          <Counter />
-          <VideoInput />
-        </section>
+      {userAuthIsLoaded ? (
+        !userAuthIsEmpty && userEmailVerified ? (
+          <section>
+            <User />
+            <Counter />
+            <VideoInput />
+          </section>
+        ) : (
+          <section>
+            <SignInSignUpContainer />
+          </section>
+        )
       ) : (
-        <section>
-          <SignInSignUpContainer />
-        </section>
+        <Spinner />
       )}
       {showModal && (
         <Modal>
           <InnerModal />
         </Modal>
       )}
-    </AppContainer>
-  ) : (
-    <AppContainer>
-      <GlobalStyles />
-      <Spinner />
     </AppContainer>
   );
 };

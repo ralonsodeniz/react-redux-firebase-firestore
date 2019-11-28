@@ -39,6 +39,11 @@ export const selectUserProfileId = createSelector(
     profile.isLoaded && !profile.isEmpty && !auth.isEmpty ? profile.uid : ""
 );
 
+export const selectUserAuthId = createSelector(
+  [selectUserAuth],
+  auth => auth.uid
+);
+
 export const selectUserProfileDisplayName = createSelector(
   [selectUserProfile, selectUserAuth],
   (profile, auth) =>
