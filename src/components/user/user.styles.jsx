@@ -88,7 +88,7 @@ export const LogOutButtonContainer = styled.div`
 export const UserDataContainer = styled.div`
   display: grid;
   justify-content: space-evenly;
-  width: 100%;
+  width: 400px;
   grid-template: auto/auto;
   grid-template-areas:
     "displayName age"
