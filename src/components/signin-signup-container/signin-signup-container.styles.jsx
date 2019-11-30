@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const SignInAndSignUpFrame = styled.div`
-  width: 30vw;
+  width: 61vw;
   height: auto;
   background-color: #fafafa;
   box-shadow: 0 0 32px 8px rgba(0, 0, 0, 0.3);
@@ -26,6 +26,6 @@ export const OptionText = styled.span`
   cursor: pointer;
 
   &:hover {
-    color: #4285f4;
+    color: #2f8e89;
   }
 `;

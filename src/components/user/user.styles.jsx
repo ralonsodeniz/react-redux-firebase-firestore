@@ -6,12 +6,12 @@ const UserDataStyles = css`
 `;
 
 export const UserContainer = styled.div`
-  width: 30vw;
+  width: 61vw;
   height: auto;
   background-color: #fafafa;
   box-shadow: 0 0 32px 8px rgba(0, 0, 0, 0.3);
   border-radius: 32px;
-  margin: 20px auto 50px;
+  margin: 50px auto;
   padding: 16px 32px;
   display: flex;
   flex-direction: column;
@@ -88,7 +88,7 @@ export const LogOutButtonContainer = styled.div`
 export const UserDataContainer = styled.div`
   display: grid;
   justify-content: space-evenly;
-  width: 400px;
+  width: 50vw;
   grid-template: auto/auto;
   grid-template-areas:
     "displayName age"

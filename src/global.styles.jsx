@@ -17,6 +17,12 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+a {
+  text-decoration: none;
+  color: #2f8e89;
+}
+
 /* this css is important for the modal to show correctly ontop of the rest of the app */
 #modal {
   position: relative;

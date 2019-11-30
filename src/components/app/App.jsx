@@ -1,6 +1,7 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { useSelector, shallowEqual } from "react-redux";
 import { createStructuredSelector } from "reselect";
+import { Switch, Route, Redirect } from "react-router-dom";
 
 import { selectShowModal } from "../../redux/modal/selectors";
 import {
@@ -9,16 +10,20 @@ import {
   selectUserEmailVerified
 } from "../../redux/user/selectors";
 
-import Counter from "../counter/counter";
-import VideoInput from "../video-input/video-input";
 import InnerModal from "../modal/inner-modal";
 import Modal from "../modal/modal";
-import SignInSignUpContainer from "../signin-signup-container/signin-signup-container";
-import User from "../user/user";
 import Spinner from "../spinner/spinner";
+import ErrorBoundary from "../error-boundary/error-boundary";
+import Header from "../header/header";
 
 import { GlobalStyles } from "../../global.styles";
-import { AppContainer, AppLogo } from "./App.styles";
+import { AppContainer } from "./App.styles";
+
+const MainPage = lazy(() => import("../../pages/main/main"));
+const AccountPage = lazy(() => import("../../pages/account/account"));
+const SigninPage = lazy(() => import("../../pages/signin/signin"));
+const SignupPage = lazy(() => import("../../pages/signup/signup"));
+const Playground = lazy(() => import("../../pages/playground/playground"));
 
 const selectAppData = createStructuredSelector({
   showModal: selectShowModal,
@@ -29,12 +34,7 @@ const selectAppData = createStructuredSelector({
 
 const App = () => {
   const appData = useSelector(selectAppData, shallowEqual);
-  const {
-    showModal,
-    userAuthIsEmpty,
-    userAuthIsLoaded,
-    userEmailVerified
-  } = appData;
+  const { showModal, userAuthIsEmpty, userAuthIsLoaded } = appData;
   // this is replaced by state.firebase.auth
   // useEffect(() => {
   //   dispatch(checkUserSessionStart());
@@ -45,23 +45,59 @@ const App = () => {
       {console.log("APP RENDER")}
       <GlobalStyles />
       <header>
-        <AppLogo />
+        <Header />
       </header>
-      {userAuthIsLoaded ? (
-        !userAuthIsEmpty && userEmailVerified ? (
-          <section>
-            <User />
-            <Counter />
-            <VideoInput />
-          </section>
-        ) : (
-          <section>
-            <SignInSignUpContainer />
-          </section>
-        )
-      ) : (
-        <Spinner />
-      )}
+      <ErrorBoundary>
+        <Switch>
+          <Suspense fallback={<Spinner />}>
+            <Route exact path="/" component={MainPage} />
+            <Route
+              exact
+              path="/signin"
+              render={() =>
+                userAuthIsLoaded && !userAuthIsEmpty ? (
+                  <Redirect to="/" />
+                ) : (
+                  <SigninPage />
+                )
+              }
+            />
+            <Route
+              exact
+              path="/signup"
+              render={() =>
+                userAuthIsLoaded && !userAuthIsEmpty ? (
+                  <Redirect to="/" />
+                ) : (
+                  <SignupPage />
+                )
+              }
+            />
+            <Route
+              exact
+              path="/account"
+              render={() =>
+                userAuthIsLoaded && userAuthIsEmpty ? (
+                  <Redirect to="/signin" />
+                ) : (
+                  <AccountPage />
+                )
+              }
+            />
+            <Route
+              exact
+              path="/playground"
+              render={() =>
+                userAuthIsLoaded && userAuthIsEmpty ? (
+                  <Redirect to="/signin" />
+                ) : (
+                  <Playground />
+                )
+              }
+            />
+          </Suspense>
+        </Switch>
+      </ErrorBoundary>
       {showModal && (
         <Modal>
           <InnerModal />

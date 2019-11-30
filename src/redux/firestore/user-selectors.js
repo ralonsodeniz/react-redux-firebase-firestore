@@ -12,10 +12,11 @@ export const selectFirestoreUserOrderedData = createSelector(
   firestore => firestore.ordered
 );
 
-export const selectFirestoreRequesting = createSelector(
-  [selectFirestore],
-  firestore =>
-    firestore.data !== {}
-      ? Object.values(firestore.status.requesting).includes(true)
+export const selectFirestoreRequesting = () =>
+  createSelector([selectFirestore, (_, uid) => uid], (firestore, uid) =>
+    firestore.data.users === null || firestore.data.users === undefined
+      ? true
+      : firestore.data.users.hasOwnProperty(uid)
+      ? false
       : true
-);
+  );
