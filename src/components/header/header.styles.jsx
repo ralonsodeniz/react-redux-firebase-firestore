@@ -37,5 +37,5 @@ export const HeaderSigninSignOutSpan = styled.span`
 
 export const HeaderLogo = styled(Logo)`
   width: 18vw;
-  height: 100%;
+  height: 7vh;
 `;

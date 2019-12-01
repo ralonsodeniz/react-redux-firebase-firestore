@@ -83,7 +83,8 @@ export const uploadFileToStorage = (
   setProgress,
   setLoading,
   setFile,
-  action
+  urlAction,
+  additionalAction
 ) => {
   try {
     const storageRef = storage.ref(`${directory}`); // we create the storage reference object seting the name of the folder where we want to save our
@@ -104,7 +105,8 @@ export const uploadFileToStorage = (
         unsubscribe(); // we close the observable connection once there is an error or the upload is finished
       },
       complete: async () => {
-        await documentFile.getDownloadURL().then(url => action(url));
+        await documentFile.getDownloadURL().then(url => urlAction(url));
+        if (additionalAction) additionalAction();
         setLoading(false);
         setFile(null);
         unsubscribe();
@@ -123,6 +125,23 @@ export const updateAvatarInFS = async url => {
   } catch (error) {
     console.log("error updating avatar url", error);
     throw new Error("Ooops something happened while updating your avatar");
+  }
+};
+
+export const addNewChallengeTemplateInFs = async challengeData => {
+  const { category } = challengeData;
+  const challengeRef = firestore.doc(`challengesTemplates/${category}`);
+  try {
+    await challengeRef.set({
+      ...challengeData,
+      approved: false,
+      ranking: [],
+      rating: 0,
+      timesCompleted: 0
+    });
+  } catch (error) {
+    console.log("Error while adding new challenge");
+    throw new Error("Ooops something happened while adding the challenge");
   }
 };
 

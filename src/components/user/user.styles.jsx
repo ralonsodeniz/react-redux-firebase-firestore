@@ -29,7 +29,6 @@ export const UserAvatarContainer = styled.div`
 export const AvatarContainer = styled.div`
   width: 150px;
   height: 150px;
-  margin-bottom: 10px;
 `;
 
 export const CircularProgressContainer = styled.div`

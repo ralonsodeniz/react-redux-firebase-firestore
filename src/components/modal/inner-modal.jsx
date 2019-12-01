@@ -45,7 +45,6 @@ const InnerModal = () => {
     <InnerModalContainer>
       <OnClickOutSide enabled action={closeModalOnClickOutside}>
         <InnerModalComponentContainer>
-          <span>This is the modal (React Portal)</span>
           <Suspense fallback={<Spinner />}>
             <SpecificModal {...modalData.modalProps} />
           </Suspense>
