@@ -23,7 +23,8 @@ const FileUploader = ({
   urlAction,
   additionalAction,
   labelText,
-  submitText
+  submitText,
+  disabled
 }) => {
   const dispatch = useDispatch();
   const [file, setFile] = useState(null);
@@ -100,7 +101,7 @@ const FileUploader = ({
       const notFileSelectedModalData = {
         modalType: "SYSTEM_MESSAGE",
         modalProps: {
-          text: "Please select an image first"
+          text: "Please select a file first"
         }
       };
       dispatch(openModal(notFileSelectedModalData));
@@ -134,12 +135,14 @@ const FileUploader = ({
             id="file"
             name="file"
             onChange={handleFileChange}
+            disabled={disabled}
           />
           <LabelFileContainer htmlFor="file">{labelText}</LabelFileContainer>
           <CustomButton
             type="button"
             text={submitText}
             onClick={handleFileUpload}
+            disabled={disabled}
           />
         </UpdateFileContainer>
       )}

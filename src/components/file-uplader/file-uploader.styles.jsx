@@ -5,7 +5,8 @@ export const UploadFileContainer = styled.div`
   flex-direction: column;
   justify-content: space-evenly;
   align-items: center;
-  width: 100%;
+  width: min-content;
+  margin: 5px;
 `;
 
 export const CircularProgressContainer = styled.div`

@@ -13,14 +13,16 @@ CustomButton.propTypes = {
   text: PropTypes.string.isRequired,
   large: PropTypes.bool,
   onClick: PropTypes.func,
-  type: PropTypes.string
+  type: PropTypes.string,
+  diabled: PropTypes.bool
 };
 
 CustomButton.defaultProps = {
   text: "This is a custom button",
   large: false,
   onClick: () => {},
-  type: "button"
+  type: "button",
+  disabled: false
 };
 
 export default CustomButton;

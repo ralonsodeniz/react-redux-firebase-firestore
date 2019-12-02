@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const MainContainer = styled.div`
+export const HomeContainer = styled.div`
   width: 61vw;
   height: 52vh;
   background-color: #fafafa;
@@ -11,5 +11,5 @@ export const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* justify-content: center; */
+  justify-content: center;
 `;

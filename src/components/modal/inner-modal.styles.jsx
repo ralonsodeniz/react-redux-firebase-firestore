@@ -23,7 +23,7 @@ export const InnerModalComponentContainer = styled.div`
   box-shadow: 5px 10px 18px #888888;
   border: 1px solid black;
   border-radius: 10px;
-  padding: 10px;
+  padding: 10px 23px 10px 10px;
   position: relative;
   top: -13vh;
 `;

@@ -20,8 +20,8 @@ export const UserContainer = styled.div`
 
 export const UserAvatarContainer = styled.div`
   display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
+  flex-direction: row;
+  justify-content: center;
   align-items: center;
   width: 100%;
 `;

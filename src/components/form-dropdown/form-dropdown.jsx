@@ -8,19 +8,16 @@ import {
   FormDropdownOption
 } from "./form-dropdown.styles";
 
-const FormDropdown = ({
-  handleChange,
-  label,
-  options,
-  defaultValue,
-  ...otherProps
-}) => (
+const FormDropdown = ({ handleChange, label, options, ...otherProps }) => (
   <FormDropdownReference>
     <FormDropdownContainer
-      defaultValue={defaultValue}
+      defaultValue={"selectCategory"}
       onChange={handleChange}
       {...otherProps}
     >
+      <FormDropdownOption disabled value="selectCategory">
+        Select a category
+      </FormDropdownOption>
       {options.map(option => (
         <FormDropdownOption key={option.key} value={option.value}>
           {option.text}

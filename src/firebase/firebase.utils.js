@@ -129,16 +129,23 @@ export const updateAvatarInFS = async url => {
 };
 
 export const addNewChallengeTemplateInFs = async challengeData => {
-  const { category } = challengeData;
+  const { category, name } = challengeData;
   const challengeRef = firestore.doc(`challengesTemplates/${category}`);
   try {
-    await challengeRef.set({
-      ...challengeData,
-      approved: false,
-      ranking: [],
-      rating: 0,
-      timesCompleted: 0
-    });
+    // set second argument is setOptions. merge:true option allows us to add new keys to the challenge category document without overwriting the previous without having to use .update()
+    // we want to use set because we need to create the category document if it does not exists
+    await challengeRef.set(
+      {
+        [name]: {
+          ...challengeData,
+          approved: false,
+          ranking: [],
+          rating: 0,
+          timesCompleted: 0
+        }
+      },
+      { merge: true }
+    );
   } catch (error) {
     console.log("Error while adding new challenge");
     throw new Error("Ooops something happened while adding the challenge");
