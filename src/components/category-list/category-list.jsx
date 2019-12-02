@@ -11,7 +11,10 @@ import {
 import Spinner from "../spinner/spinner";
 import CustomButton from "../custom-button/custom-button";
 
-import { CategoryListContainer } from "./category-list.styles";
+import {
+  CategoryListContainer,
+  CategoryListScrollContainer
+} from "./category-list.styles";
 
 const challengesTemplatesCategoriesSelector = createStructuredSelector({
   challengesTemplatesCategories: selectChallengesTemplatesCategories,
@@ -35,14 +38,16 @@ const CategoryList = () => {
       {challengesTemplatesAreLoading ? (
         <Spinner />
       ) : (
-        challengesTemplatesCategories.map((category, categoryIndex) => (
-          <CustomButton
-            key={categoryIndex}
-            text={category}
-            onClick={() => history.push(`${match.path}/${category}`)}
-            large
-          />
-        ))
+        <CategoryListScrollContainer>
+          {challengesTemplatesCategories.map((category, categoryIndex) => (
+            <CustomButton
+              key={categoryIndex}
+              text={category}
+              onClick={() => history.push(`${match.path}/${category}`)}
+              large
+            />
+          ))}
+        </CategoryListScrollContainer>
       )}
     </CategoryListContainer>
   );

@@ -1,8 +1,8 @@
 import styled from "styled-components";
 
-export const CategoryListContainer = styled.div`
+export const CategoryOverviewContainer = styled.div`
   width: 52vw;
-  height: min-content;
+  height: 42vh;
   background-color: #fafafa;
   box-shadow: 0 0 32px 8px rgba(0, 0, 0, 0.3);
   border-radius: 12px;
@@ -10,22 +10,23 @@ export const CategoryListContainer = styled.div`
   padding: 16px 32px;
   display: flex;
   flex-direction: row;
-  align-items: center;
-  justify-content: center;
+  /* align-items: center;
+  justify-content: center; */
   position: relative;
   top: 10px;
 `;
 
-export const CategoryListScrollContainer = styled.div`
+export const CategoryOverviewScrollContainer = styled.div`
   width: 52vw;
-  height: min-content;
+  height: 100%;
   background-color: #fafafa;
   display: flex;
   flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  overflow-x: auto;
-  overflow-y: hidden;
+  flex-wrap: wrap;
+  /* align-items: center;
+  justify-content: center; */
+  overflow-x: hidden;
+  overflow-y: auto;
 
   /* overflow */
   ::-webkit-scrollbar {
