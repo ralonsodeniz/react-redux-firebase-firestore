@@ -1,21 +1,28 @@
 import React from "react";
+import PropTypes from "prop-types";
+import { useRouteMatch, useHistory } from "react-router-dom";
+
+import CustomButton from "../custom-button/custom-button";
 
 import {
   CategoryItemContainer,
   CategoryItemVideoPlayer
 } from "./category-item.styles";
 
-const CategoryItem = ({ challengeTemplate }) => {
+const CategoryItem = ({ challengeTemplateId, challengeTemplateData }) => {
   const {
     name,
     author,
     difficulty,
     daysToComplete,
-    minimunParticipants,
+    minimumParticipants,
     timesCompleted,
     rating,
     videoUrl
-  } = challengeTemplate;
+  } = challengeTemplateData;
+  const history = useHistory();
+  const { url } = useRouteMatch();
+
   return (
     <CategoryItemContainer>
       <CategoryItemVideoPlayer
@@ -32,13 +39,23 @@ const CategoryItem = ({ challengeTemplate }) => {
       <strong>Days to complete challenge</strong>
       <span>{daysToComplete}</span>
       <strong>Minmum participants</strong>
-      <span>{minimunParticipants}</span>
+      <span>{minimumParticipants}</span>
       <strong>Times completed</strong>
       <span>{timesCompleted}</span>
       <strong>Rating</strong>
       <span>{rating}</span>
+      <CustomButton
+        text="Go to challenge"
+        type="button"
+        onClick={() => history.push(`${url}/${challengeTemplateId}`)}
+      />
     </CategoryItemContainer>
   );
+};
+
+CategoryItem.propTypes = {
+  challengeTemplateId: PropTypes.string.isRequired,
+  challengeTemplateData: PropTypes.object.isRequired
 };
 
 export default CategoryItem;

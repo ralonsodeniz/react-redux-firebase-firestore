@@ -142,7 +142,7 @@ const FileUploader = ({
             type="button"
             text={submitText}
             onClick={handleFileUpload}
-            disabled={disabled}
+            disabled={disabled || !file}
           />
         </UpdateFileContainer>
       )}

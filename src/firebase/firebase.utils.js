@@ -3,6 +3,8 @@ import "firebase/firestore";
 import "firebase/auth";
 import "firebase/storage";
 
+import { createRandomId, assignNewIdToItem } from "../utils/utils";
+
 // firebase config
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_APIKEY,
@@ -129,14 +131,23 @@ export const updateAvatarInFS = async url => {
 };
 
 export const addNewChallengeTemplateInFs = async challengeData => {
-  const { category, name } = challengeData;
-  const challengeRef = firestore.doc(`challengesTemplates/${category}`);
+  const { category } = challengeData;
   try {
+    const challengesTemplatesCategoryRef = firestore.doc(
+      `challengesTemplates/${category}`
+    );
+    const challengesTemplatesCategorySnapshot = await challengesTemplatesCategoryRef.get();
+    const challengesTemplatesCategorySnapshotData = challengesTemplatesCategorySnapshot.data();
+    const id = assignNewIdToItem(
+      challengesTemplatesCategorySnapshotData,
+      createRandomId,
+      28
+    );
     // set second argument is setOptions. merge:true option allows us to add new keys to the challenge category document without overwriting the previous without having to use .update()
     // we want to use set because we need to create the category document if it does not exists
-    await challengeRef.set(
+    await challengesTemplatesCategoryRef.set(
       {
-        [name]: {
+        [id]: {
           ...challengeData,
           approved: false,
           ranking: [],

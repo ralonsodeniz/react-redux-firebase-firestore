@@ -9,9 +9,9 @@ export const CategoryOverviewContainer = styled.div`
   margin: 50px auto;
   padding: 16px 32px;
   display: flex;
-  flex-direction: row;
-  /* align-items: center;
-  justify-content: center; */
+  flex-direction: column;
+  align-items: center;
+  /*justify-content: center; */
   position: relative;
   top: 10px;
 `;

@@ -4,9 +4,9 @@ export const CategoryItemContainer = styled.div`
   width: 24vw;
   height: max-content;
   background-color: #fafafa;
-  box-shadow: 0 0 32px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 16px 4px rgba(0, 0, 0, 0.3);
   border-radius: 12px;
-  margin: 50px auto;
+  margin: 23px auto;
   padding: 16px 32px;
   display: flex;
   flex-direction: column;

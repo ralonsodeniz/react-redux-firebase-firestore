@@ -1,8 +1,9 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { useSelector, shallowEqual } from "react-redux";
+import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import { createStructuredSelector } from "reselect";
 
+import { openModal } from "../../redux/modal/actions";
 import {
   selectChallengesTemplatesCategory,
   selectChallengesTemplatesAreLoading
@@ -10,6 +11,7 @@ import {
 
 import Spinner from "../spinner/spinner";
 import CategoryItem from "../category-item/category-item";
+import CustomButton from "../custom-button/custom-button";
 
 import {
   CategoryOverviewContainer,
@@ -22,6 +24,14 @@ const selectCategoryOverviewData = createStructuredSelector({
 
 const CategoryOverview = () => {
   const { category } = useParams();
+  const dispatch = useDispatch();
+  const addNewChallengeModalData = {
+    modalType: "ADD_CHALLENGE",
+    modalProps: {
+      urlCategory: category
+    }
+  };
+
   // since the selector is usign a prop of the component and it can be used in different components we create a memoized instance for this particular case before using it
   const selectChallengesTemplatesCategoryInstance = useMemo(
     () => selectChallengesTemplatesCategory,
@@ -36,17 +46,28 @@ const CategoryOverview = () => {
     shallowEqual
   );
 
+  const handleProposeNewChallenge = useCallback(
+    () => dispatch(openModal(addNewChallengeModalData)),
+    [dispatch, addNewChallengeModalData]
+  );
+
   return (
     <CategoryOverviewContainer>
       {!challengesTemplatesAreLoading ? (
         <CategoryOverviewScrollContainer>
-          {Object.values(challengesTemplateCategory).reduce(
+          {Object.entries(challengesTemplateCategory).reduce(
             (accumulator, challengeTemplate, challengeTemplateIndex) => {
-              if (challengeTemplate.approved === false) {
+              // this is destructuring from an array instead of an object as we are more used to see
+              const [
+                challengeTemplateId,
+                challengeTemplateData
+              ] = challengeTemplate;
+              if (challengeTemplateData.approved === false) {
                 accumulator.push(
                   <CategoryItem
                     key={challengeTemplateIndex}
-                    challengeTemplate={challengeTemplate}
+                    challengeTemplateId={challengeTemplateId}
+                    challengeTemplateData={challengeTemplateData}
                   />
                 );
               }
@@ -58,6 +79,12 @@ const CategoryOverview = () => {
       ) : (
         <Spinner />
       )}
+      <CustomButton
+        type="button"
+        text="Propose new challenge"
+        large
+        onClick={handleProposeNewChallenge}
+      />
     </CategoryOverviewContainer>
   );
 };

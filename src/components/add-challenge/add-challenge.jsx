@@ -1,52 +1,54 @@
 import React, { useState, useCallback } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { createStructuredSelector } from "reselect";
-
+import PropTypes from "prop-types";
 import { addNewChallengeStart } from "../../redux/firestore/challenges-templates/actions";
 import { selectUserProfileDisplayName } from "../../redux/user/selectors";
 
 import FormInput from "../form-input/form-input";
-import FormDropdown from "../form-dropdown/form-dropdown";
+// import FormDropdown from "../form-dropdown/form-dropdown";
 import FileUploader from "../file-uplader/file-uploader";
 import CustomButton from "../custom-button/custom-button";
 
-import { AddChallengeContainer } from "./add-challenge.styles";
-import { openModal } from "../../redux/modal/actions";
+import {
+  AddChallengeContainer,
+  AddChallengeValidationContainer
+} from "./add-challenge.styles";
+// import { openModal } from "../../redux/modal/actions";
 
 const selectAddChallengeData = createStructuredSelector({
   userProfileDisplayName: selectUserProfileDisplayName
 });
 
-const AddChallenge = () => {
+const AddChallenge = ({ urlCategory }) => {
   const dispatch = useDispatch();
   const addChallengeData = useSelector(selectAddChallengeData, shallowEqual);
   const { userProfileDisplayName } = addChallengeData;
   const [formChallengeData, setFormChallengeData] = useState({
-    category: "",
     description: "",
     difficulty: "",
-    minimunParticipants: "",
+    minimumParticipants: "",
     name: "",
     daysToComplete: ""
   });
   const [formValidated, setFormValidated] = useState(false);
-  const options = [
-    {
-      value: "ability",
-      text: "Ability",
-      key: 0
-    },
-    {
-      value: "foodie",
-      text: "Foodie",
-      key: 1
-    }
-  ];
+  // no logner needed since we are passing category from the selected in the url
+  // const options = [
+  //   {
+  //     value: "ability",
+  //     text: "Ability",
+  //     key: 0
+  //   },
+  //   {
+  //     value: "foodie",
+  //     text: "Foodie",
+  //     key: 1
+  //   }
+  // ];
   const {
-    category,
     description,
     difficulty,
-    minimunParticipants,
+    minimumParticipants,
     name,
     daysToComplete
   } = formChallengeData;
@@ -62,38 +64,36 @@ const AddChallenge = () => {
   );
   const handleFormCheck = event => {
     event.preventDefault();
-    if (Object.values(formChallengeData).includes(""))
-      return dispatch(
-        openModal({
-          modalType: "SYSTEM_MESSAGE",
-          modalProps: { text: "Please select a category" }
-        })
-      );
+    // we no longer need to check if the category is selected
+    // if (Object.values(formChallengeData).includes(""))
+    //   return dispatch(
+    //     openModal({
+    //       modalType: "SYSTEM_MESSAGE",
+    //       modalProps: { text: "Please select a category" }
+    //     })
+    //   );
     setFormValidated(true);
-    dispatch(
-      openModal({
-        modalType: "SYSTEM_MESSAGE",
-        modalProps: {
-          text: "Form validated, choose challenge video and submit"
-        }
-      })
-    );
   };
   // we use curried functions to pass first the arguments from the component and then return a function that awaits the url to dispatch the action when the file is updated and we have the video url
   // doing like this we do not have external dependencies
   const handleSubmit = useCallback(
-    (dispatch, formChallengeData, userProfileDisplayName) => url => {
+    (
+      dispatch,
+      formChallengeData,
+      userProfileDisplayName,
+      urlCategory
+    ) => url => {
       const challengeData = {
         ...formChallengeData,
         author: userProfileDisplayName,
+        category: urlCategory,
         videoUrl: url
       };
       dispatch(addNewChallengeStart(challengeData));
       setFormChallengeData({
-        category: "",
         description: "",
         difficulty: "",
-        minimunParticipants: "",
+        minimumParticipants: "",
         name: "",
         daysToComplete: ""
       });
@@ -115,7 +115,7 @@ const AddChallenge = () => {
           required
           disabled={formValidated}
         />
-        <FormDropdown
+        {/* <FormDropdown
           type="text"
           id="category"
           name="category"
@@ -124,7 +124,7 @@ const AddChallenge = () => {
           options={options}
           required
           disabled={formValidated}
-        />
+        /> */}
         <FormInput
           type="text"
           id="description"
@@ -147,9 +147,9 @@ const AddChallenge = () => {
         />
         <FormInput
           type="number"
-          id="minimunParticipants"
-          name="minimunParticipants"
-          value={minimunParticipants}
+          id="minimumParticipants"
+          name="minimumParticipants"
+          value={minimumParticipants}
           handleChange={handleChange}
           label="Minimun participants"
           required
@@ -166,22 +166,25 @@ const AddChallenge = () => {
           required
           disabled={formValidated}
         />
+        <AddChallengeValidationContainer></AddChallengeValidationContainer>
         <CustomButton
           type="submit"
           text="Validate challenge info"
           disabled={formValidated}
         />
+        {!formValidated ? <span>&#9744;</span> : <span>&#9745;</span>}
       </form>
       <FileUploader
         fileType="video"
-        directory={`challengesTemplates/${category}/${name}`}
+        directory={`challengesTemplates/${urlCategory}/${name}`}
         fileName={name}
         // in this case, since we are returning a function, because handleSubmit is a curried function and we only pass the first set of parameters, we do not need to () => handleSubmit(dispatch, formChallengeData, userProfileDisplayName)
         // the function wont run until it is called in the children
         urlAction={handleSubmit(
           dispatch,
           formChallengeData,
-          userProfileDisplayName
+          userProfileDisplayName,
+          urlCategory
         )}
         labelText={"Choose challenge video"}
         submitText="Submit new challenge!"
@@ -189,6 +192,10 @@ const AddChallenge = () => {
       />
     </AddChallengeContainer>
   );
+};
+
+AddChallenge.propTypes = {
+  urlCategory: PropTypes.string.isRequired
 };
 
 export default AddChallenge;
