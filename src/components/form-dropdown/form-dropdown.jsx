@@ -8,15 +8,24 @@ import {
   FormDropdownOption
 } from "./form-dropdown.styles";
 
-const FormDropdown = ({ handleChange, label, options, ...otherProps }) => (
+const FormDropdown = ({
+  handleChange,
+  label,
+  options,
+  multiple,
+  ...otherProps
+}) => (
   <FormDropdownReference>
     <FormDropdownContainer
-      defaultValue={"selectCategory"}
+      defaultValue={multiple ? null : "default"}
       onChange={handleChange}
+      multiple
       {...otherProps}
     >
-      <FormDropdownOption disabled value="selectCategory">
-        Select a category
+      <FormDropdownOption disabled value="default">
+        {multiple
+          ? `select one or more using ctrl / cmd`
+          : `select your option`}
       </FormDropdownOption>
       {options.map(option => (
         <FormDropdownOption key={option.key} value={option.value}>
@@ -33,7 +42,8 @@ FormDropdown.propTypes = {
   label: PropTypes.string,
   options: PropTypes.array,
   defaultValue: PropTypes.string,
-  otherProps: PropTypes.object
+  otherProps: PropTypes.object,
+  multiple: PropTypes.bool
 };
 
 export default FormDropdown;

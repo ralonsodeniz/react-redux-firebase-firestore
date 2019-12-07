@@ -15,7 +15,12 @@ export const assignNewIdToItem = (
   idLength
 ) => {
   let id = idGenerator(idLength);
-  return objectContainingItem[id]
-    ? assignNewIdToItem(objectContainingItem, idGenerator, idLength)
-    : id;
+  if (Array.isArray(objectContainingItem))
+    return objectContainingItem.find(element => element.id === id)
+      ? assignNewIdToItem(objectContainingItem, idGenerator, idLength)
+      : id;
+  if (typeof objectContainingItem === "object")
+    return objectContainingItem[id]
+      ? assignNewIdToItem(objectContainingItem, idGenerator, idLength)
+      : id;
 };

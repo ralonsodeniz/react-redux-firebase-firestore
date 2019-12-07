@@ -39,6 +39,21 @@ export const checkUserProfileDocumentInFS = async (user, additionalData) => {
       const { displayName, email, photoURL, providerData, uid } = user;
       const createdAt = new Date();
       const providerId = providerData[0].providerId;
+      const challengesInstances = {
+        ability: [],
+        foodie: []
+      };
+      const statics = {
+        ability: 0,
+        foodie: 0,
+        globalRanking: 0
+      };
+      const friends = {
+        accepted: [],
+        pending: []
+      };
+      const pendingFriendRequest = [];
+      const pendingChallengeInstancesInvites = [];
       try {
         await userRef.set({
           displayName,
@@ -49,7 +64,12 @@ export const checkUserProfileDocumentInFS = async (user, additionalData) => {
           createdAt,
           gender: additionalData ? additionalData.gender : "",
           age: additionalData ? parseInt(additionalData.age) : 0,
-          country: additionalData ? additionalData.country : ""
+          country: additionalData ? additionalData.country : "",
+          challengesInstances,
+          statics,
+          friends,
+          pendingFriendRequest,
+          pendingChallengeInstancesInvites
         });
       } catch (error) {
         console.log("error while checking user", error);
@@ -160,6 +180,86 @@ export const addNewChallengeTemplateInFs = async challengeData => {
   } catch (error) {
     console.log("Error while adding new challenge");
     throw new Error("Ooops something happened while adding the challenge");
+  }
+};
+
+export const addNewChallengeInstanceInFs = async (
+  challengeData,
+  instanceData,
+  userProfileDisplayName,
+  userProfileId
+) => {
+  try {
+    const challengeInstanceRef = firestore
+      .collection("challengesInstances")
+      .doc();
+    const challengeInstanceRefId = challengeInstanceRef.id;
+    const administrator = { userProfileDisplayName, userProfileId };
+    const { contenders, validators } = instanceData;
+    const defaultContenderProps = {
+      proof: "",
+      rating: 0,
+      public: false
+    };
+    let enhancedContenders = contenders.map(contender => ({
+      ...contender,
+      status: "pending",
+      ...defaultContenderProps
+    }));
+    enhancedContenders.push({
+      id: userProfileId,
+      name: userProfileDisplayName,
+      status: "accepted",
+      ...defaultContenderProps
+    });
+    const comments = [];
+    const likes = 0;
+    await challengeInstanceRef.set({
+      challengeInstanceRefId,
+      ...challengeData,
+      administrator,
+      enhancedContenders,
+      validators,
+      comments,
+      likes
+    });
+    const { category } = challengeData;
+    const authorUserRef = firestore.doc(`users/${userProfileId}`);
+    const authorUserSnapshot = await authorUserRef.get();
+    const challengesInstancesCategoryData = authorUserSnapshot.data()
+      .challengesInstances[category];
+    await authorUserRef.set(
+      {
+        challengesInstances: {
+          [category]: [
+            ...challengesInstancesCategoryData,
+            challengeInstanceRefId
+          ]
+        }
+      },
+      { merge: true }
+    );
+    if (contenders !== []) {
+      contenders.map(async contender => {
+        const { id } = contender;
+        const contenderUserRef = firestore.doc(`users/${id}`);
+        const contendersUserSnapshot = await contenderUserRef.get();
+        const {
+          pendingChallengeInstancesInvites
+        } = contendersUserSnapshot.data();
+        await contenderUserRef.update({
+          pendingChallengeInstancesInvites: [
+            ...pendingChallengeInstancesInvites,
+            challengeInstanceRefId
+          ]
+        });
+      });
+    }
+  } catch (error) {
+    console.log("Error while adding new challenge instance");
+    throw new Error(
+      "Ooops something happened while creating the new challenge instance"
+    );
   }
 };
 

@@ -75,3 +75,11 @@ export const selectUserEmailVerified = createSelector(
   [selectUserAuth],
   auth => auth.emailVerified
 );
+
+export const selectUserAcceptedFriends = createSelector(
+  [selectUserProfile, selectUserAuth],
+  (profile, auth) =>
+    profile.isLoaded && !profile.isEmpty && !auth.isEmpty
+      ? profile.friends.accepted
+      : []
+);

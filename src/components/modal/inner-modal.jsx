@@ -21,12 +21,16 @@ const lazySystemMessage = lazy(() =>
   import("../system-message/system-message")
 );
 const lazyAddChallenge = lazy(() => import("../add-challenge/add-challenge"));
+const lazyAddChallengeInstance = lazy(() =>
+  import("../add-challenge-instance/add-challenge-instance")
+);
 
 const MODAL_OPTIONS = {
   COUNTER_MANAGER: lazyCounterManager,
   VIDEO_PLAYER: lazyVideoPlayer,
   SYSTEM_MESSAGE: lazySystemMessage,
-  ADD_CHALLENGE: lazyAddChallenge
+  ADD_CHALLENGE: lazyAddChallenge,
+  ADD_CHALLENGE_INSTANCE: lazyAddChallengeInstance
 };
 
 // we can create a structured selector object using createStructuredSelector from reselect using different selectors and then pass it to useSelector redux custom hook

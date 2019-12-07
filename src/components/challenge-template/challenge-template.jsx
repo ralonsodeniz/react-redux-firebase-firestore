@@ -1,12 +1,14 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector, shallowEqual } from "react-redux";
 import { createStructuredSelector } from "reselect";
+import { useDispatch } from "react-redux";
 
 import {
   selectChallengeTemplateFromCategory,
   selectChallengesTemplatesAreLoading
 } from "../../redux/firestore/challenges-templates/selectors";
+import { openModal } from "../../redux/modal/actions";
 
 import CustomButton from "../custom-button/custom-button";
 
@@ -25,6 +27,7 @@ const selectChallengeTemplateData = createStructuredSelector({
 });
 
 const ChallengeTemplate = () => {
+  const dispatch = useDispatch();
   const { category, challengeTemplateId } = useParams();
   const memoizedSelectChallengeTemplateFromCategory = useMemo(
     () => selectChallengeTemplateFromCategory,
@@ -32,6 +35,16 @@ const ChallengeTemplate = () => {
   );
   const { challengesTempletesAreLoading } = useSelector(
     selectChallengeTemplateData,
+    shallowEqual
+  );
+
+  const challengeTemplate = useSelector(
+    state =>
+      memoizedSelectChallengeTemplateFromCategory(
+        state,
+        category,
+        challengeTemplateId
+      ),
     shallowEqual
   );
 
@@ -46,15 +59,17 @@ const ChallengeTemplate = () => {
     rating,
     timesCompleted,
     videoUrl
-  } = useSelector(
-    state =>
-      memoizedSelectChallengeTemplateFromCategory(
-        state,
-        category,
-        challengeTemplateId
-      ),
-    shallowEqual
-  );
+  } = challengeTemplate;
+
+  const handleOpenAcceptChallenge = useCallback(() => {
+    const openAcceptChallengeModalData = {
+      modalType: "ADD_CHALLENGE_INSTANCE",
+      modalProps: {
+        challengeTemplate
+      }
+    };
+    dispatch(openModal(openAcceptChallengeModalData));
+  }, [dispatch, challengeTemplate]);
 
   return !challengesTempletesAreLoading ? (
     <ChallengeTemplateContainer>
@@ -87,15 +102,27 @@ const ChallengeTemplate = () => {
       </ChallengeTemplateDataContainer>
       <ChallengeTemplateRanking>
         <h4>Users ranking</h4>
-        {ranking.map((user, userIndex) => (
-          <span key={userIndex}>{user}</span>
-        ))}
+        {ranking
+          .sort((a, b) =>
+            a.rating > b.rating
+              ? -1
+              : a.rating === b.rating
+              ? a.name > b.name
+                ? 1
+                : -1
+              : 1
+          )
+          .map((user, userIndex) => (
+            <span key={userIndex}>
+              {user.name} - {user.rating}
+            </span>
+          ))}
       </ChallengeTemplateRanking>
       <ChallengeTemplateButtonsContainer>
         <CustomButton
           text="Accept challenge"
           type="button"
-          onClick={() => {}}
+          onClick={handleOpenAcceptChallenge}
           large
         />
       </ChallengeTemplateButtonsContainer>
