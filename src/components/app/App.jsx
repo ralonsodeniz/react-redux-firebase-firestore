@@ -43,7 +43,8 @@ const App = () => {
   // }, [dispatch]);
   useFirestoreConnect([
     { collection: `users` },
-    { collection: `challengesTemplates` }
+    { collection: `challengesTemplates` },
+    { collection: `challengesInstances` }
   ]);
 
   return (
@@ -81,7 +82,6 @@ const App = () => {
               }
             />
             <Route
-              exact
               path="/account"
               render={() =>
                 userAuthIsLoaded && userAuthIsEmpty ? (

@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const CategoryOverviewContainer = styled.div`
+export const InstancesOverviewContainer = styled.div`
   width: 52vw;
   height: min-content;
   background-color: #fafafa;
@@ -16,7 +16,15 @@ export const CategoryOverviewContainer = styled.div`
   top: 10px;
 `;
 
-export const CategoryOverviewScrollContainer = styled.div`
+export const InstancesOverviewHeaderContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 100%;
+`;
+
+export const InstancesOverviewScrollContainer = styled.div`
   width: 52vw;
   height: 23vh;
   background-color: #fafafa;
@@ -48,4 +56,10 @@ export const CategoryOverviewScrollContainer = styled.div`
     box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
   }
+`;
+
+export const InstancesOverviewTitle = styled.h3`
+  font-weight: 400;
+  margin-left: auto;
+  margin-right: auto;
 `;

@@ -40,13 +40,15 @@ export const ChallengeTemplateDataContainer = styled.div`
   grid-area: challengeData;
   display: flex;
   justify-content: space-evenly;
+  width: 100%;
 `;
 
 export const ChallengeTemplateData = styled.div`
   display: flex;
   flex-direction: column;
   margin: 10px;
-  ${ChallengeTemplateDataStyles}
+  ${ChallengeTemplateDataStyles};
+  width: 16vw;
 `;
 
 export const ChallengeTemplateRanking = styled.div`

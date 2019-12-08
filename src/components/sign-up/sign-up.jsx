@@ -2,6 +2,8 @@ import React, { useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
 
 import { signUpStart } from "../../redux/user/actions";
+import { openModal } from "../../redux/modal/actions";
+import { countryOptions } from "../../utils/options";
 
 import CustomButton from "../custom-button/custom-button";
 
@@ -11,6 +13,8 @@ import {
   SignUpButtonsContainer
 } from "./sign-up.styles";
 import FormInput from "../form-input/form-input";
+import FormRadio from "../form-radio/form-radio";
+import FormDropdown from "../form-dropdown/form-dropdown";
 
 const SignUp = () => {
   const [userData, setUserData] = useState({
@@ -21,8 +25,11 @@ const SignUp = () => {
     gender: "",
     country: ""
   });
-  const { displayName, email, password, age, gender, country } = userData;
+
+  const { displayName, email, password, age } = userData;
+
   const dispatch = useDispatch();
+
   const handleChange = useCallback(
     event => {
       const { value, name } = event.target;
@@ -33,21 +40,44 @@ const SignUp = () => {
     },
     [userData]
   );
+
   const handleSubmit = useCallback(
     event => {
       event.preventDefault();
-      dispatch(signUpStart(userData));
-      setUserData({
-        displayName: "",
-        email: "",
-        password: "",
-        age: "",
-        gender: "",
-        country: ""
-      });
+      if (Object.values(userData).some(value => value === "")) {
+        const emptyValueModalData = {
+          modalType: "SYSTEM_MESSAGE",
+          modalProps: {
+            text: "Please fill all the form entries"
+          }
+        };
+        dispatch(openModal(emptyValueModalData));
+        return;
+      } else {
+        dispatch(signUpStart(userData));
+        setUserData({
+          displayName: "",
+          email: "",
+          password: "",
+          age: "",
+          gender: "",
+          country: ""
+        });
+      }
     },
     [dispatch, userData]
   );
+
+  const genderOptions = [
+    {
+      value: "Male",
+      text: "Male"
+    },
+    {
+      value: "Female",
+      text: "Female"
+    }
+  ];
 
   return (
     <SignUpContainer>
@@ -89,23 +119,22 @@ const SignUp = () => {
           label={"Age"}
           required
         />
-        <FormInput
-          type="text"
-          id="gender"
+        <FormRadio
           name="gender"
-          value={gender}
+          label="Gender"
+          options={genderOptions}
           handleChange={handleChange}
-          label={"Gender"}
-          required
         />
-        <FormInput
+        <FormDropdown
           type="text"
           id="country"
           name="country"
-          value={country}
+          multiple={false}
+          label="Country"
           handleChange={handleChange}
-          label={"Country"}
-          required
+          require
+          options={countryOptions}
+          size={4}
         />
         <SignUpButtonsContainer>
           <CustomButton type={"submit"} text={"Register"} />

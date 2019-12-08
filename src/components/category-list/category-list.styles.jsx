@@ -9,7 +9,7 @@ export const CategoryListContainer = styled.div`
   margin: 50px auto;
   padding: 16px 32px;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
@@ -47,4 +47,10 @@ export const CategoryListScrollContainer = styled.div`
     box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
   }
+`;
+
+export const CategoryListTitle = styled.h3`
+  font-weight: 400;
+  margin-left: auto;
+  margin-right: auto;
 `;

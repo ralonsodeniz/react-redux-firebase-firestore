@@ -6,7 +6,7 @@ const UserDataStyles = css`
 `;
 
 export const UserContainer = styled.div`
-  width: 61vw;
+  width: 52vw;
   height: auto;
   background-color: #fafafa;
   box-shadow: 0 0 32px 8px rgba(0, 0, 0, 0.3);

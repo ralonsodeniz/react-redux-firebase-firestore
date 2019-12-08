@@ -13,22 +13,24 @@ const FormDropdown = ({
   label,
   options,
   multiple,
+  size,
   ...otherProps
 }) => (
   <FormDropdownReference>
     <FormDropdownContainer
       defaultValue={multiple ? null : "default"}
       onChange={handleChange}
-      multiple
+      multiple={multiple}
       {...otherProps}
+      size={size}
     >
       <FormDropdownOption disabled value="default">
         {multiple
           ? `select one or more using ctrl / cmd`
           : `select your option`}
       </FormDropdownOption>
-      {options.map(option => (
-        <FormDropdownOption key={option.key} value={option.value}>
+      {options.map((option, optionIndex) => (
+        <FormDropdownOption key={optionIndex} value={option.value}>
           {option.text}
         </FormDropdownOption>
       ))}
@@ -43,7 +45,8 @@ FormDropdown.propTypes = {
   options: PropTypes.array,
   defaultValue: PropTypes.string,
   otherProps: PropTypes.object,
-  multiple: PropTypes.bool
+  multiple: PropTypes.bool,
+  size: PropTypes.number.isRequired
 };
 
 export default FormDropdown;

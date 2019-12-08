@@ -52,8 +52,8 @@ export const checkUserProfileDocumentInFS = async (user, additionalData) => {
         accepted: [],
         pending: []
       };
+      const instancesToValidate = [];
       const pendingFriendRequest = [];
-      const pendingChallengeInstancesInvites = [];
       try {
         await userRef.set({
           displayName,
@@ -68,8 +68,8 @@ export const checkUserProfileDocumentInFS = async (user, additionalData) => {
           challengesInstances,
           statics,
           friends,
-          pendingFriendRequest,
-          pendingChallengeInstancesInvites
+          instancesToValidate,
+          pendingFriendRequest
         });
       } catch (error) {
         console.log("error while checking user", error);
@@ -169,6 +169,7 @@ export const addNewChallengeTemplateInFs = async challengeData => {
       {
         [id]: {
           ...challengeData,
+          challengeTemplateId: id,
           approved: false,
           ranking: [],
           rating: 0,
@@ -203,56 +204,96 @@ export const addNewChallengeInstanceInFs = async (
     };
     let enhancedContenders = contenders.map(contender => ({
       ...contender,
-      status: "pending",
+      status: "Pending",
       ...defaultContenderProps
     }));
     enhancedContenders.push({
       id: userProfileId,
       name: userProfileDisplayName,
-      status: "accepted",
+      status: "Accepted",
       ...defaultContenderProps
     });
     const comments = [];
     const likes = 0;
+    const { category, challengeTemplateId } = challengeData;
     await challengeInstanceRef.set({
-      challengeInstanceRefId,
-      ...challengeData,
+      challengeInstanceId: challengeInstanceRefId,
+      challengeTemplateId,
       administrator,
-      enhancedContenders,
+      contenders: enhancedContenders,
       validators,
       comments,
       likes
     });
-    const { category } = challengeData;
-    const authorUserRef = firestore.doc(`users/${userProfileId}`);
-    const authorUserSnapshot = await authorUserRef.get();
-    const challengesInstancesCategoryData = authorUserSnapshot.data()
-      .challengesInstances[category];
-    await authorUserRef.set(
-      {
-        challengesInstances: {
-          [category]: [
-            ...challengesInstancesCategoryData,
-            challengeInstanceRefId
-          ]
-        }
-      },
-      { merge: true }
-    );
-    if (contenders !== []) {
-      contenders.map(async contender => {
-        const { id } = contender;
-        const contenderUserRef = firestore.doc(`users/${id}`);
-        const contendersUserSnapshot = await contenderUserRef.get();
-        const {
-          pendingChallengeInstancesInvites
-        } = contendersUserSnapshot.data();
-        await contenderUserRef.update({
-          pendingChallengeInstancesInvites: [
-            ...pendingChallengeInstancesInvites,
-            challengeInstanceRefId
-          ]
-        });
+
+    enhancedContenders.forEach(async contender => {
+      const { id } = contender;
+      const contenderUserRef = firestore.doc(`users/${id}`);
+      const contenderUserSnapshot = await contenderUserRef.get();
+      const challengesInstancesCategoryData = contenderUserSnapshot.data()
+        .challengesInstances[category];
+      await contenderUserRef.set(
+        {
+          challengesInstances: {
+            [category]: [
+              ...challengesInstancesCategoryData,
+              challengeInstanceRefId
+            ]
+          }
+        },
+        { merge: true }
+      );
+    });
+
+    // we use this if we want to have a separate array for pending to accept challenges from the accepted ones
+    // const authorUserRef = firestore.doc(`users/${userProfileId}`);
+    // const authorUserSnapshot = await authorUserRef.get();
+    // const challengesInstancesCategoryData = authorUserSnapshot.data()
+    //   .challengesInstances[category];
+    // await authorUserRef.set(
+    //   {
+    //     challengesInstances: {
+    //       [category]: [
+    //         ...challengesInstancesCategoryData,
+    //         challengeInstanceRefId
+    //       ]
+    //     }
+    //   },
+    //   { merge: true }
+    // );
+    // if (contenders !== []) {
+    //   contenders.map(async contender => {
+    //     const { id } = contender;
+    //     const contenderUserRef = firestore.doc(`users/${id}`);
+    //     const contendersUserSnapshot = await contenderUserRef.get();
+    //     const {
+    //       pendingChallengeInstancesInvites
+    //     } = contendersUserSnapshot.data();
+    //     await contenderUserRef.update({
+    //       pendingChallengeInstancesInvites: [
+    //         ...pendingChallengeInstancesInvites,
+    //         challengeInstanceRefId
+    //       ]
+    //     });
+    //   });
+    // }
+
+    if (validators !== []) {
+      validators.forEach(async validator => {
+        const { id } = validator;
+        const validatorUserRef = firestore.doc(`users/${id}`);
+        const validatorUserSnapshot = await validatorUserRef.get();
+        const instancesToValidateData = validatorUserSnapshot.data()
+          .instancesToValidate;
+        await validatorUserRef.set(
+          {
+            instancesToValidate: [
+              ...instancesToValidateData,
+              challengeInstanceRefId
+            ]
+          },
+          { merge: true }
+        );
       });
     }
   } catch (error) {

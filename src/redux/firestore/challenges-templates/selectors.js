@@ -30,3 +30,35 @@ export const selectChallengeTemplateFromCategory = createSelector(
   (challengesTemplates, { category, id }) =>
     challengesTemplates ? challengesTemplates[category][id] : {}
 );
+
+export const selectVideoUrlFromChallengeTemplate = createSelector(
+  [selectChallengeTemplateFromCategory],
+  challengeTemplate => (challengeTemplate ? challengeTemplate.videoUrl : "")
+);
+
+export const selectNameFromChallengeTemplate = createSelector(
+  [selectChallengeTemplateFromCategory],
+  challengeTemplate => (challengeTemplate ? challengeTemplate.name : "")
+);
+
+export const selectChallengeTemplateFromId = createSelector(
+  [selectChallengesTemplates, (_, challengeTemplateId) => challengeTemplateId],
+  (challengesTemplates, challengeTemplateId) => {
+    if (challengesTemplates) {
+      const challengeTemplateCategory = Object.values(
+        challengesTemplates
+      ).find(category => category.hasOwnProperty(challengeTemplateId));
+      return challengeTemplateCategory[challengeTemplateId];
+    } else return {};
+  }
+);
+
+export const selectVideoUrlFromChallengeTemplateUsingId = createSelector(
+  [selectChallengeTemplateFromId],
+  challengeTemplate => (challengeTemplate ? challengeTemplate.videoUrl : "")
+);
+
+export const selectNameFromChallengeTemplateUsingId = createSelector(
+  [selectChallengeTemplateFromId],
+  challengeTemplate => (challengeTemplate ? challengeTemplate.name : "")
+);

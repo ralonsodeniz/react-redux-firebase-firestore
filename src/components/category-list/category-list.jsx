@@ -13,7 +13,8 @@ import CustomButton from "../custom-button/custom-button";
 
 import {
   CategoryListContainer,
-  CategoryListScrollContainer
+  CategoryListScrollContainer,
+  CategoryListTitle
 } from "./category-list.styles";
 
 const challengesTemplatesCategoriesSelector = createStructuredSelector({
@@ -35,6 +36,7 @@ const CategoryList = () => {
   } = categoryListData;
   return (
     <CategoryListContainer>
+      <CategoryListTitle>Choose a challenge category</CategoryListTitle>
       {challengesTemplatesAreLoading ? (
         <Spinner />
       ) : (

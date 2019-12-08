@@ -118,6 +118,7 @@ const AddChallengeInstance = ({ challengeTemplate }) => {
               options={contendersOptions}
               required
               multiple={true}
+              size={4}
             />
             <CustomButton
               type="button"
@@ -151,6 +152,7 @@ const AddChallengeInstance = ({ challengeTemplate }) => {
               options={validatorOptions}
               required
               multiple={true}
+              size={3}
             />
 
             <CustomButton type="submit" text="Start challenge!" />

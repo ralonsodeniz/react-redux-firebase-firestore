@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const AccountContainer = styled.div`
   width: 61vw;
-  height: 52vh;
+  height: min-content;
   background-color: #fafafa;
   box-shadow: 0 0 32px 8px rgba(0, 0, 0, 0.3);
   border-radius: 32px;
@@ -11,5 +11,5 @@ export const AccountContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  /* justify-content: center; */
 `;
