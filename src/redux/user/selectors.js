@@ -16,13 +16,21 @@ export const selectUserAuthIsEmpty = createSelector(
 );
 
 export const selectUserProfileIsLoaded = createSelector(
-  [selectUserProfile],
-  profile => profile.isLoaded
+  [selectUserProfile, selectUserAuthIsLoaded],
+  (profile, authIsLoaded) =>
+    authIsLoaded ? (profile.isLoaded ? true : false) : false
 );
 
 export const selectUserProfileIsEmpty = createSelector(
-  [selectUserProfile],
-  profile => profile.isEmpty
+  [selectUserProfile, selectUserAuthIsLoaded],
+  (profile, authIsLoaded) =>
+    authIsLoaded
+      ? profile.isLoaded
+        ? profile.isEmpty
+          ? true
+          : false
+        : true
+      : true
 );
 
 export const selectUserProfilePhotoURL = createSelector(

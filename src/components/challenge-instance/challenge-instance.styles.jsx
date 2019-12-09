@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components";
 
-const ChallengeTemplateDataStyles = css`
+const ChallengeInstanceDataStyles = css`
   h4 {
     font-weight: 400;
   }
@@ -9,7 +9,7 @@ const ChallengeTemplateDataStyles = css`
   }
 `;
 
-export const ChallengeTemplateContainer = styled.div`
+export const ChallengeInstanceContainer = styled.div`
   width: 52vw;
   height: 610px;
   background-color: #fafafa;
@@ -26,7 +26,7 @@ export const ChallengeTemplateContainer = styled.div`
     "buttons buttons";
 `;
 
-export const ChallengeTemplateVideoPlayer = styled.video`
+export const ChallengeInstanceVideoPlayer = styled.video`
   grid-area: proof;
   border: 0;
   height: 12vh;
@@ -36,29 +36,29 @@ export const ChallengeTemplateVideoPlayer = styled.video`
   border: 1px solid black;
 `;
 
-export const ChallengeTemplateDataContainer = styled.div`
+export const ChallengeInstanceDataContainer = styled.div`
   grid-area: challengeData;
   display: flex;
   justify-content: space-evenly;
   width: 100%;
 `;
 
-export const ChallengeTemplateData = styled.div`
+export const ChallengeInstanceData = styled.div`
   display: flex;
   flex-direction: column;
   margin: 10px;
-  ${ChallengeTemplateDataStyles};
+  ${ChallengeInstanceDataStyles};
   width: 16vw;
 `;
 
-export const ChallengeTemplateRanking = styled.div`
+export const ChallengeInstanceRanking = styled.div`
   grid-area: ranking;
   display: flex;
   flex-direction: column;
-  ${ChallengeTemplateDataStyles}
+  ${ChallengeInstanceDataStyles}
 `;
 
-export const ChallengeTemplateButtonsContainer = styled.div`
+export const ChallengeInstanceButtonsContainer = styled.div`
   grid-area: buttons;
   display: flex;
   justify-content: space-evenly;

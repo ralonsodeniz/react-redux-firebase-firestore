@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import { useSelector, shallowEqual } from "react-redux";
 import { createStructuredSelector } from "reselect";
 import { useDispatch } from "react-redux";
@@ -8,6 +8,7 @@ import {
   selectChallengeTemplateFromCategory,
   selectChallengesTemplatesAreLoading
 } from "../../redux/firestore/challenges-templates/selectors";
+import { selectUserProfileIsEmpty } from "../../redux/user/selectors";
 import { openModal } from "../../redux/modal/actions";
 
 import CustomButton from "../custom-button/custom-button";
@@ -23,17 +24,19 @@ import {
 import Spinner from "../spinner/spinner";
 
 const selectChallengeTemplateData = createStructuredSelector({
-  challengesTempletesAreLoading: selectChallengesTemplatesAreLoading
+  challengesTempletesAreLoading: selectChallengesTemplatesAreLoading,
+  userProfileIsEmpty: selectUserProfileIsEmpty
 });
 
 const ChallengeTemplate = () => {
   const dispatch = useDispatch();
   const { category, challengeTemplateId } = useParams();
+  const { push } = useHistory();
   const memoizedSelectChallengeTemplateFromCategory = useMemo(
     () => selectChallengeTemplateFromCategory,
     []
   );
-  const { challengesTempletesAreLoading } = useSelector(
+  const { challengesTempletesAreLoading, userProfileIsEmpty } = useSelector(
     selectChallengeTemplateData,
     shallowEqual
   );
@@ -62,14 +65,18 @@ const ChallengeTemplate = () => {
   } = challengeTemplate;
 
   const handleOpenAcceptChallenge = useCallback(() => {
-    const openAcceptChallengeModalData = {
-      modalType: "ADD_CHALLENGE_INSTANCE",
-      modalProps: {
-        challengeTemplate
-      }
-    };
-    dispatch(openModal(openAcceptChallengeModalData));
-  }, [dispatch, challengeTemplate]);
+    if (userProfileIsEmpty) {
+      push("/signin");
+    } else {
+      const openAcceptChallengeModalData = {
+        modalType: "ADD_CHALLENGE_INSTANCE",
+        modalProps: {
+          challengeTemplate
+        }
+      };
+      dispatch(openModal(openAcceptChallengeModalData));
+    }
+  }, [dispatch, challengeTemplate, push, userProfileIsEmpty]);
 
   return !challengesTempletesAreLoading ? (
     <ChallengeTemplateContainer>

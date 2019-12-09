@@ -53,7 +53,6 @@ export const checkUserProfileDocumentInFS = async (user, additionalData) => {
         pending: []
       };
       const instancesToValidate = [];
-      const pendingFriendRequest = [];
       try {
         await userRef.set({
           displayName,
@@ -68,8 +67,7 @@ export const checkUserProfileDocumentInFS = async (user, additionalData) => {
           challengesInstances,
           statics,
           friends,
-          instancesToValidate,
-          pendingFriendRequest
+          instancesToValidate
         });
       } catch (error) {
         console.log("error while checking user", error);
@@ -198,9 +196,13 @@ export const addNewChallengeInstanceInFs = async (
     const administrator = { userProfileDisplayName, userProfileId };
     const { contenders, validators } = instanceData;
     const defaultContenderProps = {
-      proof: "",
+      proof: {
+        url: "",
+        dateUploaded: null
+      },
       rating: 0,
-      public: false
+      public: false,
+      expiresAt: null
     };
     let enhancedContenders = contenders.map(contender => ({
       ...contender,

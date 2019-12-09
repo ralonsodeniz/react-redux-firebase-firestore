@@ -27,12 +27,16 @@ const selectAddChallengeInstanceData = createStructuredSelector({
 
 const AddChallengeInstance = ({ challengeTemplate }) => {
   const dispatch = useDispatch();
+
   const [formInstanceChallengeData, setFormInstanceChallengeData] = useState({
     contenders: [],
     validators: []
   });
+
   const [contendersValidated, setContendersValidated] = useState(false);
+
   const [validateYourself, setValidateYourself] = useState(undefined);
+
   const {
     userAcceptedFriends,
     userProfileDisplayName,
@@ -45,20 +49,33 @@ const AddChallengeInstance = ({ challengeTemplate }) => {
     key: friendIndex + 1
   }));
 
-  const validatorOptions = [
-    ...contendersOptions,
-    {
-      text: userProfileDisplayName,
-      value: userProfileId,
-      key: 0
-    }
-  ];
+  const validatorOptions =
+    formInstanceChallengeData.contenders.length > 0
+      ? [
+          ...contendersOptions,
+          {
+            text: userProfileDisplayName,
+            value: userProfileId,
+            key: 0
+          }
+        ]
+      : contendersOptions;
+
+  // const validatorOptions = [
+  //   ...contendersOptions,
+  //   {
+  //     text: userProfileDisplayName,
+  //     value: userProfileId,
+  //     key: 0
+  //   }
+  // ];
 
   const handleValidateContenders = useCallback(
     () => setContendersValidated(true),
     []
   );
   const setSelfValidation = useCallback(() => setValidateYourself(true), []);
+
   const unsetSelfValidation = useCallback(() => setValidateYourself(false), []);
 
   const handleChange = useCallback(
@@ -126,8 +143,7 @@ const AddChallengeInstance = ({ challengeTemplate }) => {
               onClick={handleValidateContenders}
             />
           </div>
-        ) : formInstanceChallengeData.contenders.length > 0 &&
-          validateYourself === undefined ? (
+        ) : validateYourself === undefined ? (
           <div>
             <h4>Do you want to validate yourself the challenge?</h4>
             <CustomButton

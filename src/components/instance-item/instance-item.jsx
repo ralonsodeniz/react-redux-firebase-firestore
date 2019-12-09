@@ -59,8 +59,11 @@ const InstanceItem = ({ challengeInstanceData, category }) => {
   const userInstanceData = contenders.find(
     contender => contender.id === userProfileId
   );
-  const { status, proof } = userInstanceData;
-  const videoUrl = proof !== "" ? proof : videoUrlFromChallengeTemplate;
+  const {
+    status,
+    proof: { url }
+  } = userInstanceData;
+  const videoUrl = url !== "" ? url : videoUrlFromChallengeTemplate;
 
   return (
     <InstanceItemContainer>
