@@ -25,6 +25,7 @@ const MainPage = lazy(() => import("../../pages/main/main"));
 const AccountPage = lazy(() => import("../../pages/account/account"));
 const SigninPage = lazy(() => import("../../pages/signin/signin"));
 const SignupPage = lazy(() => import("../../pages/signup/signup"));
+const InstancePage = lazy(() => import("../../pages/instance/instance"));
 const Playground = lazy(() => import("../../pages/playground/playground"));
 
 const selectAppData = createStructuredSelector({
@@ -102,6 +103,7 @@ const App = () => {
                 )
               }
             />
+            <Route path="/instance" component={InstancePage} />
           </Suspense>
         </Switch>
       </ErrorBoundary>

@@ -1,6 +1,7 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useCallback } from "react";
 import { useSelector, shallowEqual } from "react-redux";
 import { createStructuredSelector } from "reselect";
+import { useHistory } from "react-router-dom";
 import PropTypes from "prop-types";
 
 import { selectUserProfileId } from "../../redux/user/selectors";
@@ -12,7 +13,8 @@ import {
 import {
   InstanceItemContainer,
   InstanceItemVideoPlayer,
-  InstanceItemStatusText
+  InstanceItemStatusText,
+  InstanceCustomButton
 } from "./instance-item.styles";
 
 const selectInstanceItemData = createStructuredSelector({
@@ -20,17 +22,22 @@ const selectInstanceItemData = createStructuredSelector({
 });
 
 const InstanceItem = ({ challengeInstanceData, category }) => {
+  const { push } = useHistory();
+
   const { userProfileId } = useSelector(selectInstanceItemData, shallowEqual);
+
   const {
     administrator: { userProfileDisplayName },
     challengeInstanceId,
     challengeTemplateId,
     contenders
   } = challengeInstanceData;
+
   const memoizedSelectVideoUrlFromChallengeTemplate = useMemo(
     () => selectVideoUrlFromChallengeTemplate,
     []
   );
+
   const videoUrlFromChallengeTemplate = useSelector(
     state =>
       memoizedSelectVideoUrlFromChallengeTemplate(
@@ -40,10 +47,12 @@ const InstanceItem = ({ challengeInstanceData, category }) => {
       ),
     shallowEqual
   );
+
   const memoizedSelectNameFromChallengeTemplate = useMemo(
     () => selectNameFromChallengeTemplate,
     []
   );
+
   const nameFromChallengeTemplate = useSelector(
     state =>
       memoizedSelectNameFromChallengeTemplate(
@@ -53,17 +62,26 @@ const InstanceItem = ({ challengeInstanceData, category }) => {
       ),
     shallowEqual
   );
+
   const contendersDisplayNamesString = contenders
     .map(contender => contender.name)
     .join(", ");
+
   const userInstanceData = contenders.find(
     contender => contender.id === userProfileId
   );
+
   const {
     status,
     proof: { url }
   } = userInstanceData;
+
   const videoUrl = url !== "" ? url : videoUrlFromChallengeTemplate;
+
+  const handleOnClick = useCallback(
+    () => push(`/instance/${challengeInstanceId}`),
+    [push, challengeInstanceId]
+  );
 
   return (
     <InstanceItemContainer>
@@ -82,6 +100,11 @@ const InstanceItem = ({ challengeInstanceData, category }) => {
       <span>{contendersDisplayNamesString}</span>
       <strong>Status:</strong>
       <InstanceItemStatusText status={status}>{status}</InstanceItemStatusText>
+      <InstanceCustomButton
+        type="button"
+        text="Go to instance"
+        onClick={handleOnClick}
+      />
     </InstanceItemContainer>
   );
 };

@@ -171,7 +171,9 @@ export const addNewChallengeTemplateInFs = async challengeData => {
           approved: false,
           ranking: [],
           rating: 0,
-          timesCompleted: 0
+          timesCompleted: 0,
+          difficulty: "",
+          daysToComplete: ""
         }
       },
       { merge: true }

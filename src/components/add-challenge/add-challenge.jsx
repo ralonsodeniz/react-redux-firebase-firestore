@@ -26,10 +26,10 @@ const AddChallenge = ({ urlCategory }) => {
   const { userProfileDisplayName } = addChallengeData;
   const [formChallengeData, setFormChallengeData] = useState({
     description: "",
-    difficulty: "",
+    // difficulty: "",
     minimumParticipants: "",
-    name: "",
-    daysToComplete: ""
+    name: ""
+    // daysToComplete: ""
   });
   const [formValidated, setFormValidated] = useState(false);
   // no logner needed since we are passing category from the selected in the url
@@ -47,10 +47,10 @@ const AddChallenge = ({ urlCategory }) => {
   // ];
   const {
     description,
-    difficulty,
+    // difficulty,
     minimumParticipants,
-    name,
-    daysToComplete
+    name
+    // daysToComplete
   } = formChallengeData;
   const handleChange = useCallback(
     event => {
@@ -92,10 +92,10 @@ const AddChallenge = ({ urlCategory }) => {
       dispatch(addNewChallengeStart(challengeData));
       setFormChallengeData({
         description: "",
-        difficulty: "",
+        // difficulty: "",
         minimumParticipants: "",
-        name: "",
-        daysToComplete: ""
+        name: ""
+        // daysToComplete: ""
       });
       setFormValidated(false);
     },
@@ -135,7 +135,7 @@ const AddChallenge = ({ urlCategory }) => {
           required
           disabled={formValidated}
         />
-        <FormInput
+        {/* <FormInput
           type="text"
           id="difficulty"
           name="difficulty"
@@ -144,7 +144,7 @@ const AddChallenge = ({ urlCategory }) => {
           label="Difficulty"
           required
           disabled={formValidated}
-        />
+        /> */}
         <FormInput
           type="number"
           id="minimumParticipants"
@@ -156,7 +156,7 @@ const AddChallenge = ({ urlCategory }) => {
           disabled={formValidated}
         />
 
-        <FormInput
+        {/* <FormInput
           type="number"
           id="daysToComplete"
           name="daysToComplete"
@@ -165,7 +165,7 @@ const AddChallenge = ({ urlCategory }) => {
           label="Days to complete the challenge"
           required
           disabled={formValidated}
-        />
+        /> */}
         <AddChallengeValidationContainer></AddChallengeValidationContainer>
         <CustomButton
           type="submit"

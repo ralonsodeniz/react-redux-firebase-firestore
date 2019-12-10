@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import CustomButton from "../custom-button/custom-button";
 
 export const InstanceItemContainer = styled.div`
   width: 24vw;
@@ -33,4 +34,8 @@ export const InstanceItemStatusText = styled.span`
       : status === "Cancelled"
       ? `color:red`
       : ""}
+`;
+
+export const InstanceCustomButton = styled(CustomButton)`
+  justify-self: center;
 `;
