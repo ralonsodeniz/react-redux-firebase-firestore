@@ -41,6 +41,11 @@ const CategoryList = () => {
         <Spinner />
       ) : (
         <CategoryListScrollContainer>
+          <CustomButton
+            text={"all"}
+            onClick={() => history.push(`${match.path}/all`)}
+            large
+          />
           {challengesTemplatesCategories.map((category, categoryIndex) => (
             <CustomButton
               key={categoryIndex}

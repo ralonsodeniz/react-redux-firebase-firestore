@@ -20,7 +20,7 @@ import Header from "../header/header";
 import { GlobalStyles } from "../../global.styles";
 import { AppContainer } from "./App.styles";
 
-const Home = lazy(() => import("../../pages/home/home"));
+// const Home = lazy(() => import("../../pages/home/home"));
 const MainPage = lazy(() => import("../../pages/main/main"));
 const AccountPage = lazy(() => import("../../pages/account/account"));
 const SigninPage = lazy(() => import("../../pages/signin/signin"));
@@ -58,7 +58,8 @@ const App = () => {
       <ErrorBoundary>
         <Switch>
           <Suspense fallback={<Spinner />}>
-            <Route exact path="/" component={Home} />
+            {/* <Route exact path="/" component={Home} /> */}
+            <Route exact path="/" render={() => <Redirect to="/main/all" />} />
             <Route path="/main" component={MainPage} />
             <Route
               exact
@@ -88,7 +89,10 @@ const App = () => {
                 userAuthIsLoaded && userAuthIsEmpty ? (
                   <Redirect to="/signin" />
                 ) : (
-                  <AccountPage />
+                  <div>
+                    <Redirect to="/account/all" />
+                    <AccountPage />
+                  </div>
                 )
               }
             />

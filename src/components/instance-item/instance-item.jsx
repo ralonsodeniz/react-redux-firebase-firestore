@@ -7,7 +7,8 @@ import PropTypes from "prop-types";
 import { selectUserProfileId } from "../../redux/user/selectors";
 import {
   selectVideoUrlFromChallengeTemplate,
-  selectNameFromChallengeTemplate
+  selectNameFromChallengeTemplate,
+  selectCategoryFromChallengeTemplate
 } from "../../redux/firestore/challenges-templates/selectors";
 
 import {
@@ -21,7 +22,7 @@ const selectInstanceItemData = createStructuredSelector({
   userProfileId: selectUserProfileId
 });
 
-const InstanceItem = ({ challengeInstanceData, category }) => {
+const InstanceItem = ({ challengeInstanceData }) => {
   const { push } = useHistory();
 
   const { userProfileId } = useSelector(selectInstanceItemData, shallowEqual);
@@ -40,12 +41,17 @@ const InstanceItem = ({ challengeInstanceData, category }) => {
 
   const videoUrlFromChallengeTemplate = useSelector(
     state =>
-      memoizedSelectVideoUrlFromChallengeTemplate(
-        state,
-        category,
-        challengeTemplateId
-      ),
+      memoizedSelectVideoUrlFromChallengeTemplate(state, challengeTemplateId),
     shallowEqual
+  );
+
+  const memoizedSelectCategoryFromChallengeTemplate = useMemo(
+    () => selectCategoryFromChallengeTemplate,
+    []
+  );
+
+  const categoryFromChallengeTemplate = useSelector(state =>
+    memoizedSelectCategoryFromChallengeTemplate(state, challengeTemplateId)
   );
 
   const memoizedSelectNameFromChallengeTemplate = useMemo(
@@ -55,11 +61,7 @@ const InstanceItem = ({ challengeInstanceData, category }) => {
 
   const nameFromChallengeTemplate = useSelector(
     state =>
-      memoizedSelectNameFromChallengeTemplate(
-        state,
-        category,
-        challengeTemplateId
-      ),
+      memoizedSelectNameFromChallengeTemplate(state, challengeTemplateId),
     shallowEqual
   );
 
@@ -92,6 +94,8 @@ const InstanceItem = ({ challengeInstanceData, category }) => {
       />
       <strong>Name:</strong>
       <span>{nameFromChallengeTemplate}</span>
+      <strong>Category:</strong>
+      <span>{categoryFromChallengeTemplate}</span>
       <strong>Administrator:</strong>
       <span>{userProfileDisplayName}</span>
       <strong>Instance ID:</strong>
@@ -110,8 +114,7 @@ const InstanceItem = ({ challengeInstanceData, category }) => {
 };
 
 InstanceItem.propTypes = {
-  challengeInstanceData: PropTypes.object.isRequired,
-  category: PropTypes.string.isRequired
+  challengeInstanceData: PropTypes.object.isRequired
 };
 
 export default InstanceItem;

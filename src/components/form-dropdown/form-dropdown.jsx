@@ -14,11 +14,12 @@ const FormDropdown = ({
   options,
   multiple,
   size,
+  defaultValue,
   ...otherProps
 }) => (
   <FormDropdownReference>
     <FormDropdownContainer
-      defaultValue={multiple ? null : "default"}
+      defaultValue={multiple ? null : defaultValue}
       onChange={handleChange}
       multiple={multiple}
       {...otherProps}

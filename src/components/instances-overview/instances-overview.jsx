@@ -31,7 +31,7 @@ const selectInstancesOverviewData = createStructuredSelector({
 
 const InstancesOverview = () => {
   const { category } = useParams();
-  const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("Accepted");
   const memoizedSelectUserAcceptedInstancesArray = useMemo(
     () => selectUserAcceptedInstancesArray,
     []
@@ -77,6 +77,7 @@ const InstancesOverview = () => {
           required
           options={statusOptions}
           size={0}
+          defaultValue="Accepted"
         />
       </InstancesOverviewHeaderContainer>
       <InstancesOverviewScrollContainer>
@@ -90,7 +91,6 @@ const InstancesOverview = () => {
                 <InstanceItem
                   key={instanceIndex}
                   challengeInstanceData={instance}
-                  category={category}
                 />
               );
             }

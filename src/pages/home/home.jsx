@@ -6,7 +6,7 @@ import { HomeContainer } from "./home.styles";
 const Home = () => {
   return (
     <HomeContainer>
-      <Link to="/main">Go to Main</Link>
+      <Link to="/main/all">Go to Main</Link>
     </HomeContainer>
   );
 };

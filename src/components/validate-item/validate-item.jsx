@@ -3,8 +3,8 @@ import PropTypes from "prop-types";
 import { useSelector, shallowEqual } from "react-redux";
 
 import {
-  selectVideoUrlFromChallengeTemplateUsingId,
-  selectNameFromChallengeTemplateUsingId
+  selectVideoUrlFromChallengeTemplate,
+  selectNameFromChallengeTemplate
 } from "../../redux/firestore/challenges-templates/selectors";
 
 import {
@@ -21,31 +21,25 @@ const ValidateItem = ({ challengeInstanceData }) => {
     contenders
   } = challengeInstanceData;
 
-  const memoizedSelectVideoUrlFromChallengeTemplateUsingId = useMemo(
-    () => selectVideoUrlFromChallengeTemplateUsingId,
+  const memoizedSelectVideoUrlFromChallengeTemplate = useMemo(
+    () => selectVideoUrlFromChallengeTemplate,
     []
   );
 
-  const memoizedSelectNameFromChallengeTemplateUsingId = useMemo(
-    () => selectNameFromChallengeTemplateUsingId,
+  const memoizedSelectNameFromChallengeTemplate = useMemo(
+    () => selectNameFromChallengeTemplate,
     []
   );
 
   const videoUrlFromChallengeTemplayte = useSelector(
     state =>
-      memoizedSelectVideoUrlFromChallengeTemplateUsingId(
-        state,
-        challengeTemplateId
-      ),
+      memoizedSelectVideoUrlFromChallengeTemplate(state, challengeTemplateId),
     shallowEqual
   );
 
   const nameFromChallengeTemplate = useSelector(
     state =>
-      memoizedSelectNameFromChallengeTemplateUsingId(
-        state,
-        challengeTemplateId
-      ),
+      memoizedSelectNameFromChallengeTemplate(state, challengeTemplateId),
     shallowEqual
   );
 
@@ -54,7 +48,7 @@ const ValidateItem = ({ challengeInstanceData }) => {
     .join(" ,");
 
   const status = contenders.some(
-    contender => contender.status === "Accepted" && contender.proof !== ""
+    contender => contender.status === "Accepted" && contender.proof.url !== ""
   )
     ? "Validations pending"
     : contenders.every(contender => contender.status === "Completed")

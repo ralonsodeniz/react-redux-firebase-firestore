@@ -20,26 +20,40 @@ export const selectChallengesTemplatesAreLoading = createSelector(
 
 export const selectChallengesTemplatesCategory = category =>
   createSelector([selectChallengesTemplates], challengesTemplates =>
-    challengesTemplates ? challengesTemplates[category] : {}
+    challengesTemplates
+      ? category === "all"
+        ? Object.values(challengesTemplates).reduce((accumulator, category) => {
+            Object.values(category).forEach(challenge => {
+              accumulator[challenge.challengeTemplateId] = challenge;
+            });
+            return accumulator;
+          }, {})
+        : challengesTemplates[category]
+      : {}
   );
 
 // this is also a selector rhat gets arguments, appart from state, but declared in a different way that he one before.
 // here we do not use curried function but compose
-export const selectChallengeTemplateFromCategory = createSelector(
-  [selectChallengesTemplates, (_, category, id) => ({ category, id })],
-  (challengesTemplates, { category, id }) =>
-    challengesTemplates ? challengesTemplates[category][id] : {}
-);
+// export const selectChallengeTemplateFromCategory = createSelector(
+//   [selectChallengesTemplates, (_, category, id) => ({ category, id })],
+//   (challengesTemplates, { category, id }) =>
+//     challengesTemplates ? challengesTemplates[category][id] : {}
+// );
 
-export const selectVideoUrlFromChallengeTemplate = createSelector(
-  [selectChallengeTemplateFromCategory],
-  challengeTemplate => (challengeTemplate ? challengeTemplate.videoUrl : "")
-);
+// export const selectVideoUrlFromChallengeTemplate = createSelector(
+//   [selectChallengeTemplateFromCategory],
+//   challengeTemplate => (challengeTemplate ? challengeTemplate.videoUrl : "")
+// );
 
-export const selectNameFromChallengeTemplate = createSelector(
-  [selectChallengeTemplateFromCategory],
-  challengeTemplate => (challengeTemplate ? challengeTemplate.name : "")
-);
+// export const selectNameFromChallengeTemplate = createSelector(
+//   [selectChallengeTemplateFromCategory],
+//   challengeTemplate => (challengeTemplate ? challengeTemplate.name : "")
+// );
+
+// export const selectCategoryFromChallengeTemplate = createSelector(
+//   [selectChallengeTemplateFromCategory],
+//   challengeTemplate => (challengeTemplate ? challengeTemplate.category : "")
+// );
 
 export const selectChallengeTemplateFromId = createSelector(
   [selectChallengesTemplates, (_, challengeTemplateId) => challengeTemplateId],
@@ -53,12 +67,17 @@ export const selectChallengeTemplateFromId = createSelector(
   }
 );
 
-export const selectVideoUrlFromChallengeTemplateUsingId = createSelector(
+export const selectVideoUrlFromChallengeTemplate = createSelector(
   [selectChallengeTemplateFromId],
   challengeTemplate => (challengeTemplate ? challengeTemplate.videoUrl : "")
 );
 
-export const selectNameFromChallengeTemplateUsingId = createSelector(
+export const selectNameFromChallengeTemplate = createSelector(
   [selectChallengeTemplateFromId],
   challengeTemplate => (challengeTemplate ? challengeTemplate.name : "")
+);
+
+export const selectCategoryFromChallengeTemplate = createSelector(
+  [selectChallengeTemplateFromId],
+  challengeTemplate => (challengeTemplate ? challengeTemplate.category : "")
 );

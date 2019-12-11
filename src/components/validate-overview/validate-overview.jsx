@@ -31,7 +31,7 @@ const selectValidateOverviewData = createStructuredSelector({
 });
 
 const ValidateOverview = () => {
-  const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("Validations pending");
 
   const memoizedSelectUserInstancesToValidateArray = useMemo(
     () => selectUserInstancesToValidateArray,
@@ -69,6 +69,7 @@ const ValidateOverview = () => {
           required
           options={validateStatusOptions}
           size={0}
+          defaultValue="Validations pending"
         />
       </ValidateOverviewHeaderContainer>
       <ValidateOverviewScrollContainer>
@@ -76,7 +77,7 @@ const ValidateOverview = () => {
           (accumulator, instance, instanceIndex) => {
             const instanceStatus = instance.contenders.some(
               contender =>
-                contender.status === "Accepted" && contender.proof !== ""
+                contender.status === "Accepted" && contender.proof.url !== ""
             )
               ? "Validations pending"
               : instance.contenders.every(

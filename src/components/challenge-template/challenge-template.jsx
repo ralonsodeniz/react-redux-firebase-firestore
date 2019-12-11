@@ -5,7 +5,7 @@ import { createStructuredSelector } from "reselect";
 import { useDispatch } from "react-redux";
 
 import {
-  selectChallengeTemplateFromCategory,
+  selectChallengeTemplateFromId,
   selectChallengesTemplatesAreLoading
 } from "../../redux/firestore/challenges-templates/selectors";
 import {
@@ -39,10 +39,10 @@ const selectChallengeTemplateData = createStructuredSelector({
 
 const ChallengeTemplate = () => {
   const dispatch = useDispatch();
-  const { category, challengeTemplateId } = useParams();
+  const { challengeTemplateId } = useParams();
   const { push } = useHistory();
-  const memoizedSelectChallengeTemplateFromCategory = useMemo(
-    () => selectChallengeTemplateFromCategory,
+  const memoizedSelectChallengeTemplateFromId = useMemo(
+    () => selectChallengeTemplateFromId,
     []
   );
   const {
@@ -54,12 +54,7 @@ const ChallengeTemplate = () => {
   } = useSelector(selectChallengeTemplateData, shallowEqual);
 
   const challengeTemplate = useSelector(
-    state =>
-      memoizedSelectChallengeTemplateFromCategory(
-        state,
-        category,
-        challengeTemplateId
-      ),
+    state => memoizedSelectChallengeTemplateFromId(state, challengeTemplateId),
     shallowEqual
   );
 

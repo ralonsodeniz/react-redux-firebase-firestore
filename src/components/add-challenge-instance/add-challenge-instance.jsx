@@ -76,7 +76,23 @@ const AddChallengeInstance = ({ challengeTemplate }) => {
   );
   const setSelfValidation = useCallback(() => setValidateYourself(true), []);
 
-  const unsetSelfValidation = useCallback(() => setValidateYourself(false), []);
+  const unsetSelfValidation = useCallback(() => {
+    setValidateYourself(false);
+    dispatch(
+      addNewInstanceStart(
+        challengeTemplate,
+        formInstanceChallengeData,
+        userProfileDisplayName,
+        userProfileId
+      )
+    );
+  }, [
+    challengeTemplate,
+    dispatch,
+    formInstanceChallengeData,
+    userProfileDisplayName,
+    userProfileId
+  ]);
 
   const handleChange = useCallback(
     event => {
@@ -175,8 +191,10 @@ const AddChallengeInstance = ({ challengeTemplate }) => {
 
             <CustomButton type="submit" text="Start challenge!" />
           </div>
-        ) : // <CustomButton type="submit" text="Start challenge!" />
-        null}
+        ) : (
+          // <CustomButton type="submit" text="Start challenge!" />
+          "Creating instance"
+        )}
       </AddChallengeInstanceFormContainer>
     </AddChallengeInstanceContainer>
   );

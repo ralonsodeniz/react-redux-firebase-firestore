@@ -95,7 +95,15 @@ export const selectUserAcceptedFriends = createSelector(
 export const selectUserAcceptedInstancesByCategory = category =>
   createSelector([selectUserProfile, selectUserAuth], (profile, auth) =>
     profile.isLoaded && !profile.isEmpty && !auth.isEmpty
-      ? profile.challengesInstances[category]
+      ? category === "all"
+        ? Object.values(profile.challengesInstances).reduce(
+            (accumulator, challengeInstance) => {
+              accumulator = [...accumulator, ...challengeInstance];
+              return accumulator;
+            },
+            []
+          )
+        : profile.challengesInstances[category]
         ? profile.challengesInstances[category]
         : []
       : []

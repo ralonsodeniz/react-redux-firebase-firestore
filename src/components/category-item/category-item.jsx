@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { useRouteMatch, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 import CustomButton from "../custom-button/custom-button";
 
@@ -18,10 +18,10 @@ const CategoryItem = ({ challengeTemplateId, challengeTemplateData }) => {
     minimumParticipants,
     timesCompleted,
     rating,
-    videoUrl
+    videoUrl,
+    category
   } = challengeTemplateData;
   const history = useHistory();
-  const { url } = useRouteMatch();
 
   return (
     <CategoryItemContainer>
@@ -32,6 +32,8 @@ const CategoryItem = ({ challengeTemplateId, challengeTemplateData }) => {
       />
       <strong>Name:</strong>
       <span>{name}</span>
+      <strong>Category:</strong>
+      <span>{category}</span>
       <strong>Author:</strong>
       <span>{author}</span>
       <strong>Difficulty</strong>
@@ -47,7 +49,7 @@ const CategoryItem = ({ challengeTemplateId, challengeTemplateData }) => {
       <CustomButton
         text="Go to challenge"
         type="button"
-        onClick={() => history.push(`${url}/${challengeTemplateId}`)}
+        onClick={() => history.push(`${category}/${challengeTemplateId}`)}
       />
     </CategoryItemContainer>
   );
