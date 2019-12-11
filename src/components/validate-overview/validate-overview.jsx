@@ -94,9 +94,6 @@ const ValidateOverview = () => {
                 )
               ? "No proofs to validate"
               : "";
-
-            console.log("instanceStatus", instanceStatus);
-
             if (instanceStatus === selectedStatus) {
               accumulator.push(
                 <ValidateItem

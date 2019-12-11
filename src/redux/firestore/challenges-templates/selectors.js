@@ -44,7 +44,7 @@ export const selectNameFromChallengeTemplate = createSelector(
 export const selectChallengeTemplateFromId = createSelector(
   [selectChallengesTemplates, (_, challengeTemplateId) => challengeTemplateId],
   (challengesTemplates, challengeTemplateId) => {
-    if (challengesTemplates) {
+    if (challengesTemplates && challengeTemplateId) {
       const challengeTemplateCategory = Object.values(
         challengesTemplates
       ).find(category => category.hasOwnProperty(challengeTemplateId));

@@ -123,6 +123,7 @@ const AddChallengeInstance = ({ challengeTemplate }) => {
       <AddChallengeInstanceFormContainer
         onSubmit={handleCreateNewChallengeInstance}
       >
+        {/* {!contendersValidated && userAcceptedFriends.length > 0 ? ( */}
         {!contendersValidated ? (
           <div>
             <h4>Invite friends to compete in the challenge!</h4>
@@ -143,7 +144,8 @@ const AddChallengeInstance = ({ challengeTemplate }) => {
               onClick={handleValidateContenders}
             />
           </div>
-        ) : validateYourself === undefined ? (
+        ) : //): validateYourself === undefined && userAcceptedFriends.length > 0 ? (
+        validateYourself === undefined ? (
           <div>
             <h4>Do you want to validate yourself the challenge?</h4>
             <CustomButton
@@ -173,9 +175,8 @@ const AddChallengeInstance = ({ challengeTemplate }) => {
 
             <CustomButton type="submit" text="Start challenge!" />
           </div>
-        ) : (
-          <CustomButton type="submit" text="Start challenge!" />
-        )}
+        ) : // <CustomButton type="submit" text="Start challenge!" />
+        null}
       </AddChallengeInstanceFormContainer>
     </AddChallengeInstanceContainer>
   );

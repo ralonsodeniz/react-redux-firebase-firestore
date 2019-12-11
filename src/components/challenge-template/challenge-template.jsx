@@ -8,8 +8,14 @@ import {
   selectChallengeTemplateFromCategory,
   selectChallengesTemplatesAreLoading
 } from "../../redux/firestore/challenges-templates/selectors";
-import { selectUserProfileIsEmpty } from "../../redux/user/selectors";
+import {
+  selectUserProfileIsEmpty,
+  selectUserAcceptedFriends,
+  selectUserProfileDisplayName,
+  selectUserProfileId
+} from "../../redux/user/selectors";
 import { openModal } from "../../redux/modal/actions";
+import { addNewInstanceStart } from "../../redux/firestore/challenges-instances/actions";
 
 import CustomButton from "../custom-button/custom-button";
 
@@ -25,7 +31,10 @@ import Spinner from "../spinner/spinner";
 
 const selectChallengeTemplateData = createStructuredSelector({
   challengesTempletesAreLoading: selectChallengesTemplatesAreLoading,
-  userProfileIsEmpty: selectUserProfileIsEmpty
+  userProfileIsEmpty: selectUserProfileIsEmpty,
+  userAcceptedFriends: selectUserAcceptedFriends,
+  userProfileDisplayName: selectUserProfileDisplayName,
+  userProfileId: selectUserProfileId
 });
 
 const ChallengeTemplate = () => {
@@ -36,10 +45,13 @@ const ChallengeTemplate = () => {
     () => selectChallengeTemplateFromCategory,
     []
   );
-  const { challengesTempletesAreLoading, userProfileIsEmpty } = useSelector(
-    selectChallengeTemplateData,
-    shallowEqual
-  );
+  const {
+    challengesTempletesAreLoading,
+    userProfileIsEmpty,
+    userAcceptedFriends,
+    userProfileDisplayName,
+    userProfileId
+  } = useSelector(selectChallengeTemplateData, shallowEqual);
 
   const challengeTemplate = useSelector(
     state =>
@@ -77,6 +89,31 @@ const ChallengeTemplate = () => {
       dispatch(openModal(openAcceptChallengeModalData));
     }
   }, [dispatch, challengeTemplate, push, userProfileIsEmpty]);
+
+  const handleCreateNewChallengeInstance = useCallback(() => {
+    if (userProfileIsEmpty) {
+      push("/signin");
+    } else {
+      dispatch(
+        addNewInstanceStart(
+          challengeTemplate,
+          {
+            contenders: [],
+            validators: []
+          },
+          userProfileDisplayName,
+          userProfileId
+        )
+      );
+    }
+  }, [
+    challengeTemplate,
+    userProfileDisplayName,
+    userProfileId,
+    dispatch,
+    push,
+    userProfileIsEmpty
+  ]);
 
   return !challengesTempletesAreLoading ? (
     <ChallengeTemplateContainer>
@@ -126,12 +163,21 @@ const ChallengeTemplate = () => {
           ))}
       </ChallengeTemplateRanking>
       <ChallengeTemplateButtonsContainer>
-        <CustomButton
-          text="Accept challenge"
-          type="button"
-          onClick={handleOpenAcceptChallenge}
-          large
-        />
+        {userAcceptedFriends.length > 0 ? (
+          <CustomButton
+            text="Accept challenge"
+            type="button"
+            onClick={handleOpenAcceptChallenge}
+            large
+          />
+        ) : (
+          <CustomButton
+            text="Accept challenge"
+            type="button"
+            onClick={handleCreateNewChallengeInstance}
+            large
+          />
+        )}
       </ChallengeTemplateButtonsContainer>
     </ChallengeTemplateContainer>
   ) : (

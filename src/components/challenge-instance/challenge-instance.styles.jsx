@@ -19,15 +19,15 @@ export const ChallengeInstanceContainer = styled.div`
   padding: 16px 32px;
   display: grid;
   justify-content: space-evenly;
-  grid-template: 2fr 1fr / auto;
+  grid-template: 1fr 1fr / auto;
   grid-template-areas:
-    "proof ranking"
-    "challengeData ranking"
+    "templateProof instanceData"
+    "templateData instanceData"
     "buttons buttons";
 `;
 
 export const ChallengeInstanceVideoPlayer = styled.video`
-  grid-area: proof;
+  grid-area: templateProof;
   border: 0;
   height: 12vh;
   width: 24vw;
@@ -36,14 +36,14 @@ export const ChallengeInstanceVideoPlayer = styled.video`
   border: 1px solid black;
 `;
 
-export const ChallengeInstanceDataContainer = styled.div`
-  grid-area: challengeData;
+export const ChallengeInstanceTemplateDataContainer = styled.div`
+  grid-area: templateData;
   display: flex;
   justify-content: space-evenly;
   width: 100%;
 `;
 
-export const ChallengeInstanceData = styled.div`
+export const ChallengeInstanceTemplateData = styled.div`
   display: flex;
   flex-direction: column;
   margin: 10px;
@@ -51,11 +51,10 @@ export const ChallengeInstanceData = styled.div`
   width: 16vw;
 `;
 
-export const ChallengeInstanceRanking = styled.div`
-  grid-area: ranking;
+export const ChallengeInstanceData = styled.div`
+  grid-area: instanceData;
   display: flex;
   flex-direction: column;
-  ${ChallengeInstanceDataStyles}
 `;
 
 export const ChallengeInstanceButtonsContainer = styled.div`

@@ -25,13 +25,29 @@ export const selectUserInstancesToValidateArray = arrayOfInstancesToValidate =>
   );
 
 export const selectInstanceFromId = createSelector(
-  [selectChallengesInstances, (_, instanceId) => instanceId],
-  (challengesInstances, instanceId) =>
-    challengesInstances && instanceId ? challengesInstances[instanceId] : {}
+  [
+    selectChallengesInstances,
+    selectChallengesInstancesAreLoading,
+    (_, instanceId) => instanceId
+  ],
+  (challengesInstances, challengesInstancesAreLoading, instanceId) =>
+    challengesInstances && instanceId && !challengesInstancesAreLoading
+      ? challengesInstances[instanceId]
+      : null
 );
 
 export const selectInstanceTemplateId = createSelector(
   [selectInstanceFromId],
   challengeInstance =>
     challengeInstance ? challengeInstance.challengeTemplateId : ""
+);
+
+export const selectInstanceContenders = createSelector(
+  [selectInstanceFromId],
+  challengeInstance => (challengeInstance ? challengeInstance.contenders : [])
+);
+
+export const selectInstanceValidators = createSelector(
+  [selectInstanceFromId],
+  challengeInstance => (challengeInstance ? challengeInstance.validators : [])
 );

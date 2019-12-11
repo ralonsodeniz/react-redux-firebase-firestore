@@ -234,19 +234,32 @@ export const addNewChallengeInstanceInFs = async (
       const { id } = contender;
       const contenderUserRef = firestore.doc(`users/${id}`);
       const contenderUserSnapshot = await contenderUserRef.get();
-      const challengesInstancesCategoryData = contenderUserSnapshot.data()
-        .challengesInstances[category];
-      await contenderUserRef.set(
-        {
-          challengesInstances: {
-            [category]: [
-              ...challengesInstancesCategoryData,
-              challengeInstanceRefId
-            ]
-          }
-        },
-        { merge: true }
-      );
+      const challengesInstancesCategoriesData = contenderUserSnapshot.data();
+      const challengesInstancesCategoryData =
+        challengesInstancesCategoriesData.challengesInstances[category];
+
+      if (!challengesInstancesCategoryData) {
+        await contenderUserRef.set(
+          {
+            challengesInstances: {
+              [category]: [challengeInstanceRefId]
+            }
+          },
+          { merge: true }
+        );
+      } else {
+        await contenderUserRef.set(
+          {
+            challengesInstances: {
+              [category]: [
+                ...challengesInstancesCategoryData,
+                challengeInstanceRefId
+              ]
+            }
+          },
+          { merge: true }
+        );
+      }
     });
 
     // we use this if we want to have a separate array for pending to accept challenges from the accepted ones
