@@ -5,25 +5,34 @@ import { createStructuredSelector } from "reselect";
 
 import {
   selectInstanceContenders,
-  selectInstanceTemplateId
+  selectInstanceTemplateId,
+  selectInstanceValidators
 } from "../../redux/firestore/challenges-instances/selectors";
 import { selectChallengeTemplateFromId } from "../../redux/firestore/challenges-templates/selectors";
-import { selectUserProfileId } from "../../redux/user/selectors";
+import {
+  selectUserProfileId,
+  selectUserProfileIsLoaded
+} from "../../redux/user/selectors";
 import { selectChallengesTemplatesAreLoading } from "../../redux/firestore/challenges-templates/selectors";
 import { selectChallengesInstancesAreLoading } from "../../redux/firestore/challenges-instances/selectors";
 
 import Spinner from "../spinner/spinner";
+import CustomButton from "../custom-button/custom-button";
+import FileUploader from "../file-uplader/file-uploader";
+import InstanceContenderInfo from "../instance-contender-info/instance-contender-info";
 
 import {
   ChallengeInstanceContainer,
   ChallengeInstanceVideoPlayer,
   ChallengeInstanceTemplateDataContainer,
   ChallengeInstanceTemplateData,
-  ChallengeInstanceButtonsContainer
+  ChallengeInstanceButtonsContainer,
+  ChallengeInstanceData
 } from "./challenge-instance.styles";
 
 const selectChallengeInstanceData = createStructuredSelector({
   userProfileId: selectUserProfileId,
+  userProfileIsLoaded: selectUserProfileIsLoaded,
   challengesTemplatesAreLoading: selectChallengesTemplatesAreLoading,
   challengesInstancesAreLoading: selectChallengesInstancesAreLoading
 });
@@ -33,6 +42,7 @@ const ChallengeInstance = () => {
 
   const {
     userProfileId,
+    userProfileIsLoaded,
     challengesTemplatesAreLoading,
     challengesInstancesAreLoading
   } = useSelector(selectChallengeInstanceData, shallowEqual);
@@ -52,6 +62,11 @@ const ChallengeInstance = () => {
     []
   );
 
+  const memoizedSelectInstanceValidators = useMemo(
+    () => selectInstanceValidators,
+    []
+  );
+
   const challengeInstanceContenders = useSelector(
     state => memoizedSelectInstanceContenders(state, instanceId),
     shallowEqual
@@ -67,6 +82,11 @@ const ChallengeInstance = () => {
     shallowEqual
   );
 
+  const challengeInstanceValidators = useSelector(
+    state => memoizedSelectInstanceValidators(state, instanceId),
+    shallowEqual
+  );
+
   const {
     author,
     daysToComplete,
@@ -79,12 +99,25 @@ const ChallengeInstance = () => {
     videoUrl
   } = challengeTemplate;
 
-  const isUserContender = challengeInstanceContenders.find(
+  const userContenderObject = challengeInstanceContenders.find(
     contender => contender.id === userProfileId
   );
-  console.log(isUserContender);
 
-  return challengesInstancesAreLoading || challengesTemplatesAreLoading ? (
+  const userStatus = userContenderObject
+    ? userContenderObject.status
+    : undefined;
+
+  const userDisplayNameForFileName = userContenderObject
+    ? userContenderObject.name.replace(/\s/g, "")
+    : undefined;
+
+  const isUserValidator = challengeInstanceValidators.some(
+    validator => validator.id === userProfileId
+  );
+
+  return challengesInstancesAreLoading ||
+    challengesTemplatesAreLoading ||
+    !userProfileIsLoaded ? (
     <ChallengeInstanceContainer>
       <Spinner />
     </ChallengeInstanceContainer>
@@ -116,16 +149,47 @@ const ChallengeInstance = () => {
           <h4>Rating:</h4>
           <span>{rating}</span>
         </ChallengeInstanceTemplateData>
-        <ChallengeInstanceButtonsContainer>
-          {/* {
-                isUserContender ? (
-
-                ) :(
-
-                )
-            } */}
-        </ChallengeInstanceButtonsContainer>
       </ChallengeInstanceTemplateDataContainer>
+      {userStatus &&
+        (userStatus === "Pending" ? (
+          <ChallengeInstanceButtonsContainer>
+            <CustomButton
+              type="button"
+              text="Accept challenge"
+              onClick={() => alert("accept challenge")}
+            />
+            <CustomButton
+              type="button"
+              text="Decline challenge"
+              onClick={() => alert("decline challenge")}
+            />
+          </ChallengeInstanceButtonsContainer>
+        ) : (
+          <ChallengeInstanceButtonsContainer>
+            <CustomButton
+              type="button"
+              text="Cancel challenge"
+              onClick={() => alert("cancel challenge")}
+            />
+            <FileUploader
+              fileType="imageOrvideo"
+              directory={`challengesInstances/${instanceId}/${userProfileId}`}
+              fileName={userDisplayNameForFileName}
+              urlAction={() => console.log()}
+              labelText="Choose challenge proof"
+              submitText={"Upload"}
+              disabled={false}
+              maxFileSizeInMB={50}
+            />
+          </ChallengeInstanceButtonsContainer>
+        ))}
+      <ChallengeInstanceData>
+        <InstanceContenderInfo
+          challengeInstanceContenders={challengeInstanceContenders}
+          userProfileId={userProfileId}
+          isUserValidator={isUserValidator}
+        />
+      </ChallengeInstanceData>
     </ChallengeInstanceContainer>
   );
 };

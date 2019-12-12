@@ -11,7 +11,7 @@ const ChallengeInstanceDataStyles = css`
 
 export const ChallengeInstanceContainer = styled.div`
   width: 52vw;
-  height: 610px;
+  height: auto;
   background-color: #fafafa;
   box-shadow: 0 0 32px 8px rgba(0, 0, 0, 0.3);
   border-radius: 12px;
@@ -19,7 +19,7 @@ export const ChallengeInstanceContainer = styled.div`
   padding: 16px 32px;
   display: grid;
   justify-content: space-evenly;
-  grid-template: 1fr 1fr / auto;
+  grid-template: auto / 1fr 1fr;
   grid-template-areas:
     "templateProof instanceData"
     "templateData instanceData"
@@ -28,11 +28,8 @@ export const ChallengeInstanceContainer = styled.div`
 
 export const ChallengeInstanceVideoPlayer = styled.video`
   grid-area: templateProof;
-  border: 0;
-  height: 12vh;
-  width: 24vw;
-  left: 0;
-  top: 0;
+  height: 13vh;
+  width: 23vw;
   border: 1px solid black;
 `;
 

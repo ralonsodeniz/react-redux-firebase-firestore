@@ -46,6 +46,7 @@ const UserAvatar = () => {
         urlAction={dispatchedUpdateAvatarStart}
         labelText="Choose your profile image"
         submitText="Upload image"
+        maxFileSizeInMB={1}
       />
     </UserAvatarContainer>
   );

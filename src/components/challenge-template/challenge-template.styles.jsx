@@ -11,7 +11,7 @@ const ChallengeTemplateDataStyles = css`
 
 export const ChallengeTemplateContainer = styled.div`
   width: 52vw;
-  height: 610px;
+  height: auto;
   background-color: #fafafa;
   box-shadow: 0 0 32px 8px rgba(0, 0, 0, 0.3);
   border-radius: 12px;
@@ -19,7 +19,7 @@ export const ChallengeTemplateContainer = styled.div`
   padding: 16px 32px;
   display: grid;
   justify-content: space-evenly;
-  grid-template: 2fr 1fr / auto;
+  grid-template: auto / 1fr 1fr;
   grid-template-areas:
     "proof ranking"
     "challengeData ranking"
@@ -28,11 +28,8 @@ export const ChallengeTemplateContainer = styled.div`
 
 export const ChallengeTemplateVideoPlayer = styled.video`
   grid-area: proof;
-  border: 0;
   height: 12vh;
   width: 24vw;
-  left: 0;
-  top: 0;
   border: 1px solid black;
 `;
 

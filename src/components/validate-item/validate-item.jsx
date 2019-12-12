@@ -1,11 +1,14 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useCallback } from "react";
 import PropTypes from "prop-types";
 import { useSelector, shallowEqual } from "react-redux";
+import { useHistory } from "react-router-dom";
 
 import {
   selectVideoUrlFromChallengeTemplate,
   selectNameFromChallengeTemplate
 } from "../../redux/firestore/challenges-templates/selectors";
+
+import CustomButton from "../custom-button/custom-button";
 
 import {
   ValidateItemContainer,
@@ -14,6 +17,8 @@ import {
 } from "./validate-item.styles";
 
 const ValidateItem = ({ challengeInstanceData }) => {
+  const { push } = useHistory();
+
   const {
     administrator: { userProfileDisplayName },
     challengeInstanceId,
@@ -48,7 +53,7 @@ const ValidateItem = ({ challengeInstanceData }) => {
     .join(" ,");
 
   const status = contenders.some(
-    contender => contender.status === "Accepted" && contender.proof.url !== ""
+    contender => contender.proof.state === "Pending"
   )
     ? "Validations pending"
     : contenders.every(contender => contender.status === "Completed")
@@ -58,10 +63,15 @@ const ValidateItem = ({ challengeInstanceData }) => {
     : contenders.some(
         contender =>
           contender.status === "Pending" ||
-          (contender.status === "Accepted" && contender.proof === "")
+          contender.proof === "No proof provided"
       )
     ? "No proofs to validate"
     : "";
+
+  const handleOnClick = useCallback(
+    () => push(`/instance/${challengeInstanceId}`),
+    [push, challengeInstanceId]
+  );
 
   return (
     <ValidateItemContainer>
@@ -80,6 +90,11 @@ const ValidateItem = ({ challengeInstanceData }) => {
       <span>{contendersDisplayNamesString}</span>
       <strong>Status:</strong>
       <ValidateItemStatusText status={status}>{status}</ValidateItemStatusText>
+      <CustomButton
+        type="button"
+        text="Go to instance"
+        onClick={handleOnClick}
+      />
     </ValidateItemContainer>
   );
 };

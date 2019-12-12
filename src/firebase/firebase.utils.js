@@ -200,7 +200,8 @@ export const addNewChallengeInstanceInFs = async (
     const defaultContenderProps = {
       proof: {
         url: "",
-        dateUploaded: null
+        dateUploaded: null,
+        state: "No proof provided"
       },
       rating: 0,
       public: false,

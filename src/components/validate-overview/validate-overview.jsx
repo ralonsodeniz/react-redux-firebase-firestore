@@ -76,8 +76,7 @@ const ValidateOverview = () => {
         {userInstancesToValidateArray.reduce(
           (accumulator, instance, instanceIndex) => {
             const instanceStatus = instance.contenders.some(
-              contender =>
-                contender.status === "Accepted" && contender.proof.url !== ""
+              contender => contender.proof.state === "Pending"
             )
               ? "Validations pending"
               : instance.contenders.every(
@@ -91,7 +90,7 @@ const ValidateOverview = () => {
               : instance.contenders.some(
                   contender =>
                     contender.status === "Pending" ||
-                    (contender.status === "Accepted" && contender.proof === "")
+                    contender.proof.state === "No proof provided"
                 )
               ? "No proofs to validate"
               : "";

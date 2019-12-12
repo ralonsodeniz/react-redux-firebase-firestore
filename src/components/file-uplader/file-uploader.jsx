@@ -24,7 +24,8 @@ const FileUploader = ({
   additionalAction,
   labelText,
   submitText,
-  disabled
+  disabled,
+  maxFileSizeInMB
 }) => {
   const dispatch = useDispatch();
   const [file, setFile] = useState(null);
@@ -49,7 +50,8 @@ const FileUploader = ({
 
   const fileTypesRegex = {
     image: /\.(jpe?g|png|gif)$/i,
-    video: /\.(avi|wmv|flv|mpg|mp4)$/i
+    video: /\.(avi|wmv|flv|mpg|mp4)$/i,
+    imageOrvideo: /\.(jpe?g|png|gif|avi|wmv|flv|mpg|mp4)$/i
   };
 
   const handleFileUpload = useCallback(() => {
@@ -57,13 +59,13 @@ const FileUploader = ({
       if (fileTypesRegex[fileType]) {
         if (fileTypesRegex[fileType].test(file.name)) {
           const fileSize = file.size / 1024 / 1024;
-          if (fileSize > 50) {
+          if (fileSize > maxFileSizeInMB) {
             const invalidFileSizeModalData = {
               modalType: "SYSTEM_MESSAGE",
               modalProps: {
-                text: `Avatar file is ${fileSize.toFixed(
+                text: `File is ${fileSize.toFixed(
                   2
-                )} MB and the maximun file size is 1 MB`
+                )} MB and the maximun file size is ${maxFileSizeInMB} MB`
               }
             };
             return dispatch(openModal(invalidFileSizeModalData));
@@ -114,7 +116,8 @@ const FileUploader = ({
     urlAction,
     directory,
     fileName,
-    additionalAction
+    additionalAction,
+    maxFileSizeInMB
   ]);
 
   return (
@@ -157,7 +160,9 @@ FileUploader.propTypes = {
   urlAction: PropTypes.func.isRequired,
   additionalAction: PropTypes.func,
   labelText: PropTypes.string.isRequired,
-  submitText: PropTypes.string.isRequired
+  submitText: PropTypes.string.isRequired,
+  disabled: PropTypes.bool,
+  maxFileSizeInMB: PropTypes.number.isRequired
 };
 
 export default FileUploader;

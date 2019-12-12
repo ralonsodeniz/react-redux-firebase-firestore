@@ -32,28 +32,28 @@ export const selectChallengesTemplatesCategory = category =>
       : {}
   );
 
-// this is also a selector rhat gets arguments, appart from state, but declared in a different way that he one before.
+// this is also a selector that gets arguments, appart from state, but declared in a different way that he one before.
 // here we do not use curried function but compose
-// export const selectChallengeTemplateFromCategory = createSelector(
-//   [selectChallengesTemplates, (_, category, id) => ({ category, id })],
-//   (challengesTemplates, { category, id }) =>
-//     challengesTemplates ? challengesTemplates[category][id] : {}
-// );
+export const selectChallengeTemplateFromCategoryAndId = createSelector(
+  [selectChallengesTemplates, (_, category, id) => ({ category, id })],
+  (challengesTemplates, { category, id }) =>
+    challengesTemplates ? challengesTemplates[category][id] : {}
+);
 
-// export const selectVideoUrlFromChallengeTemplate = createSelector(
-//   [selectChallengeTemplateFromCategory],
-//   challengeTemplate => (challengeTemplate ? challengeTemplate.videoUrl : "")
-// );
+export const selectVideoUrlFromChallengeTemplateWithCategoryAndId = createSelector(
+  [selectChallengeTemplateFromCategoryAndId],
+  challengeTemplate => (challengeTemplate ? challengeTemplate.videoUrl : "")
+);
 
-// export const selectNameFromChallengeTemplate = createSelector(
-//   [selectChallengeTemplateFromCategory],
-//   challengeTemplate => (challengeTemplate ? challengeTemplate.name : "")
-// );
+export const selectNameFromChallengeTemplateWithCategoryAndId = createSelector(
+  [selectChallengeTemplateFromCategoryAndId],
+  challengeTemplate => (challengeTemplate ? challengeTemplate.name : "")
+);
 
-// export const selectCategoryFromChallengeTemplate = createSelector(
-//   [selectChallengeTemplateFromCategory],
-//   challengeTemplate => (challengeTemplate ? challengeTemplate.category : "")
-// );
+export const selectCategoryFromChallengeTemplateWithCategoryAndId = createSelector(
+  [selectChallengeTemplateFromCategoryAndId],
+  challengeTemplate => (challengeTemplate ? challengeTemplate.category : "")
+);
 
 export const selectChallengeTemplateFromId = createSelector(
   [selectChallengesTemplates, (_, challengeTemplateId) => challengeTemplateId],

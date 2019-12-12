@@ -189,6 +189,7 @@ const AddChallenge = ({ urlCategory }) => {
         labelText={"Choose challenge video"}
         submitText="Submit new challenge!"
         disabled={!formValidated}
+        maxFileSizeInMB={50}
       />
     </AddChallengeContainer>
   );
