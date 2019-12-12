@@ -3,7 +3,7 @@ import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import { createStructuredSelector } from "reselect";
 import { Link } from "react-router-dom";
 
-import { signOutStart } from "../../redux/user/actions";
+import { signOutStarts } from "../../redux/user/actions";
 import {
   selectUserAuthIsLoaded,
   selectUserAuthIsEmpty
@@ -27,7 +27,9 @@ const SigninSignOutHeader = () => {
   const authData = useSelector(authDataSelector, shallowEqual);
   const { userAuthIsLoaded, userAuthIsEmpty } = authData;
   const dispatch = useDispatch();
-  const handleSignOut = useCallback(() => dispatch(signOutStart()), [dispatch]);
+  const handleSignOut = useCallback(() => dispatch(signOutStarts()), [
+    dispatch
+  ]);
 
   return (
     <HeaderSigninSignOutContainer>

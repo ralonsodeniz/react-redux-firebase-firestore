@@ -1,11 +1,11 @@
 import { USER } from "./types";
 
 export const googleSignInStarts = () => ({
-  type: USER.GOOGLE_SIGN_IN_START
+  type: USER.GOOGLE_SIGN_IN_STARTS
 });
 
-export const emailAndPasswordSignInStart = credentials => ({
-  type: USER.EMAIL_PASSWORD_SIGN_IN_START,
+export const emailAndPasswordSignInStarts = credentials => ({
+  type: USER.EMAIL_PASSWORD_SIGN_IN_STARTS,
   payload: credentials
 });
 
@@ -28,8 +28,8 @@ export const emailAndPasswordSignInStart = credentials => ({
 //   type: USER.CHECK_USER_SESSION_END
 // });
 
-export const signOutStart = () => ({
-  type: USER.SIGN_OUT_START
+export const signOutStarts = () => ({
+  type: USER.SIGN_OUT_STARTS
 });
 
 // export const signOutSuccess = () => ({
@@ -41,8 +41,8 @@ export const signOutStart = () => ({
 //   payload: error
 // });
 
-export const signUpStart = userData => ({
-  type: USER.SIGN_UP_START,
+export const signUpStarts = userData => ({
+  type: USER.SIGN_UP_STARTS,
   payload: userData
 });
 
@@ -55,8 +55,8 @@ export const signUpStart = userData => ({
 //   payload: error
 // });
 
-export const updateAvatarStart = url => ({
-  type: USER.UPDATE_AVATAR_START,
+export const updateAvatarStarts = url => ({
+  type: USER.UPDATE_AVATAR_STARTS,
   payload: url
 });
 

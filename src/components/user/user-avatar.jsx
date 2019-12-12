@@ -6,7 +6,7 @@ import {
   selectUserProfilePhotoURL,
   selectUserProfileId
 } from "../../redux/user/selectors";
-import { updateAvatarStart } from "../../redux/user/actions";
+import { updateAvatarStarts } from "../../redux/user/actions";
 
 import ClippedImage from "../clipped-image/clipped-image";
 import FileUploader from "../file-uplader/file-uploader";
@@ -25,7 +25,7 @@ const UserAvatar = () => {
   const { userPhotoURL, userId } = userData;
   const directory = `users/${userId}/userPhoto`;
   const dispatchedUpdateAvatarStart = useCallback(
-    url => dispatch(updateAvatarStart(url)),
+    url => dispatch(updateAvatarStarts(url)),
     [dispatch]
   );
 

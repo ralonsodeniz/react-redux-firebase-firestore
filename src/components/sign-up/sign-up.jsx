@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
 
-import { signUpStart } from "../../redux/user/actions";
+import { signUpStarts } from "../../redux/user/actions";
 import { openModal } from "../../redux/modal/actions";
 import { countryOptions } from "../../utils/options";
 
@@ -54,7 +54,7 @@ const SignUp = () => {
         dispatch(openModal(emptyValueModalData));
         return;
       } else {
-        dispatch(signUpStart(userData));
+        dispatch(signUpStarts(userData));
         setUserData({
           displayName: "",
           email: "",

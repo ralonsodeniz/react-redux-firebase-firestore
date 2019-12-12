@@ -83,15 +83,21 @@ const InstanceContenderInfo = ({
                   {contender.name}
                 </InstanceContenderInfoText>
                 <InstanceContenderInfoTitle>Proof</InstanceContenderInfoTitle>
-                {isUserValidator || isUserContender || contender.public ? (
-                  <InstanceContenderInfoVideoPlayer
-                    src={contender.proof.url}
-                    controls
-                    controlsList="nodownload"
-                  />
+                {contender.proof.url ? (
+                  isUserValidator || isUserContender || contender.public ? (
+                    <InstanceContenderInfoVideoPlayer
+                      src={contender.proof.url}
+                      controls
+                      controlsList="nodownload"
+                    />
+                  ) : (
+                    <InstanceContenderInfoText>
+                      Proof is private
+                    </InstanceContenderInfoText>
+                  )
                 ) : (
                   <InstanceContenderInfoText>
-                    Proof is private
+                    No proof provided
                   </InstanceContenderInfoText>
                 )}
                 <InstanceContenderInfoTitle>

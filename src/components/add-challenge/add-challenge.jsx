@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { createStructuredSelector } from "reselect";
 import PropTypes from "prop-types";
-import { addNewChallengeStart } from "../../redux/firestore/challenges-templates/actions";
+import { addNewChallengeStarts } from "../../redux/firestore/challenges-templates/actions";
 import { selectUserProfileDisplayName } from "../../redux/user/selectors";
 
 import FormInput from "../form-input/form-input";
@@ -89,7 +89,7 @@ const AddChallenge = ({ urlCategory }) => {
         category: urlCategory,
         videoUrl: url
       };
-      dispatch(addNewChallengeStart(challengeData));
+      dispatch(addNewChallengeStarts(challengeData));
       setFormChallengeData({
         description: "",
         // difficulty: "",

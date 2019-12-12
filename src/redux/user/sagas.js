@@ -23,8 +23,8 @@ import {
 } from "../../firebase/firebase.utils";
 
 // sign up with email and password
-export function* onSignUpStart() {
-  yield takeLatest(USER.SIGN_UP_START, signUp);
+export function* onSignUpStarts() {
+  yield takeLatest(USER.SIGN_UP_STARTS, signUp);
 }
 
 export function* signUp({ payload }) {
@@ -57,8 +57,8 @@ export function* signUp({ payload }) {
 }
 
 // google sign in sagas
-export function* onGoogleSignInStart() {
-  yield takeLatest(USER.GOOGLE_SIGN_IN_START, signInWithGoogle);
+export function* onGoogleSignInStarts() {
+  yield takeLatest(USER.GOOGLE_SIGN_IN_STARTS, signInWithGoogle);
 }
 
 export function* signInWithGoogle() {
@@ -86,8 +86,8 @@ export function* signInWithGoogle() {
 }
 
 // email signin
-export function* onEmailSignIn() {
-  yield takeLatest(USER.EMAIL_PASSWORD_SIGN_IN_START, signInWithEmail);
+export function* onEmailSignInStarts() {
+  yield takeLatest(USER.EMAIL_PASSWORD_SIGN_IN_STARTS, signInWithEmail);
 }
 
 export function* signInWithEmail({ payload }) {
@@ -159,8 +159,8 @@ export function* signInWithEmail({ payload }) {
 // }
 
 // sign out
-export function* onSignOutStart() {
-  yield takeLatest(USER.SIGN_OUT_START, signOut);
+export function* onSignOutStarts() {
+  yield takeLatest(USER.SIGN_OUT_STARTS, signOut);
 }
 
 export function* signOut() {
@@ -187,8 +187,8 @@ export function* signOut() {
 }
 
 // update user avatar
-export function* onUpdateAvatarStart() {
-  yield takeLatest(USER.UPDATE_AVATAR_START, updateAvatar);
+export function* onUpdateAvatarStarts() {
+  yield takeLatest(USER.UPDATE_AVATAR_STARTS, updateAvatar);
 }
 
 export function* updateAvatar({ payload }) {
@@ -210,11 +210,11 @@ export function* updateAvatar({ payload }) {
 // root saga creator for users with all the tiggering generation functions of the saga
 export function* userSagas() {
   yield all([
-    call(onGoogleSignInStart),
-    call(onEmailSignIn),
-    call(onSignUpStart),
+    call(onGoogleSignInStarts),
+    call(onEmailSignInStarts),
+    call(onSignUpStarts),
     // call(onCheckUserSessionStart),
-    call(onSignOutStart),
-    call(onUpdateAvatarStart)
+    call(onSignOutStarts),
+    call(onUpdateAvatarStarts)
   ]);
 }

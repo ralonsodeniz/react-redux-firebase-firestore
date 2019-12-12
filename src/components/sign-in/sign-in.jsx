@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 
 import {
   googleSignInStarts,
-  emailAndPasswordSignInStart
+  emailAndPasswordSignInStarts
 } from "../../redux/user/actions";
 
 import FormInput from "../form-input/form-input";
@@ -35,7 +35,7 @@ const SignIn = () => {
   const handleSignInWithEmailAndPassword = useCallback(
     event => {
       event.preventDefault();
-      dispatch(emailAndPasswordSignInStart(userCredentials));
+      dispatch(emailAndPasswordSignInStarts(userCredentials));
       setUserCredentials({ email: "", password: "" });
     },
     [dispatch, userCredentials]

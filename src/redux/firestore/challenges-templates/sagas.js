@@ -5,8 +5,8 @@ import { openModal } from "../../modal/actions";
 import { addNewChallengeTemplateInFs } from "../../../firebase/firebase.utils";
 
 // add new challenge to templates
-export function* onAddNewChallengeStart() {
-  yield takeLatest(CHALLENGES.ADD_NEW_CHALLENGE_START, addNewChallenge);
+export function* onAddNewChallengeStarts() {
+  yield takeLatest(CHALLENGES.ADD_NEW_CHALLENGE_STARTS, addNewChallenge);
 }
 
 export function* addNewChallenge({ payload }) {
@@ -32,5 +32,5 @@ export function* addNewChallenge({ payload }) {
 
 // root saga creator for challenges templates
 export function* challengesTemplatesSagas() {
-  yield all([call(onAddNewChallengeStart)]);
+  yield all([call(onAddNewChallengeStarts)]);
 }
