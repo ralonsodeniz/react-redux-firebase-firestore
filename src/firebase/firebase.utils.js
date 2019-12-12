@@ -133,6 +133,7 @@ export const uploadFileToStorage = (
       }
     });
   } catch (error) {
+    console.log("Error while uploading your file", error);
     throw new Error("Ooops error while uploading your file");
   }
 };
@@ -179,7 +180,7 @@ export const addNewChallengeTemplateInFs = async challengeData => {
       { merge: true }
     );
   } catch (error) {
-    console.log("Error while adding new challenge");
+    console.log("Error while adding new challenge", error);
     throw new Error("Ooops something happened while adding the challenge");
   }
 };
@@ -315,10 +316,209 @@ export const addNewChallengeInstanceInFs = async (
       });
     }
   } catch (error) {
-    console.log("Error while adding new challenge instance");
+    console.log("Error while adding new challenge instance", error);
     throw new Error(
       "Ooops something happened while creating the new challenge instance"
     );
+  }
+};
+
+export const acceptInstanceInFs = async (
+  userProfileId,
+  instanceId,
+  daysToComplete
+) => {
+  try {
+    const challengeInstanceRef = firestore.doc(
+      `challengesInstances/${instanceId}`
+    );
+    const challengeInstanceSnapshot = await challengeInstanceRef.get();
+    const contenders = challengeInstanceSnapshot.data().contenders;
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + parseInt(daysToComplete));
+    const updatedContenders = contenders.map(contender => {
+      if (contender.id === userProfileId) {
+        return {
+          ...contender,
+          status: "Accepted",
+          expiresAt: expiresAt
+        };
+      } else {
+        return contender;
+      }
+    });
+    await challengeInstanceRef.update({
+      contenders: updatedContenders
+    });
+  } catch (error) {
+    console.log("Error while accepting challenge instance", error);
+    throw new Error(
+      "Ooops something happened while accepting challenge instance"
+    );
+  }
+};
+
+export const cancelInstanceInFs = async (userProfileId, instanceId) => {
+  try {
+    const challengeInstanceRef = firestore.doc(
+      `challengesInstances/${instanceId}`
+    );
+    const challengeInstanceSnapshot = await challengeInstanceRef.get();
+    const contenders = challengeInstanceSnapshot.data().contenders;
+    const updatedContenders = contenders.map(contender => {
+      if (contender.id === userProfileId) {
+        return {
+          ...contender,
+          status: "Cancelled",
+          expiresAt: null,
+          proof: {
+            ...contender.proof,
+            state: "Cancelled"
+          }
+        };
+      } else {
+        return contender;
+      }
+    });
+    await challengeInstanceRef.update({
+      contenders: updatedContenders
+    });
+  } catch (error) {
+    console.log("Error while cancelling challenge instance", error);
+    throw new Error(
+      "Ooops something happened while cancelling challenge instance"
+    );
+  }
+};
+
+export const updateProofInFs = async (userProfileId, instanceId, url) => {
+  try {
+    const challengeInstanceRef = firestore.doc(
+      `challengesInstances/${instanceId}`
+    );
+    const challengeInstanceSnapshot = await challengeInstanceRef.get();
+    const contenders = challengeInstanceSnapshot.data().contenders;
+    const dateUploaded = new Date();
+    const updatedContenders = contenders.map(contender => {
+      if (contender.id === userProfileId) {
+        return {
+          ...contender,
+          proof: {
+            dateUploaded,
+            state: "Pending",
+            url
+          }
+        };
+      } else {
+        return contender;
+      }
+    });
+    await challengeInstanceRef.update({
+      contenders: updatedContenders
+    });
+  } catch (error) {
+    console.log("Error while updating challenge instance proof", error);
+    throw new Error(
+      "Ooops something happened while updating challenge instance proof"
+    );
+  }
+};
+
+export const toggleProofPublicPrivateInFs = async (
+  userProfileId,
+  instanceId
+) => {
+  let proofPublicOrPrivate = "";
+  try {
+    const challengeInstanceRef = firestore.doc(
+      `challengesInstances/${instanceId}`
+    );
+    const challengeInstanceSnapshot = await challengeInstanceRef.get();
+    const contenders = challengeInstanceSnapshot.data().contenders;
+    const updatedContenders = contenders.map(contender => {
+      if (contender.id === userProfileId) {
+        // we ask for the negate because we are going to toggle it in the function
+        if (!contender.public) {
+          proofPublicOrPrivate = "public";
+        } else {
+          proofPublicOrPrivate = "private";
+        }
+        return {
+          ...contender,
+          public: !contender.public
+        };
+      } else {
+        return contender;
+      }
+    });
+    await challengeInstanceRef.update({
+      contenders: updatedContenders
+    });
+  } catch (error) {
+    console.log("Error while updating challenge proof", error);
+    throw new Error(
+      "Ooops something happened while updating challenge instance proof"
+    );
+  }
+  return proofPublicOrPrivate;
+};
+
+export const validateProofInFs = async (userToValidateId, instanceId) => {
+  try {
+    const challengeInstanceRef = firestore.doc(
+      `challengesInstances/${instanceId}`
+    );
+    const challengeInstanceSnapshot = await challengeInstanceRef.get();
+    const contenders = challengeInstanceSnapshot.data().contenders;
+    const updatedContenders = contenders.map(contender => {
+      if (contender.id === userToValidateId) {
+        return {
+          ...contender,
+          proof: {
+            ...contender.proof,
+            state: "Accepted"
+          },
+          status: "Completed"
+        };
+      } else {
+        return contender;
+      }
+    });
+    await challengeInstanceRef.update({
+      contenders: updatedContenders
+    });
+  } catch (error) {
+    console.log("Error while validating proof", error);
+    throw new Error("Ooops something happened while validating proof");
+  }
+};
+
+export const invalidateProofInFs = async (userToInvalidateId, instanceId) => {
+  try {
+    const challengeInstanceRef = firestore.doc(
+      `challengesInstances/${instanceId}`
+    );
+    const challengeInstanceSnapshot = await challengeInstanceRef.get();
+    const contenders = challengeInstanceSnapshot.data().contenders;
+    const updatedContenders = contenders.map(contender => {
+      if (contender.id === userToInvalidateId) {
+        return {
+          ...contender,
+          proof: {
+            ...contender.proof,
+            state: "Cancelled"
+          }
+        };
+      } else {
+        return contender;
+      }
+    });
+    await challengeInstanceRef.update({
+      contenders: updatedContenders
+    });
+  } catch (error) {
+    console.log("Error while invalidating proof", error);
+    throw new Error("Ooops something happened while invalidating proof");
   }
 };
 

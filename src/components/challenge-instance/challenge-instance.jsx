@@ -1,6 +1,6 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { useSelector, shallowEqual } from "react-redux";
+import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import { createStructuredSelector } from "reselect";
 
 import {
@@ -15,6 +15,12 @@ import {
 } from "../../redux/user/selectors";
 import { selectChallengesTemplatesAreLoading } from "../../redux/firestore/challenges-templates/selectors";
 import { selectChallengesInstancesAreLoading } from "../../redux/firestore/challenges-instances/selectors";
+import {
+  acceptInstanceStarts,
+  cancelInstanceStarts,
+  uploadProofStarts,
+  toggleProofPublicPrivateStarts
+} from "../../redux/firestore/challenges-instances/actions";
 
 import Spinner from "../spinner/spinner";
 import CustomButton from "../custom-button/custom-button";
@@ -27,7 +33,8 @@ import {
   ChallengeInstanceTemplateDataContainer,
   ChallengeInstanceTemplateData,
   ChallengeInstanceButtonsContainer,
-  ChallengeInstanceData
+  ChallengeInstanceData,
+  ChallengeInstanceButtonsGroup
 } from "./challenge-instance.styles";
 
 const selectChallengeInstanceData = createStructuredSelector({
@@ -38,6 +45,8 @@ const selectChallengeInstanceData = createStructuredSelector({
 });
 
 const ChallengeInstance = () => {
+  const dispatch = useDispatch();
+
   const { instanceId } = useParams();
 
   const {
@@ -96,7 +105,8 @@ const ChallengeInstance = () => {
     name,
     rating,
     timesCompleted,
-    videoUrl
+    videoUrl,
+    category
   } = challengeTemplate;
 
   const userContenderObject = challengeInstanceContenders.find(
@@ -111,8 +121,40 @@ const ChallengeInstance = () => {
     ? userContenderObject.name.replace(/\s/g, "")
     : undefined;
 
+  const userInstancePublic = userContenderObject
+    ? userContenderObject.public
+    : false;
+
   const isUserValidator = challengeInstanceValidators.some(
     validator => validator.id === userProfileId
+  );
+
+  const handleAcceptChallenge = useCallback(
+    () =>
+      dispatch(acceptInstanceStarts(userProfileId, instanceId, daysToComplete)),
+    [dispatch, userProfileId, instanceId, daysToComplete]
+  );
+
+  const handleCancelChallenge = useCallback(
+    () => dispatch(cancelInstanceStarts(userProfileId, instanceId)),
+    [dispatch, userProfileId, instanceId]
+  );
+
+  const handleUploadProof = useCallback(
+    (dispatch, instanceId, userProfileId) => url => {
+      const proofData = {
+        instanceId,
+        userProfileId,
+        url
+      };
+      dispatch(uploadProofStarts(proofData));
+    },
+    []
+  );
+
+  const handleUpdateProofPublicOrPrivate = useCallback(
+    () => dispatch(toggleProofPublicPrivateStarts(userProfileId, instanceId)),
+    [userProfileId, instanceId, dispatch]
   );
 
   return challengesInstancesAreLoading ||
@@ -142,6 +184,8 @@ const ChallengeInstance = () => {
         <ChallengeInstanceTemplateData>
           <h4>Author:</h4>
           <span>{author}</span>
+          <h4>Category:</h4>
+          <span>{category}</span>
           <h4>Difficulty:</h4>
           <span>{difficulty}</span>
           <h4>Times completed:</h4>
@@ -156,38 +200,54 @@ const ChallengeInstance = () => {
             <CustomButton
               type="button"
               text="Accept challenge"
-              onClick={() => alert("accept challenge")}
+              onClick={handleAcceptChallenge}
             />
             <CustomButton
               type="button"
               text="Decline challenge"
-              onClick={() => alert("decline challenge")}
+              onClick={handleCancelChallenge}
             />
           </ChallengeInstanceButtonsContainer>
-        ) : (
+        ) : userStatus === "Accepted" ? (
           <ChallengeInstanceButtonsContainer>
-            <CustomButton
-              type="button"
-              text="Cancel challenge"
-              onClick={() => alert("cancel challenge")}
-            />
+            <ChallengeInstanceButtonsGroup>
+              <CustomButton
+                type="button"
+                text="Cancel challenge"
+                onClick={handleCancelChallenge}
+              />
+              {userInstancePublic ? (
+                <CustomButton
+                  type="button"
+                  text="Make your proof private"
+                  onClick={handleUpdateProofPublicOrPrivate}
+                />
+              ) : (
+                <CustomButton
+                  type="button"
+                  text="Make your proof public"
+                  onClick={handleUpdateProofPublicOrPrivate}
+                />
+              )}
+            </ChallengeInstanceButtonsGroup>
             <FileUploader
               fileType="imageOrvideo"
               directory={`challengesInstances/${instanceId}/${userProfileId}`}
               fileName={userDisplayNameForFileName}
-              urlAction={() => console.log()}
+              urlAction={handleUploadProof(dispatch, instanceId, userProfileId)}
               labelText="Choose challenge proof"
               submitText={"Upload"}
               disabled={false}
               maxFileSizeInMB={50}
             />
           </ChallengeInstanceButtonsContainer>
-        ))}
+        ) : null)}
       <ChallengeInstanceData>
         <InstanceContenderInfo
           challengeInstanceContenders={challengeInstanceContenders}
           userProfileId={userProfileId}
           isUserValidator={isUserValidator}
+          instanceId={instanceId}
         />
       </ChallengeInstanceData>
     </ChallengeInstanceContainer>

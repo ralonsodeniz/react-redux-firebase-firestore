@@ -15,7 +15,7 @@ import {
   selectUserProfileId
 } from "../../redux/user/selectors";
 import { openModal } from "../../redux/modal/actions";
-import { addNewInstanceStart } from "../../redux/firestore/challenges-instances/actions";
+import { addNewInstanceStarts } from "../../redux/firestore/challenges-instances/actions";
 
 import CustomButton from "../custom-button/custom-button";
 
@@ -90,7 +90,7 @@ const ChallengeTemplate = () => {
       push("/signin");
     } else {
       dispatch(
-        addNewInstanceStart(
+        addNewInstanceStarts(
           challengeTemplate,
           {
             contenders: [],

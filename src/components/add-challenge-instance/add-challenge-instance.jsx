@@ -9,7 +9,7 @@ import {
   selectUserProfileDisplayName,
   selectUserProfileId
 } from "../../redux/user/selectors";
-import { addNewInstanceStart } from "../../redux/firestore/challenges-instances/actions";
+import { addNewInstanceStarts } from "../../redux/firestore/challenges-instances/actions";
 
 import FormDropdown from "../form-dropdown/form-dropdown";
 import CustomButton from "../custom-button/custom-button";
@@ -79,7 +79,7 @@ const AddChallengeInstance = ({ challengeTemplate }) => {
   const unsetSelfValidation = useCallback(() => {
     setValidateYourself(false);
     dispatch(
-      addNewInstanceStart(
+      addNewInstanceStarts(
         challengeTemplate,
         formInstanceChallengeData,
         userProfileDisplayName,
@@ -117,7 +117,7 @@ const AddChallengeInstance = ({ challengeTemplate }) => {
     event => {
       event.preventDefault();
       dispatch(
-        addNewInstanceStart(
+        addNewInstanceStarts(
           challengeTemplate,
           formInstanceChallengeData,
           userProfileDisplayName,

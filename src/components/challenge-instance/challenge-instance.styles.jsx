@@ -59,4 +59,13 @@ export const ChallengeInstanceButtonsContainer = styled.div`
   display: flex;
   justify-content: space-evenly;
   align-items: center;
+  margin-top: 10px;
+`;
+
+export const ChallengeInstanceButtonsGroup = styled.div`
+  grid-area: buttons;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
 `;

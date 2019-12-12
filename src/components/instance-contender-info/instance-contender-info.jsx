@@ -1,8 +1,14 @@
 import React, { useState, useCallback } from "react";
 import PropTypes from "prop-types";
+import { useDispatch } from "react-redux";
 
 import FormDropdown from "../form-dropdown/form-dropdown";
 import CustomButton from "../custom-button/custom-button";
+
+import {
+  validateProofStarts,
+  invalidateProofStarts
+} from "../../redux/firestore/challenges-instances/actions";
 
 import {
   InstanceContenderInfoContainer,
@@ -18,8 +24,11 @@ import {
 const InstanceContenderInfo = ({
   challengeInstanceContenders,
   userProfileId,
-  isUserValidator
+  isUserValidator,
+  instanceId
 }) => {
+  const dispatch = useDispatch();
+
   const isUserContender = challengeInstanceContenders.some(
     contender => contender.id === userProfileId
   );
@@ -42,6 +51,16 @@ const InstanceContenderInfo = ({
     setSelectedContender(value);
   }, []);
 
+  const handleValidateProof = useCallback(
+    () => dispatch(validateProofStarts(selectedContender, instanceId)),
+    [dispatch, selectedContender, instanceId]
+  );
+
+  const handleInvalidateProof = useCallback(
+    () => dispatch(invalidateProofStarts(selectedContender, instanceId)),
+    [dispatch, selectedContender, instanceId]
+  );
+
   return (
     <InstanceContenderInfoContainer>
       <InstanceContenderInfoFormDropdownContainer>
@@ -63,15 +82,18 @@ const InstanceContenderInfo = ({
                 <InstanceContenderInfoText>
                   {contender.name}
                 </InstanceContenderInfoText>
-                <InstanceContenderInfoVideoPlayer
-                  src={contender.proof.url}
-                  controls
-                  controlsList="nodownload"
-                />
-                <InstanceContenderInfoTitle>Rating</InstanceContenderInfoTitle>
-                <InstanceContenderInfoText>
-                  {contender.rating}
-                </InstanceContenderInfoText>
+                <InstanceContenderInfoTitle>Proof</InstanceContenderInfoTitle>
+                {isUserValidator || isUserContender || contender.public ? (
+                  <InstanceContenderInfoVideoPlayer
+                    src={contender.proof.url}
+                    controls
+                    controlsList="nodownload"
+                  />
+                ) : (
+                  <InstanceContenderInfoText>
+                    Proof is private
+                  </InstanceContenderInfoText>
+                )}
                 <InstanceContenderInfoTitle>
                   Instance tatus
                 </InstanceContenderInfoTitle>
@@ -84,20 +106,34 @@ const InstanceContenderInfo = ({
                 <InstanceContenderInfoStateText state={contender.proof.state}>
                   {contender.proof.state}
                 </InstanceContenderInfoStateText>
+                {contender.status === "Accepted" && (
+                  <div>
+                    <InstanceContenderInfoTitle>
+                      Expires at
+                    </InstanceContenderInfoTitle>
+                    <InstanceContenderInfoText>
+                      {contender.expiresAt.toDate().toString()}
+                    </InstanceContenderInfoText>
+                  </div>
+                )}
+                <InstanceContenderInfoTitle>Rating</InstanceContenderInfoTitle>
+                <InstanceContenderInfoText>
+                  {contender.rating}
+                </InstanceContenderInfoText>
 
                 {isUserValidator &&
                   contender.id !== userProfileId &&
                   contender.proof.state === "Pending" && (
                     <InstanceContenderInfoButtonsContainer>
                       <CustomButton
-                        text="Valid proof"
+                        text="Validate proof"
                         type="button"
-                        onClick={() => {}}
+                        onClick={handleValidateProof}
                       />
                       <CustomButton
-                        text="Invalid proof"
+                        text="Invalidate proof"
                         type="button"
-                        onClick={() => {}}
+                        onClick={handleInvalidateProof}
                       />
                     </InstanceContenderInfoButtonsContainer>
                   )}
@@ -115,7 +151,8 @@ const InstanceContenderInfo = ({
 InstanceContenderInfo.propTypes = {
   challengeInstanceContenders: PropTypes.array.isRequired,
   userProfileId: PropTypes.string.isRequired,
-  isUserValidator: PropTypes.bool.isRequired
+  isUserValidator: PropTypes.bool.isRequired,
+  instanceId: PropTypes.string.isRequired
 };
 
 export default InstanceContenderInfo;
