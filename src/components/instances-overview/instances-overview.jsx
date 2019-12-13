@@ -31,7 +31,7 @@ const selectInstancesOverviewData = createStructuredSelector({
 
 const InstancesOverview = () => {
   const { category } = useParams();
-  const [selectedStatus, setSelectedStatus] = useState("Accepted");
+  const [selectedStatus, setSelectedStatus] = useState("Any");
   const memoizedSelectUserAcceptedInstancesArray = useMemo(
     () => selectUserAcceptedInstancesArray,
     []
@@ -65,7 +65,9 @@ const InstancesOverview = () => {
     <InstancesOverviewContainer>
       <InstancesOverviewHeaderContainer>
         <InstancesOverviewTitle>
-          Challenges instances from {category} category
+          {category === "all"
+            ? `Challenges instances from ${category} categories`
+            : `  Challenges instances from ${category} category`}
         </InstancesOverviewTitle>
         <FormDropdown
           type="text"
@@ -77,22 +79,75 @@ const InstancesOverview = () => {
           required
           options={statusOptions}
           size={0}
-          defaultValue="Accepted"
+          defaultValue="Any"
         />
       </InstancesOverviewHeaderContainer>
       <InstancesOverviewScrollContainer>
         {userAcceptedInstancesArray.reduce(
           (accumulator, instance, instanceIndex) => {
-            const user = instance.contenders.find(
-              contender => contender.id === userProfileId
-            );
-            if (user.status === selectedStatus) {
+            const getContenderExpiresAt = instance =>
+              instance.contenders.find(
+                contender => contender.id === userProfileId
+              ).expiresAt;
+
+            const getContenderStatus = instance => {
+              return instance.contenders.find(
+                contender => contender.id === userProfileId
+              ).status;
+            };
+
+            if (selectedStatus === "Any") {
               accumulator.push(
                 <InstanceItem
                   key={instanceIndex}
                   challengeInstanceData={instance}
                 />
               );
+              accumulator.sort((a, b) => {
+                const aContenderStatus = getContenderStatus(
+                  a.props.challengeInstanceData
+                );
+                const bContenderStatus = getContenderStatus(
+                  b.props.challengeInstanceData
+                );
+                const aContenderExpiresAt = getContenderExpiresAt(
+                  a.props.challengeInstanceData
+                );
+                const bContenderExpiresAt = getContenderExpiresAt(
+                  b.props.challengeInstanceData
+                );
+
+                return aContenderStatus > bContenderStatus
+                  ? 1
+                  : aContenderStatus === bContenderStatus
+                  ? aContenderExpiresAt > bContenderExpiresAt
+                    ? 1
+                    : -1
+                  : -1;
+              });
+            } else {
+              const user = instance.contenders.find(
+                contender => contender.id === userProfileId
+              );
+              if (user.status === selectedStatus) {
+                accumulator.push(
+                  <InstanceItem
+                    key={instanceIndex}
+                    challengeInstanceData={instance}
+                  />
+                );
+              }
+              if (selectedStatus === "Accepted") {
+                accumulator.sort((a, b) => {
+                  const aContenderExpiresAt = getContenderExpiresAt(
+                    a.props.challengeInstanceData
+                  );
+                  const bContenderExpiresAt = getContenderExpiresAt(
+                    b.props.challengeInstanceData
+                  );
+                  return aContenderExpiresAt > bContenderExpiresAt ? 1 : -1;
+                });
+              }
             }
             return accumulator;
           },

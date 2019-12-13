@@ -39,3 +39,8 @@ export const InstanceItemStatusText = styled.span`
 export const InstanceCustomButton = styled(CustomButton)`
   justify-self: center;
 `;
+
+export const InstanceExpiresAtContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;

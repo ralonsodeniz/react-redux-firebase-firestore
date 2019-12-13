@@ -285,38 +285,42 @@ export const countryOptions = [
 ];
 
 export const statusOptions = [
-  { key: 0, text: "Accepted", value: "Accepted" },
   {
-    key: 1,
+    text: "Any",
+    value: "Any"
+  },
+  {
+    text: "Accepted",
+    value: "Accepted"
+  },
+  {
     text: "Pending",
     value: "Pending"
   },
   {
-    key: 2,
     text: "Completed",
     value: "Completed"
   },
   {
-    key: 3,
     text: "Cancelled",
     value: "Cancelled"
   }
 ];
 
 export const validateStatusOptions = [
-  { key: 0, text: "Waiting", value: "No proofs to validate" },
   {
-    key: 1,
+    text: "Waiting",
+    value: "No proofs to validate"
+  },
+  {
     text: "Pending",
     value: "Validations pending"
   },
   {
-    key: 2,
     text: "Cancelled",
     value: "Challenge cancelled"
   },
   {
-    key: 3,
     text: "Completed",
     value: "Challenge completed"
   }

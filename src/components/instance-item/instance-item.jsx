@@ -15,7 +15,8 @@ import {
   InstanceItemContainer,
   InstanceItemVideoPlayer,
   InstanceItemStatusText,
-  InstanceCustomButton
+  InstanceCustomButton,
+  InstanceExpiresAtContainer
 } from "./instance-item.styles";
 
 const selectInstanceItemData = createStructuredSelector({
@@ -75,7 +76,8 @@ const InstanceItem = ({ challengeInstanceData }) => {
 
   const {
     status,
-    proof: { url }
+    proof: { url },
+    expiresAt
   } = userInstanceData;
 
   const videoUrl = url !== "" ? url : videoUrlFromChallengeTemplate;
@@ -104,6 +106,12 @@ const InstanceItem = ({ challengeInstanceData }) => {
       <span>{contendersDisplayNamesString}</span>
       <strong>Status:</strong>
       <InstanceItemStatusText status={status}>{status}</InstanceItemStatusText>
+      {expiresAt && (
+        <InstanceExpiresAtContainer>
+          <strong>Expires at:</strong>
+          <span>{expiresAt.toDate().toString()}</span>
+        </InstanceExpiresAtContainer>
+      )}
       <InstanceCustomButton
         type="button"
         text="Go to instance"

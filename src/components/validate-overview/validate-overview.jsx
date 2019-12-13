@@ -9,7 +9,8 @@ import {
 
 import {
   selectUserIntancesToValidate,
-  selectUserProfileIsLoaded
+  selectUserProfileIsLoaded,
+  selectUserProfileId
 } from "../../redux/user/selectors";
 import { validateStatusOptions } from "../../utils/options";
 
@@ -27,7 +28,8 @@ import {
 const selectValidateOverviewData = createStructuredSelector({
   userIntancesToValidate: selectUserIntancesToValidate,
   challengesInstancesAreLoading: selectChallengesInstancesAreLoading,
-  userProfileIsLoaded: selectUserProfileIsLoaded
+  userProfileIsLoaded: selectUserProfileIsLoaded,
+  userProfileId: selectUserProfileId
 });
 
 const ValidateOverview = () => {
@@ -41,7 +43,8 @@ const ValidateOverview = () => {
   const {
     userIntancesToValidate,
     challengesInstancesAreLoading,
-    userProfileIsLoaded
+    userProfileIsLoaded,
+    userProfileId
   } = useSelector(selectValidateOverviewData, shallowEqual);
 
   const userInstancesToValidateArray = useSelector(state =>
@@ -76,7 +79,9 @@ const ValidateOverview = () => {
         {userInstancesToValidateArray.reduce(
           (accumulator, instance, instanceIndex) => {
             const instanceStatus = instance.contenders.some(
-              contender => contender.proof.state === "Pending"
+              contender =>
+                contender.proof.state === "Pending" &&
+                contender.id !== userProfileId
             )
               ? "Validations pending"
               : instance.contenders.every(
@@ -101,6 +106,28 @@ const ValidateOverview = () => {
                   challengeInstanceData={instance}
                 />
               );
+            }
+            if (selectedStatus === "Validations pending") {
+              const getOlderDateUploaded = instance => {
+                const filteredContenders = instance.contenders.filter(
+                  contender => contender.proof.state === "Pending"
+                );
+                const sortedContenders = filteredContenders.sort((a, b) =>
+                  a.proof.dateUploaded > b.proof.dateUploaded ? 1 : -1
+                );
+                return sortedContenders[0].proof.dateUploaded;
+              };
+
+              accumulator.sort((a, b) => {
+                const aOlderDateUploaded = getOlderDateUploaded(
+                  a.props.challengeInstanceData
+                );
+                const bOlderDateUploaded = getOlderDateUploaded(
+                  b.props.challengeInstanceData
+                );
+
+                return aOlderDateUploaded > bOlderDateUploaded ? 1 : -1;
+              });
             }
             return accumulator;
           },

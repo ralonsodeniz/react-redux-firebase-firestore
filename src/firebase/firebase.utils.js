@@ -198,6 +198,9 @@ export const addNewChallengeInstanceInFs = async (
     const challengeInstanceRefId = challengeInstanceRef.id;
     const administrator = { userProfileDisplayName, userProfileId };
     const { contenders, validators } = instanceData;
+    const comments = [];
+    const likes = 0;
+    const { category, challengeTemplateId, daysToComplete } = challengeData;
     const defaultContenderProps = {
       proof: {
         url: "",
@@ -205,23 +208,23 @@ export const addNewChallengeInstanceInFs = async (
         state: "No proof provided"
       },
       rating: 0,
-      public: false,
-      expiresAt: null
+      public: false
     };
     let enhancedContenders = contenders.map(contender => ({
       ...contender,
       status: "Pending",
+      expiresAt: null,
       ...defaultContenderProps
     }));
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + parseInt(daysToComplete));
     enhancedContenders.push({
       id: userProfileId,
       name: userProfileDisplayName,
       status: "Accepted",
+      expiresAt,
       ...defaultContenderProps
     });
-    const comments = [];
-    const likes = 0;
-    const { category, challengeTemplateId } = challengeData;
     await challengeInstanceRef.set({
       challengeInstanceId: challengeInstanceRefId,
       challengeTemplateId,
@@ -341,7 +344,7 @@ export const acceptInstanceInFs = async (
         return {
           ...contender,
           status: "Accepted",
-          expiresAt: expiresAt
+          expiresAt
         };
       } else {
         return contender;
@@ -478,7 +481,8 @@ export const validateProofInFs = async (userToValidateId, instanceId) => {
             ...contender.proof,
             state: "Accepted"
           },
-          status: "Completed"
+          status: "Completed",
+          expiresAt: null
         };
       } else {
         return contender;
