@@ -69,3 +69,8 @@ export const updateAvatarStarts = url => ({
 //   type: USER.UPDATE_AVATAR_FAILURE,
 //   payload: error
 // });
+
+export const updateUserDataStarts = userData => ({
+  type: USER.UPDATE_USER_DATA_STARTS,
+  payload: userData
+});

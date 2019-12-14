@@ -4,7 +4,10 @@ import { createStructuredSelector } from "reselect";
 import { useHistory } from "react-router-dom";
 import PropTypes from "prop-types";
 
-import { selectUserProfileId } from "../../redux/user/selectors";
+import {
+  selectUserProfileId,
+  selectUsersDisplayNamesById
+} from "../../redux/user/selectors";
 import {
   selectVideoUrlFromChallengeTemplate,
   selectNameFromChallengeTemplate,
@@ -29,7 +32,7 @@ const InstanceItem = ({ challengeInstanceData }) => {
   const { userProfileId } = useSelector(selectInstanceItemData, shallowEqual);
 
   const {
-    administrator: { userProfileDisplayName },
+    administrator,
     challengeInstanceId,
     challengeTemplateId,
     contenders
@@ -66,9 +69,22 @@ const InstanceItem = ({ challengeInstanceData }) => {
     shallowEqual
   );
 
-  const contendersDisplayNamesString = contenders
-    .map(contender => contender.name)
-    .join(", ");
+  const memoizedSelectUsersDisplayNamesById = useMemo(
+    () => selectUsersDisplayNamesById,
+    []
+  );
+
+  const authorDisplayName = useSelector(state =>
+    memoizedSelectUsersDisplayNamesById(state, administrator)
+  );
+
+  const contendersIdArray = contenders.map(contender => contender.id);
+
+  const contendersDisplayNamesArray = useSelector(state =>
+    memoizedSelectUsersDisplayNamesById(state, contendersIdArray)
+  );
+
+  const contendersDisplayNamesString = contendersDisplayNamesArray.join(" ,");
 
   const userInstanceData = contenders.find(
     contender => contender.id === userProfileId
@@ -99,7 +115,7 @@ const InstanceItem = ({ challengeInstanceData }) => {
       <strong>Category:</strong>
       <span>{categoryFromChallengeTemplate}</span>
       <strong>Administrator:</strong>
-      <span>{userProfileDisplayName}</span>
+      <span>{authorDisplayName}</span>
       <strong>Instance ID:</strong>
       <span>{challengeInstanceId}</span>
       <strong>Contenders:</strong>

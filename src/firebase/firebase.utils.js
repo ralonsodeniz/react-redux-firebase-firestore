@@ -39,15 +39,18 @@ export const checkUserProfileDocumentInFS = async (user, additionalData) => {
       const { displayName, email, photoURL, providerData, uid } = user;
       const createdAt = new Date();
       const providerId = providerData[0].providerId;
-      const challengesInstances = {
-        ability: [],
-        foodie: []
-      };
-      const statics = {
-        ability: 0,
-        foodie: 0,
-        globalRanking: 0
-      };
+      let challengesInstances = {};
+      let statistics = {};
+
+      const challengesTemplatesSnapshot = await firestore
+        .collection(`challengesTemplates`)
+        .get();
+
+      challengesTemplatesSnapshot.docs.forEach(category => {
+        challengesInstances[category.id] = [];
+        statistics[category.id] = 0;
+      });
+
       const friends = {
         accepted: [],
         pending: []
@@ -65,7 +68,7 @@ export const checkUserProfileDocumentInFS = async (user, additionalData) => {
           age: additionalData ? parseInt(additionalData.age) : 0,
           country: additionalData ? additionalData.country : "",
           challengesInstances,
-          statics,
+          statistics,
           friends,
           instancesToValidate
         });
@@ -188,7 +191,6 @@ export const addNewChallengeTemplateInFs = async challengeData => {
 export const addNewChallengeInstanceInFs = async (
   challengeData,
   instanceData,
-  userProfileDisplayName,
   userProfileId
 ) => {
   try {
@@ -196,7 +198,7 @@ export const addNewChallengeInstanceInFs = async (
       .collection("challengesInstances")
       .doc();
     const challengeInstanceRefId = challengeInstanceRef.id;
-    const administrator = { userProfileDisplayName, userProfileId };
+    const administrator = userProfileId;
     const { contenders, validators } = instanceData;
     const comments = [];
     const likes = 0;
@@ -211,7 +213,7 @@ export const addNewChallengeInstanceInFs = async (
       public: false
     };
     let enhancedContenders = contenders.map(contender => ({
-      ...contender,
+      id: contender,
       status: "Pending",
       expiresAt: null,
       ...defaultContenderProps
@@ -220,7 +222,6 @@ export const addNewChallengeInstanceInFs = async (
     expiresAt.setDate(expiresAt.getDate() + parseInt(daysToComplete));
     enhancedContenders.push({
       id: userProfileId,
-      name: userProfileDisplayName,
       status: "Accepted",
       expiresAt,
       ...defaultContenderProps
@@ -302,8 +303,7 @@ export const addNewChallengeInstanceInFs = async (
 
     if (validators !== []) {
       validators.forEach(async validator => {
-        const { id } = validator;
-        const validatorUserRef = firestore.doc(`users/${id}`);
+        const validatorUserRef = firestore.doc(`users/${validator}`);
         const validatorUserSnapshot = await validatorUserRef.get();
         const instancesToValidateData = validatorUserSnapshot.data()
           .instancesToValidate;
@@ -523,6 +523,30 @@ export const invalidateProofInFs = async (userToInvalidateId, instanceId) => {
   } catch (error) {
     console.log("Error while invalidating proof", error);
     throw new Error("Ooops something happened while invalidating proof");
+  }
+};
+
+export const updateUserDataInFs = async userData => {
+  try {
+    const { displayName, age, gender, country } = userData;
+    const userProfileId = auth.currentUser.uid;
+    const userRef = firestore.doc(`users/${userProfileId}`);
+    const userSnapshot = await userRef.get();
+    const userStoredData = userSnapshot.data();
+    const storedDisplayname = userStoredData.displayName;
+    const storedAge = userStoredData.age;
+    const storedGender = userStoredData.gender;
+    const storedCountry = userStoredData.country;
+
+    await userRef.update({
+      displayName: displayName ? displayName : storedDisplayname,
+      age: age ? age : storedAge,
+      gender: gender ? gender : storedGender,
+      country: country ? country : storedCountry
+    });
+  } catch (error) {
+    console.log("Error while updating user data", error);
+    throw new Error("Ooops something happened while updating user data");
   }
 };
 

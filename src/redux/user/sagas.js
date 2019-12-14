@@ -19,7 +19,8 @@ import {
   checkUserProfileDocumentInFS,
   actionCodeSettings,
   // getCurrentUserFromAuth,
-  updateAvatarInFS
+  updateAvatarInFS,
+  updateUserDataInFs
 } from "../../firebase/firebase.utils";
 
 // sign up with email and password
@@ -207,6 +208,32 @@ export function* updateAvatar({ payload }) {
   }
 }
 
+// update user data
+export function* onUpdateUserDataStarts() {
+  yield takeLatest(USER.UPDATE_USER_DATA_STARTS, updateUserData);
+}
+
+export function* updateUserData({ payload }) {
+  try {
+    yield call(updateUserDataInFs, payload);
+    const updateUserDataSuccessModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: "User data updated"
+      }
+    };
+    yield put(openModal(updateUserDataSuccessModalData));
+  } catch (error) {
+    const updateUserDataFailureModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: error.message
+      }
+    };
+    yield put(openModal(updateUserDataFailureModalData));
+  }
+}
+
 // root saga creator for users with all the tiggering generation functions of the saga
 export function* userSagas() {
   yield all([
@@ -215,6 +242,7 @@ export function* userSagas() {
     call(onSignUpStarts),
     // call(onCheckUserSessionStart),
     call(onSignOutStarts),
-    call(onUpdateAvatarStarts)
+    call(onUpdateAvatarStarts),
+    call(onUpdateUserDataStarts)
   ]);
 }

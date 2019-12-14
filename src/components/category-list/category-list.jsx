@@ -24,16 +24,19 @@ const challengesTemplatesCategoriesSelector = createStructuredSelector({
 
 const CategoryList = () => {
   const history = useHistory();
+
   const match = useRouteMatch();
 
   const categoryListData = useSelector(
     challengesTemplatesCategoriesSelector,
     shallowEqual
   );
+
   const {
     challengesTemplatesCategories,
     challengesTemplatesAreLoading
   } = categoryListData;
+
   return (
     <CategoryListContainer>
       <CategoryListTitle>Choose a challenge category</CategoryListTitle>

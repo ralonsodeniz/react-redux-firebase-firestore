@@ -18,18 +18,12 @@ export function* onAddNewInstanceStarts() {
 }
 
 export function* addNewInstance({ payload }) {
-  const {
-    challengeData,
-    instanceData,
-    userProfileDisplayName,
-    userProfileId
-  } = payload;
+  const { challengeData, instanceData, userProfileId } = payload;
   try {
     yield call(
       addNewChallengeInstanceInFs,
       challengeData,
       instanceData,
-      userProfileDisplayName,
       userProfileId
     );
     const addNewInstanceSuccessModalData = {

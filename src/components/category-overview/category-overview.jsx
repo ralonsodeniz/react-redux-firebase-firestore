@@ -24,7 +24,9 @@ const selectCategoryOverviewData = createStructuredSelector({
 
 const CategoryOverview = () => {
   const { category } = useParams();
+
   const dispatch = useDispatch();
+
   const addNewChallengeModalData = {
     modalType: "ADD_CHALLENGE",
     modalProps: {
@@ -37,10 +39,12 @@ const CategoryOverview = () => {
     () => selectChallengesTemplatesCategory,
     []
   );
+
   const { challengesTemplatesAreLoading } = useSelector(
     selectCategoryOverviewData,
     shallowEqual
   );
+
   const challengesTemplateCategory = useSelector(
     state => selectChallengesTemplatesCategoryInstance(category)(state),
     shallowEqual

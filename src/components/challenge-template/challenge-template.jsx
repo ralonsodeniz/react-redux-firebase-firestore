@@ -11,8 +11,8 @@ import {
 import {
   selectUserProfileIsEmpty,
   selectUserAcceptedFriends,
-  selectUserProfileDisplayName,
-  selectUserProfileId
+  selectUserProfileId,
+  selectUsersDisplayNamesById
 } from "../../redux/user/selectors";
 import { openModal } from "../../redux/modal/actions";
 import { addNewInstanceStarts } from "../../redux/firestore/challenges-instances/actions";
@@ -33,23 +33,30 @@ const selectChallengeTemplateData = createStructuredSelector({
   challengesTempletesAreLoading: selectChallengesTemplatesAreLoading,
   userProfileIsEmpty: selectUserProfileIsEmpty,
   userAcceptedFriends: selectUserAcceptedFriends,
-  userProfileDisplayName: selectUserProfileDisplayName,
   userProfileId: selectUserProfileId
 });
 
 const ChallengeTemplate = () => {
   const dispatch = useDispatch();
+
   const { challengeTemplateId } = useParams();
+
   const { push } = useHistory();
+
   const memoizedSelectChallengeTemplateFromId = useMemo(
     () => selectChallengeTemplateFromId,
     []
   );
+
+  const memoizedSelectUsersDisplayNamesById = useMemo(
+    () => selectUsersDisplayNamesById,
+    []
+  );
+
   const {
     challengesTempletesAreLoading,
     userProfileIsEmpty,
     userAcceptedFriends,
-    userProfileDisplayName,
     userProfileId
   } = useSelector(selectChallengeTemplateData, shallowEqual);
 
@@ -70,6 +77,23 @@ const ChallengeTemplate = () => {
     timesCompleted,
     videoUrl
   } = challengeTemplate;
+
+  const authorDisplayName = useSelector(state =>
+    memoizedSelectUsersDisplayNamesById(state, author)
+  );
+
+  const rankingUsersId = ranking ? ranking.map(user => user.id) : [];
+
+  const rankingUsersDisplayNames = useSelector(state =>
+    memoizedSelectUsersDisplayNamesById(state, rankingUsersId)
+  );
+
+  const enhancedRanking = ranking
+    ? ranking.map((user, userIndex) => ({
+        ...user,
+        name: rankingUsersDisplayNames[userIndex]
+      }))
+    : [];
 
   const handleOpenAcceptChallenge = useCallback(() => {
     if (userProfileIsEmpty) {
@@ -96,19 +120,11 @@ const ChallengeTemplate = () => {
             contenders: [],
             validators: []
           },
-          userProfileDisplayName,
           userProfileId
         )
       );
     }
-  }, [
-    challengeTemplate,
-    userProfileDisplayName,
-    userProfileId,
-    dispatch,
-    push,
-    userProfileIsEmpty
-  ]);
+  }, [challengeTemplate, userProfileId, dispatch, push, userProfileIsEmpty]);
 
   return !challengesTempletesAreLoading ? (
     <ChallengeTemplateContainer>
@@ -130,7 +146,7 @@ const ChallengeTemplate = () => {
         </ChallengeTemplateData>
         <ChallengeTemplateData>
           <h4>Author:</h4>
-          <span>{author}</span>
+          <span>{authorDisplayName}</span>
           <h4>Difficulty:</h4>
           <span>{difficulty}</span>
           <h4>Times completed:</h4>
@@ -141,7 +157,7 @@ const ChallengeTemplate = () => {
       </ChallengeTemplateDataContainer>
       <ChallengeTemplateRanking>
         <h4>Users ranking</h4>
-        {ranking
+        {enhancedRanking
           .sort((a, b) =>
             a.rating > b.rating
               ? -1

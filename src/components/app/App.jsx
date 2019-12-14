@@ -7,8 +7,7 @@ import { useFirestoreConnect } from "react-redux-firebase";
 import { selectShowModal } from "../../redux/modal/selectors";
 import {
   selectUserAuthIsEmpty,
-  selectUserAuthIsLoaded,
-  selectUserEmailVerified
+  selectUserAuthIsLoaded
 } from "../../redux/user/selectors";
 
 import InnerModal from "../modal/inner-modal";
@@ -31,17 +30,18 @@ const Playground = lazy(() => import("../../pages/playground/playground"));
 const selectAppData = createStructuredSelector({
   showModal: selectShowModal,
   userAuthIsLoaded: selectUserAuthIsLoaded,
-  userAuthIsEmpty: selectUserAuthIsEmpty,
-  userEmailVerified: selectUserEmailVerified
+  userAuthIsEmpty: selectUserAuthIsEmpty
 });
 
 const App = () => {
   const appData = useSelector(selectAppData, shallowEqual);
+
   const { showModal, userAuthIsEmpty, userAuthIsLoaded } = appData;
   // this is replaced by state.firebase.auth
   // useEffect(() => {
   //   dispatch(checkUserSessionStart());
   // }, [dispatch]);
+
   useFirestoreConnect([
     { collection: `users` },
     { collection: `challengesTemplates` },
@@ -89,10 +89,7 @@ const App = () => {
                 userAuthIsLoaded && userAuthIsEmpty ? (
                   <Redirect to="/signin" />
                 ) : (
-                  <div>
-                    <Redirect to="/account/all" />
-                    <AccountPage />
-                  </div>
+                  <AccountPage />
                 )
               }
             />

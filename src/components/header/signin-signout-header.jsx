@@ -43,7 +43,7 @@ const SigninSignOutHeader = () => {
         ) : (
           <HeaderAccountContainer>
             <Link to="/playground">Playground</Link>
-            <Link to="/account/all">Account</Link>
+            <Link to="/account">Account</Link>
             <HeaderSigninSignOutSpan onClick={handleSignOut}>
               Sign out
             </HeaderSigninSignOutSpan>

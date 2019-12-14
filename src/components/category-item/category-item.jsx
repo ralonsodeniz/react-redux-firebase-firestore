@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useMemo } from "react";
 import PropTypes from "prop-types";
 import { useHistory } from "react-router-dom";
+import { useSelector, shallowEqual } from "react-redux";
+
+import { selectUsersDisplayNamesById } from "../../redux/user/selectors";
 
 import CustomButton from "../custom-button/custom-button";
 
@@ -21,7 +24,18 @@ const CategoryItem = ({ challengeTemplateId, challengeTemplateData }) => {
     videoUrl,
     category
   } = challengeTemplateData;
+
   const history = useHistory();
+
+  const memoizedSelectUsersDisplayNamesById = useMemo(
+    () => selectUsersDisplayNamesById,
+    []
+  );
+
+  const authorDisplayName = useSelector(
+    state => memoizedSelectUsersDisplayNamesById(state, author),
+    shallowEqual
+  );
 
   return (
     <CategoryItemContainer>
@@ -35,7 +49,7 @@ const CategoryItem = ({ challengeTemplateId, challengeTemplateData }) => {
       <strong>Category:</strong>
       <span>{category}</span>
       <strong>Author:</strong>
-      <span>{author}</span>
+      <span>{authorDisplayName}</span>
       <strong>Difficulty</strong>
       <span>{difficulty}</span>
       <strong>Days to complete challenge</strong>

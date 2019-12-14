@@ -3,7 +3,7 @@ import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { createStructuredSelector } from "reselect";
 import PropTypes from "prop-types";
 import { addNewChallengeStarts } from "../../redux/firestore/challenges-templates/actions";
-import { selectUserProfileDisplayName } from "../../redux/user/selectors";
+import { selectUserProfileId } from "../../redux/user/selectors";
 
 import FormInput from "../form-input/form-input";
 // import FormDropdown from "../form-dropdown/form-dropdown";
@@ -17,13 +17,16 @@ import {
 // import { openModal } from "../../redux/modal/actions";
 
 const selectAddChallengeData = createStructuredSelector({
-  userProfileDisplayName: selectUserProfileDisplayName
+  userProfileId: selectUserProfileId
 });
 
 const AddChallenge = ({ urlCategory }) => {
   const dispatch = useDispatch();
+
   const addChallengeData = useSelector(selectAddChallengeData, shallowEqual);
-  const { userProfileDisplayName } = addChallengeData;
+
+  const { userProfileId } = addChallengeData;
+
   const [formChallengeData, setFormChallengeData] = useState({
     description: "",
     // difficulty: "",
@@ -31,6 +34,7 @@ const AddChallenge = ({ urlCategory }) => {
     name: ""
     // daysToComplete: ""
   });
+
   const [formValidated, setFormValidated] = useState(false);
   // no logner needed since we are passing category from the selected in the url
   // const options = [
@@ -45,6 +49,7 @@ const AddChallenge = ({ urlCategory }) => {
   //     key: 1
   //   }
   // ];
+
   const {
     description,
     // difficulty,
@@ -52,6 +57,7 @@ const AddChallenge = ({ urlCategory }) => {
     name
     // daysToComplete
   } = formChallengeData;
+
   const handleChange = useCallback(
     event => {
       const { value, name } = event.target;
@@ -62,6 +68,7 @@ const AddChallenge = ({ urlCategory }) => {
     },
     [formChallengeData]
   );
+
   const handleFormCheck = event => {
     event.preventDefault();
     // we no longer need to check if the category is selected
@@ -76,16 +83,12 @@ const AddChallenge = ({ urlCategory }) => {
   };
   // we use curried functions to pass first the arguments from the component and then return a function that awaits the url to dispatch the action when the file is updated and we have the video url
   // doing like this we do not have external dependencies
+
   const handleSubmit = useCallback(
-    (
-      dispatch,
-      formChallengeData,
-      userProfileDisplayName,
-      urlCategory
-    ) => url => {
+    (dispatch, formChallengeData, userProfileId, urlCategory) => url => {
       const challengeData = {
         ...formChallengeData,
-        author: userProfileDisplayName,
+        author: userProfileId,
         category: urlCategory,
         videoUrl: url
       };
@@ -178,12 +181,12 @@ const AddChallenge = ({ urlCategory }) => {
         fileType="video"
         directory={`challengesTemplates/${urlCategory}/${name}`}
         fileName={name}
-        // in this case, since we are returning a function, because handleSubmit is a curried function and we only pass the first set of parameters, we do not need to () => handleSubmit(dispatch, formChallengeData, userProfileDisplayName)
+        // in this case, since we are returning a function, because handleSubmit is a curried function and we only pass the first set of parameters, we do not need to () => handleSubmit(dispatch, formChallengeData, userProfileId)
         // the function wont run until it is called in the children
         urlAction={handleSubmit(
           dispatch,
           formChallengeData,
-          userProfileDisplayName,
+          userProfileId,
           urlCategory
         )}
         labelText={"Choose challenge video"}

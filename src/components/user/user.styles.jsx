@@ -43,6 +43,11 @@ export const UpdateAvatarContainer = styled.div`
   align-items: center;
 `;
 
+export const UserButtonsContainer = styled.div`
+  display: flex;
+  justify-content: space-evenly;
+`;
+
 export const InputFileContainer = styled.input`
   border: 0;
   clip-path: rect(0, 0, 0, 0);
@@ -78,10 +83,6 @@ export const LabelFileContainer = styled.label`
   &:active {
     box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.15);
   }
-`;
-
-export const LogOutButtonContainer = styled.div`
-  align-self: flex-end;
 `;
 
 export const UserDataContainer = styled.div`
@@ -128,4 +129,16 @@ export const UserDataTextTitle = styled.h4`
 
 export const UserDataText = styled.span`
   font-weight: 100;
+`;
+
+export const UpdateUserDataTitle = styled.h4`
+  font-weight: 400;
+  margin: auto;
+`;
+
+export const UpdateUserDataContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  justify-content: space-evenly;
 `;

@@ -3,18 +3,18 @@ import { useDispatch } from "react-redux";
 
 import { signUpStarts } from "../../redux/user/actions";
 import { openModal } from "../../redux/modal/actions";
-import { countryOptions } from "../../utils/options";
+import { countryOptions, genderOptions } from "../../utils/options";
 
 import CustomButton from "../custom-button/custom-button";
+import FormInput from "../form-input/form-input";
+import FormRadio from "../form-radio/form-radio";
+import FormDropdown from "../form-dropdown/form-dropdown";
 
 import {
   SignUpContainer,
   SignUpText,
   SignUpButtonsContainer
 } from "./sign-up.styles";
-import FormInput from "../form-input/form-input";
-import FormRadio from "../form-radio/form-radio";
-import FormDropdown from "../form-dropdown/form-dropdown";
 
 const SignUp = () => {
   const [userData, setUserData] = useState({
@@ -67,17 +67,6 @@ const SignUp = () => {
     },
     [dispatch, userData]
   );
-
-  const genderOptions = [
-    {
-      value: "Male",
-      text: "Male"
-    },
-    {
-      value: "Female",
-      text: "Female"
-    }
-  ];
 
   return (
     <SignUpContainer>

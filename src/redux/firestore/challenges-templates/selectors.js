@@ -8,9 +8,7 @@ const selectChallengesTemplates = state =>
 export const selectChallengesTemplatesCategories = createSelector(
   [selectChallengesTemplates],
   challengesTemplates =>
-    challengesTemplates
-      ? Object.keys(challengesTemplates).map(category => category)
-      : []
+    challengesTemplates ? Object.keys(challengesTemplates) : []
 );
 
 export const selectChallengesTemplatesAreLoading = createSelector(

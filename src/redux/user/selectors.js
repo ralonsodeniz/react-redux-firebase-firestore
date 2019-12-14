@@ -3,6 +3,7 @@ import { createSelector } from "reselect";
 // input selector
 const selectUserAuth = state => state.firebase.auth;
 const selectUserProfile = state => state.firebase.profile;
+const selectUsers = state => state.firestore.data.users;
 
 // output selector
 export const selectUserAuthIsLoaded = createSelector(
@@ -116,5 +117,20 @@ export const selectUserIntancesToValidate = createSelector(
       ? profile.instancesToValidate
         ? profile.instancesToValidate
         : []
+      : []
+);
+
+export const selectUsersAreLoading = createSelector(
+  state => state.firestore.status.requesting,
+  requesting => requesting.users
+);
+
+export const selectUsersDisplayNamesById = createSelector(
+  [selectUsers, selectUsersAreLoading, (_, usersArray) => usersArray],
+  (users, usersAreLoading, usersArray) =>
+    !usersAreLoading && users && usersArray
+      ? !Array.isArray(usersArray)
+        ? users[usersArray].displayName
+        : usersArray.map(user => users[user].displayName)
       : []
 );

@@ -8,12 +8,15 @@ import {
   selectInstanceTemplateId,
   selectInstanceValidators
 } from "../../redux/firestore/challenges-instances/selectors";
-import { selectChallengeTemplateFromId } from "../../redux/firestore/challenges-templates/selectors";
+import {
+  selectChallengeTemplateFromId,
+  selectChallengesTemplatesAreLoading
+} from "../../redux/firestore/challenges-templates/selectors";
 import {
   selectUserProfileId,
-  selectUserProfileIsLoaded
+  selectUserProfileIsLoaded,
+  selectUsersDisplayNamesById
 } from "../../redux/user/selectors";
-import { selectChallengesTemplatesAreLoading } from "../../redux/firestore/challenges-templates/selectors";
 import { selectChallengesInstancesAreLoading } from "../../redux/firestore/challenges-instances/selectors";
 import {
   acceptInstanceStarts,
@@ -76,6 +79,11 @@ const ChallengeInstance = () => {
     []
   );
 
+  const memoizedSelectUsersDisplayNameById = useMemo(
+    () => selectUsersDisplayNamesById,
+    []
+  );
+
   const challengeInstanceContenders = useSelector(
     state => memoizedSelectInstanceContenders(state, instanceId),
     shallowEqual
@@ -88,11 +96,6 @@ const ChallengeInstance = () => {
 
   const challengeTemplate = useSelector(
     state => memoizedSelectChallengeTemplateFromId(state, templateId),
-    shallowEqual
-  );
-
-  const challengeInstanceValidators = useSelector(
-    state => memoizedSelectInstanceValidators(state, instanceId),
     shallowEqual
   );
 
@@ -109,7 +112,33 @@ const ChallengeInstance = () => {
     category
   } = challengeTemplate;
 
-  const userContenderObject = challengeInstanceContenders.find(
+  const challengeInstanceValidators = useSelector(
+    state => memoizedSelectInstanceValidators(state, instanceId),
+    shallowEqual
+  );
+
+  const challengeInstanceContendersIds = challengeInstanceContenders.map(
+    contender => contender.id
+  );
+
+  const challengeInstanceContendersDisplayNames = useSelector(state =>
+    memoizedSelectUsersDisplayNameById(state, challengeInstanceContendersIds)
+  );
+
+  const authorDisplayName = useSelector(state =>
+    memoizedSelectUsersDisplayNameById(state, author)
+  );
+
+  const enhancedChallengeInstanceContenders = challengeInstanceContenders.map(
+    (contender, contenderIndex) => {
+      return {
+        ...contender,
+        name: challengeInstanceContendersDisplayNames[contenderIndex]
+      };
+    }
+  );
+
+  const userContenderObject = enhancedChallengeInstanceContenders.find(
     contender => contender.id === userProfileId
   );
 
@@ -126,7 +155,7 @@ const ChallengeInstance = () => {
     : false;
 
   const isUserValidator = challengeInstanceValidators.some(
-    validator => validator.id === userProfileId
+    validator => validator === userProfileId
   );
 
   const handleAcceptChallenge = useCallback(
@@ -183,7 +212,7 @@ const ChallengeInstance = () => {
         </ChallengeInstanceTemplateData>
         <ChallengeInstanceTemplateData>
           <h4>Author:</h4>
-          <span>{author}</span>
+          <span>{authorDisplayName}</span>
           <h4>Category:</h4>
           <span>{category}</span>
           <h4>Difficulty:</h4>
@@ -244,7 +273,7 @@ const ChallengeInstance = () => {
         ) : null)}
       <ChallengeInstanceData>
         <InstanceContenderInfo
-          challengeInstanceContenders={challengeInstanceContenders}
+          challengeInstanceContenders={enhancedChallengeInstanceContenders}
           userProfileId={userProfileId}
           isUserValidator={isUserValidator}
           instanceId={instanceId}

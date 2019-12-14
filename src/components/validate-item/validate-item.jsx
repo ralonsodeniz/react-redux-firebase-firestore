@@ -8,6 +8,8 @@ import {
   selectNameFromChallengeTemplate
 } from "../../redux/firestore/challenges-templates/selectors";
 
+import { selectUsersDisplayNamesById } from "../../redux/user/selectors";
+
 import CustomButton from "../custom-button/custom-button";
 
 import {
@@ -20,7 +22,7 @@ const ValidateItem = ({ challengeInstanceData }) => {
   const { push } = useHistory();
 
   const {
-    administrator: { userProfileDisplayName },
+    administrator,
     challengeInstanceId,
     challengeTemplateId,
     contenders
@@ -36,6 +38,11 @@ const ValidateItem = ({ challengeInstanceData }) => {
     []
   );
 
+  const memoizedSelectUsersDisplayNamesById = useMemo(
+    () => selectUsersDisplayNamesById,
+    []
+  );
+
   const videoUrlFromChallengeTemplayte = useSelector(
     state =>
       memoizedSelectVideoUrlFromChallengeTemplate(state, challengeTemplateId),
@@ -48,9 +55,17 @@ const ValidateItem = ({ challengeInstanceData }) => {
     shallowEqual
   );
 
-  const contendersDisplayNamesString = contenders
-    .map(contender => contender.name)
-    .join(" ,");
+  const authorDisplayName = useSelector(state =>
+    memoizedSelectUsersDisplayNamesById(state, administrator)
+  );
+
+  const contendersIdArray = contenders.map(contender => contender.id);
+
+  const contendersDisplayNamesArray = useSelector(state =>
+    memoizedSelectUsersDisplayNamesById(state, contendersIdArray)
+  );
+
+  const contendersDisplayNamesString = contendersDisplayNamesArray.join(" ,");
 
   const status = contenders.some(
     contender => contender.proof.state === "Pending"
@@ -83,7 +98,7 @@ const ValidateItem = ({ challengeInstanceData }) => {
       <strong>Name:</strong>
       <span>{nameFromChallengeTemplate}</span>
       <strong>Administrator:</strong>
-      <span>{userProfileDisplayName}</span>
+      <span>{authorDisplayName}</span>
       <strong>Instance ID:</strong>
       <span>{challengeInstanceId}</span>
       <strong>Contenders:</strong>

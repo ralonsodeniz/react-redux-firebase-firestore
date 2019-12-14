@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { createStructuredSelector } from "reselect";
 import { useSelector, shallowEqual } from "react-redux";
 import PropTypes from "prop-types";
@@ -7,7 +7,8 @@ import { useDispatch } from "react-redux";
 import {
   selectUserAcceptedFriends,
   selectUserProfileDisplayName,
-  selectUserProfileId
+  selectUserProfileId,
+  selectUsersDisplayNamesById
 } from "../../redux/user/selectors";
 import { addNewInstanceStarts } from "../../redux/firestore/challenges-instances/actions";
 
@@ -43,10 +44,25 @@ const AddChallengeInstance = ({ challengeTemplate }) => {
     userProfileId
   } = useSelector(selectAddChallengeInstanceData, shallowEqual);
 
+  const memoizedSelectUsersDisplayNamesById = useMemo(
+    () => selectUsersDisplayNamesById,
+    []
+  );
+
+  console.log("userAcceptedFriends", userAcceptedFriends);
+
+  const userAcceptedFriendsDisplayNames = useSelector(state =>
+    memoizedSelectUsersDisplayNamesById(state, userAcceptedFriends)
+  );
+
+  console.log(
+    "userAcceptedFriendsDisplayName",
+    userAcceptedFriendsDisplayNames
+  );
+
   const contendersOptions = userAcceptedFriends.map((friend, friendIndex) => ({
-    text: friend.displayName,
-    value: friend.uid,
-    key: friendIndex + 1
+    text: userAcceptedFriendsDisplayNames[friendIndex],
+    value: friend
   }));
 
   const validatorOptions =
@@ -55,8 +71,7 @@ const AddChallengeInstance = ({ challengeTemplate }) => {
           ...contendersOptions,
           {
             text: userProfileDisplayName,
-            value: userProfileId,
-            key: 0
+            value: userProfileId
           }
         ]
       : contendersOptions;
@@ -82,17 +97,10 @@ const AddChallengeInstance = ({ challengeTemplate }) => {
       addNewInstanceStarts(
         challengeTemplate,
         formInstanceChallengeData,
-        userProfileDisplayName,
         userProfileId
       )
     );
-  }, [
-    challengeTemplate,
-    dispatch,
-    formInstanceChallengeData,
-    userProfileDisplayName,
-    userProfileId
-  ]);
+  }, [challengeTemplate, dispatch, formInstanceChallengeData, userProfileId]);
 
   const handleChange = useCallback(
     event => {
@@ -100,8 +108,7 @@ const AddChallengeInstance = ({ challengeTemplate }) => {
       // selectedOptions is an HTMLCollection so we create a function to iterate it and get the data we need
       const getValuesFromSelectedOptions = selectedOptions => {
         let arrayOfValues = [];
-        for (let option of selectedOptions)
-          arrayOfValues.push({ id: option.value, name: option.text });
+        for (let option of selectedOptions) arrayOfValues.push(option.value);
         return arrayOfValues;
       };
       const valueArray = getValuesFromSelectedOptions(selectedOptions);
@@ -120,18 +127,11 @@ const AddChallengeInstance = ({ challengeTemplate }) => {
         addNewInstanceStarts(
           challengeTemplate,
           formInstanceChallengeData,
-          userProfileDisplayName,
           userProfileId
         )
       );
     },
-    [
-      challengeTemplate,
-      formInstanceChallengeData,
-      userProfileDisplayName,
-      userProfileId,
-      dispatch
-    ]
+    [challengeTemplate, formInstanceChallengeData, userProfileId, dispatch]
   );
 
   return (
