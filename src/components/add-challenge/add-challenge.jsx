@@ -178,7 +178,7 @@ const AddChallenge = ({ urlCategory }) => {
         {!formValidated ? <span>&#9744;</span> : <span>&#9745;</span>}
       </form>
       <FileUploader
-        fileType="video"
+        fileType="imageOrvideo"
         directory={`challengesTemplates/${urlCategory}/${name}`}
         fileName={name}
         // in this case, since we are returning a function, because handleSubmit is a curried function and we only pass the first set of parameters, we do not need to () => handleSubmit(dispatch, formChallengeData, userProfileId)
@@ -189,7 +189,7 @@ const AddChallenge = ({ urlCategory }) => {
           userProfileId,
           urlCategory
         )}
-        labelText={"Choose challenge video"}
+        labelText={"Choose challenge sample proof"}
         submitText="Submit new challenge!"
         disabled={!formValidated}
         maxFileSizeInMB={50}

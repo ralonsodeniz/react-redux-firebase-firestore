@@ -62,7 +62,6 @@ const App = () => {
             <Route exact path="/" render={() => <Redirect to="/main/all" />} />
             <Route path="/main" component={MainPage} />
             <Route
-              exact
               path="/signin"
               render={() =>
                 userAuthIsLoaded && !userAuthIsEmpty ? (

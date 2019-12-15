@@ -49,15 +49,8 @@ const AddChallengeInstance = ({ challengeTemplate }) => {
     []
   );
 
-  console.log("userAcceptedFriends", userAcceptedFriends);
-
   const userAcceptedFriendsDisplayNames = useSelector(state =>
     memoizedSelectUsersDisplayNamesById(state, userAcceptedFriends)
-  );
-
-  console.log(
-    "userAcceptedFriendsDisplayName",
-    userAcceptedFriendsDisplayNames
   );
 
   const contendersOptions = userAcceptedFriends.map((friend, friendIndex) => ({

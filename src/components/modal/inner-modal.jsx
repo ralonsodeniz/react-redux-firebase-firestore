@@ -16,15 +16,26 @@ import {
 const lazyCounterManager = lazy(() =>
   import("../counter-manager/counter-manager")
 );
+
 const lazyVideoPlayer = lazy(() => import("../video-player/video-player"));
+
 const lazySystemMessage = lazy(() =>
   import("../system-message/system-message")
 );
+
 const lazyAddChallenge = lazy(() => import("../add-challenge/add-challenge"));
+
 const lazyAddChallengeInstance = lazy(() =>
   import("../add-challenge-instance/add-challenge-instance")
 );
+
 const lazyUpdateUserData = lazy(() => import("../user/update-user-data"));
+
+const lazyDeleteUser = lazy(() => import("../user/delete-user"));
+
+const lazyUpdateUserPassword = lazy(() =>
+  import("../user/update-user-password")
+);
 
 const MODAL_OPTIONS = {
   COUNTER_MANAGER: lazyCounterManager,
@@ -32,7 +43,9 @@ const MODAL_OPTIONS = {
   SYSTEM_MESSAGE: lazySystemMessage,
   ADD_CHALLENGE: lazyAddChallenge,
   ADD_CHALLENGE_INSTANCE: lazyAddChallengeInstance,
-  UPDATE_USER_DATA: lazyUpdateUserData
+  UPDATE_USER_DATA: lazyUpdateUserData,
+  DELETE_USER: lazyDeleteUser,
+  UPDATE_USER_PASSWORD: lazyUpdateUserPassword
 };
 
 // we can create a structured selector object using createStructuredSelector from reselect using different selectors and then pass it to useSelector redux custom hook

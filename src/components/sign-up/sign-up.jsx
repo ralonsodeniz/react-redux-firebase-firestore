@@ -21,12 +21,13 @@ const SignUp = () => {
     displayName: "",
     email: "",
     password: "",
+    confirmPassword: "",
     age: "",
     gender: "",
     country: ""
   });
 
-  const { displayName, email, password, age } = userData;
+  const { displayName, email, password, confirmPassword, age } = userData;
 
   const dispatch = useDispatch();
 
@@ -53,19 +54,29 @@ const SignUp = () => {
         };
         dispatch(openModal(emptyValueModalData));
         return;
+      } else if (password !== confirmPassword) {
+        const passwordsDoNotMatchModalData = {
+          modalType: "SYSTEM_MESSAGE",
+          modalProps: {
+            text: "Passwords do not match"
+          }
+        };
+        dispatch(openModal(passwordsDoNotMatchModalData));
+        return;
       } else {
         dispatch(signUpStarts(userData));
         setUserData({
           displayName: "",
           email: "",
           password: "",
+          confirmPassword: "",
           age: "",
           gender: "",
           country: ""
         });
       }
     },
-    [dispatch, userData]
+    [dispatch, userData, confirmPassword, password]
   );
 
   return (
@@ -97,6 +108,15 @@ const SignUp = () => {
           value={password}
           handleChange={handleChange}
           label={"Password"}
+          required
+        />
+        <FormInput
+          type="password"
+          id="password"
+          name="confirmPassword"
+          value={confirmPassword}
+          handleChange={handleChange}
+          label={"Confirm password"}
           required
         />
         <FormInput

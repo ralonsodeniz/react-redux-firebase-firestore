@@ -20,7 +20,11 @@ import {
   actionCodeSettings,
   // getCurrentUserFromAuth,
   updateAvatarInFS,
-  updateUserDataInFs
+  updateUserDataInFs,
+  deleteUserInFs,
+  updateUserPasswordInFs,
+  resetUserPasswordFromFB,
+  resendVerificationEmailFromFB
 } from "../../firebase/firebase.utils";
 
 // sign up with email and password
@@ -234,6 +238,131 @@ export function* updateUserData({ payload }) {
   }
 }
 
+// delete user
+export function* onDeleteUserStarts() {
+  yield takeLatest(USER.DELETE_USER_STARTS, deleteUser);
+}
+
+export function* deleteUser({ payload }) {
+  const { userCredentials, userAcceptedFriends, userProviderId } = payload;
+  try {
+    yield call(
+      deleteUserInFs,
+      userCredentials,
+      userAcceptedFriends,
+      userProviderId
+    );
+    const deleteUserSuccessModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: "User deleted"
+      }
+    };
+    yield put(openModal(deleteUserSuccessModalData));
+  } catch (error) {
+    const deleteUserFailureModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: error.message
+      }
+    };
+    yield put(openModal(deleteUserFailureModalData));
+  }
+}
+
+// update user password
+export function* onUpdateUserPasswordStarts() {
+  yield takeLatest(USER.UPDATE_USER_PASSWORD_STARTS, updateUserPassword);
+}
+
+export function* updateUserPassword({ payload }) {
+  const { newPassword, password } = payload;
+  try {
+    yield call(updateUserPasswordInFs, newPassword, password);
+    const updateUserPasswordSuccessModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: "User password updated"
+      }
+    };
+    yield put(openModal(updateUserPasswordSuccessModalData));
+  } catch (error) {
+    const updateUserPasswordFailureModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: error.message
+      }
+    };
+    yield put(openModal(updateUserPasswordFailureModalData));
+  }
+}
+
+// reset user password
+export function* onResetUserPasswordStarts() {
+  yield takeLatest(USER.RESET_USER_PASSWORD_STARTS, resetUserPassword);
+}
+
+export function* resetUserPassword({ payload }) {
+  try {
+    yield call(resetUserPasswordFromFB, payload);
+    const resetUserPasswordSuccessModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: "An email with a password reset link has been sent to you"
+      }
+    };
+    yield put(openModal(resetUserPasswordSuccessModalData));
+  } catch (error) {
+    const resetUserPasswordFailureModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: error.message
+      }
+    };
+    yield put(openModal(resetUserPasswordFailureModalData));
+  }
+}
+
+// resend verification email
+export function* onResendVerificationEmailStarts() {
+  yield takeLatest(
+    USER.RESEND_VERIFICATION_EMAIL_STARTS,
+    resendVerificationEmail
+  );
+}
+
+export function* resendVerificationEmail({ payload }) {
+  try {
+    const alreadyVerified = yield call(resendVerificationEmailFromFB, payload);
+
+    if (alreadyVerified) {
+      const resendVerificationEmailSuccessModalData = {
+        modalType: "SYSTEM_MESSAGE",
+        modalProps: {
+          text: "Your email is already verified"
+        }
+      };
+      yield put(openModal(resendVerificationEmailSuccessModalData));
+    } else {
+      const resendVerificationEmailSuccessModalData = {
+        modalType: "SYSTEM_MESSAGE",
+        modalProps: {
+          text: "Verification email resent"
+        }
+      };
+      yield put(openModal(resendVerificationEmailSuccessModalData));
+    }
+  } catch (error) {
+    const resendVerificationEmailFailureModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: error.message
+      }
+    };
+    yield put(openModal(resendVerificationEmailFailureModalData));
+  }
+}
+
 // root saga creator for users with all the tiggering generation functions of the saga
 export function* userSagas() {
   yield all([
@@ -243,6 +372,10 @@ export function* userSagas() {
     // call(onCheckUserSessionStart),
     call(onSignOutStarts),
     call(onUpdateAvatarStarts),
-    call(onUpdateUserDataStarts)
+    call(onUpdateUserDataStarts),
+    call(onDeleteUserStarts),
+    call(onUpdateUserPasswordStarts),
+    call(onResetUserPasswordStarts),
+    call(onResendVerificationEmailStarts)
   ]);
 }

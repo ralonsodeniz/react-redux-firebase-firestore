@@ -2,7 +2,10 @@ import React, { useCallback } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import { createStructuredSelector } from "reselect";
 
-import { selectUserProfileIsEmpty } from "../../redux/user/selectors";
+import {
+  selectUserProfileIsEmpty,
+  selectUserProviderId
+} from "../../redux/user/selectors";
 import { openModal } from "../../redux/modal/actions";
 
 import UserAvatar from "./user-avatar";
@@ -13,7 +16,8 @@ import CustomButton from "../custom-button/custom-button";
 import { UserContainer, UserButtonsContainer } from "./user.styles";
 
 const userDataSelector = createStructuredSelector({
-  userProfileIsEmpty: selectUserProfileIsEmpty
+  userProfileIsEmpty: selectUserProfileIsEmpty,
+  userProviderId: selectUserProviderId
 });
 
 const User = () => {
@@ -21,16 +25,36 @@ const User = () => {
 
   const dispatch = useDispatch();
 
-  const { userProfileIsEmpty } = userData;
+  const { userProfileIsEmpty, userProviderId } = userData;
 
   const updateUserDataModalData = {
     modalType: "UPDATE_USER_DATA",
     modalProps: {}
   };
 
+  const deleteUserModalData = {
+    modalType: "DELETE_USER",
+    modalProps: {}
+  };
+
+  const updateUserPasswordModalData = {
+    modalType: "UPDATE_USER_PASSWORD",
+    modalProps: {}
+  };
+
   const handleOpenUpdateUserData = useCallback(
     () => dispatch(openModal(updateUserDataModalData)),
     [dispatch, updateUserDataModalData]
+  );
+
+  const handleOpenDeleteUser = useCallback(
+    () => dispatch(openModal(deleteUserModalData)),
+    [dispatch, deleteUserModalData]
+  );
+
+  const handleOpenUpdateUserPassword = useCallback(
+    () => dispatch(openModal(updateUserPasswordModalData)),
+    [dispatch, updateUserPasswordModalData]
   );
 
   return !userProfileIsEmpty ? (
@@ -44,6 +68,18 @@ const User = () => {
           type="button"
           onClick={handleOpenUpdateUserData}
         />
+        <CustomButton
+          text="Delete user"
+          type="button"
+          onClick={handleOpenDeleteUser}
+        />
+        {userProviderId === "password" && (
+          <CustomButton
+            text="Update user password"
+            type="button"
+            onClick={handleOpenUpdateUserPassword}
+          />
+        )}
       </UserButtonsContainer>
     </UserContainer>
   ) : (

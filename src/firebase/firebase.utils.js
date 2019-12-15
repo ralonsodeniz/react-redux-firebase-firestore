@@ -177,7 +177,7 @@ export const addNewChallengeTemplateInFs = async challengeData => {
           rating: 0,
           timesCompleted: 0,
           difficulty: "",
-          daysToComplete: ""
+          daysToComplete: 0
         }
       },
       { merge: true }
@@ -202,7 +202,9 @@ export const addNewChallengeInstanceInFs = async (
     const { contenders, validators } = instanceData;
     const comments = [];
     const likes = 0;
-    const { category, challengeTemplateId, daysToComplete } = challengeData;
+    const { category, challengeTemplateId } = challengeData;
+    let { daysToComplete } = challengeData;
+
     const defaultContenderProps = {
       proof: {
         url: "",
@@ -548,6 +550,105 @@ export const updateUserDataInFs = async userData => {
     console.log("Error while updating user data", error);
     throw new Error("Ooops something happened while updating user data");
   }
+};
+
+export const deleteUserInFs = async (
+  userCredentials,
+  userAcceptedFriends,
+  userProviderId
+) => {
+  try {
+    const { email, password } = userCredentials;
+
+    const user = auth.currentUser;
+
+    const userId = user.uid;
+
+    if (userProviderId === "password") {
+      const credentials = firebase.auth.EmailAuthProvider.credential(
+        email,
+        password
+      );
+      await user.reauthenticateWithCredential(credentials);
+    } else {
+      await user.reauthenticateWithPopup(googleAuthProvider);
+    }
+
+    await firestore.doc(`users/${userId}`).delete();
+    await user.delete();
+    await auth.signOut();
+
+    userAcceptedFriends.forEach(async friend => {
+      const friendRef = firestore.doc(`users/${friend}`);
+      const friendSnapshot = await friendRef.get();
+      const friendPendingFriends = friendSnapshot.data().friends.pending;
+      const friendAcceptedFriends = friendSnapshot.data().friends.accepted;
+      const updatedFriendAcceptedFriends = friendAcceptedFriends.filter(
+        friend => friend !== userId
+      );
+
+      await friendRef.update({
+        friends: {
+          accepted: updatedFriendAcceptedFriends,
+          pending: friendPendingFriends
+        }
+      });
+    });
+  } catch (error) {
+    console.log("Error while deleting user", error);
+    throw new Error("Ooops something happened while deleting user");
+  }
+};
+
+export const updateUserPasswordInFs = async (newPassword, password) => {
+  try {
+    const user = auth.currentUser;
+    const userEmail = user.email;
+    const credentials = firebase.auth.EmailAuthProvider.credential(
+      userEmail,
+      password
+    );
+    await user.reauthenticateWithCredential(credentials);
+    await user.updatePassword(newPassword);
+  } catch (error) {
+    console.log("Error while updating user password", error);
+    throw new Error("Ooops something happened while updating user password");
+  }
+};
+
+export const resetUserPasswordFromFB = async email => {
+  try {
+    await auth.sendPasswordResetEmail(email, actionCodeSettings);
+  } catch (error) {
+    console.log("Error while reseting user password", error);
+    throw new Error("Ooops something happened while reseting user password");
+  }
+};
+
+export const resendVerificationEmailFromFB = async userCredentials => {
+  const { email, password } = userCredentials;
+  let alreadyVerified = false;
+  try {
+    const { user } = await auth.signInWithEmailAndPassword(email, password);
+
+    if (
+      !user.emailVerified &&
+      user.providerData
+        .map(provider => provider.providerId)
+        .includes("password")
+    ) {
+      await auth.currentUser.sendEmailVerification(actionCodeSettings);
+    } else {
+      alreadyVerified = true;
+    }
+  } catch (error) {
+    console.log("Error while resending verification email", error);
+    throw new Error(
+      "Ooops something happened while resending verification email"
+    );
+  }
+  await auth.signOut();
+  return alreadyVerified;
 };
 
 // firebase init

@@ -80,6 +80,14 @@ export const selectUserProfileGender = createSelector(
     profile.isLoaded && !profile.isEmpty && !auth.isEmpty ? profile.gender : ""
 );
 
+export const selectUserProviderId = createSelector(
+  [selectUserProfile, selectUserAuth],
+  (profile, auth) =>
+    profile.isLoaded && !profile.isEmpty && !auth.isEmpty
+      ? profile.providerId
+      : ""
+);
+
 export const selectUserEmailVerified = createSelector(
   [selectUserAuth],
   auth => auth.emailVerified
@@ -130,7 +138,11 @@ export const selectUsersDisplayNamesById = createSelector(
   (users, usersAreLoading, usersArray) =>
     !usersAreLoading && users && usersArray
       ? !Array.isArray(usersArray)
-        ? users[usersArray].displayName
-        : usersArray.map(user => users[user].displayName)
+        ? users[usersArray]
+          ? users[usersArray].displayName
+          : "User not found"
+        : usersArray.map(user =>
+            users[user] ? users[user].displayName : "User not found"
+          )
       : []
 );

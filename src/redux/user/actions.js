@@ -74,3 +74,30 @@ export const updateUserDataStarts = userData => ({
   type: USER.UPDATE_USER_DATA_STARTS,
   payload: userData
 });
+
+export const deleteUserStarts = (
+  userCredentials,
+  userAcceptedFriends,
+  userProviderId
+) => ({
+  type: USER.DELETE_USER_STARTS,
+  payload: { userCredentials, userAcceptedFriends, userProviderId }
+});
+
+export const updateUserPasswordStarts = (newPassword, password) => ({
+  type: USER.UPDATE_USER_PASSWORD_STARTS,
+  payload: {
+    newPassword,
+    password
+  }
+});
+
+export const resetUserPasswordStarts = email => ({
+  type: USER.RESET_USER_PASSWORD_STARTS,
+  payload: email
+});
+
+export const resendVerificationEmailStarts = userCredentials => ({
+  type: USER.RESEND_VERIFICATION_EMAIL_STARTS,
+  payload: userCredentials
+});
