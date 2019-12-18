@@ -37,7 +37,8 @@ import {
   ChallengeInstanceTemplateData,
   ChallengeInstanceButtonsContainer,
   ChallengeInstanceData,
-  ChallengeInstanceButtonsGroup
+  ChallengeInstanceButtonsGroup,
+  ChallengeInstanceImageContainer
 } from "./challenge-instance.styles";
 
 const selectChallengeInstanceData = createStructuredSelector({
@@ -108,8 +109,9 @@ const ChallengeInstance = () => {
     name,
     rating,
     timesCompleted,
-    videoUrl,
-    category
+    proofUrl,
+    category,
+    proofFileType
   } = challengeTemplate;
 
   const challengeInstanceValidators = useSelector(
@@ -170,7 +172,7 @@ const ChallengeInstance = () => {
   );
 
   const handleUploadProof = useCallback(
-    (dispatch, instanceId, userProfileId) => url => {
+    (dispatch, instanceId, userProfileId) => proofFileType => url => {
       const proofData = {
         instanceId,
         userProfileId,
@@ -194,11 +196,15 @@ const ChallengeInstance = () => {
     </ChallengeInstanceContainer>
   ) : (
     <ChallengeInstanceContainer>
-      <ChallengeInstanceVideoPlayer
-        src={videoUrl}
-        controls
-        controlsList="nodownload"
-      />
+      {proofFileType === "video" ? (
+        <ChallengeInstanceVideoPlayer
+          src={proofUrl}
+          controls
+          controlsList="nodownload"
+        />
+      ) : (
+        <ChallengeInstanceImageContainer src={proofUrl} alt="proof image" />
+      )}
       <ChallengeInstanceTemplateDataContainer>
         <ChallengeInstanceTemplateData>
           <h4>Name:</h4>
@@ -277,6 +283,7 @@ const ChallengeInstance = () => {
           userProfileId={userProfileId}
           isUserValidator={isUserValidator}
           instanceId={instanceId}
+          proofFileType={proofFileType}
         />
       </ChallengeInstanceData>
     </ChallengeInstanceContainer>

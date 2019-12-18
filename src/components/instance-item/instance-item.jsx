@@ -9,9 +9,10 @@ import {
   selectUsersDisplayNamesById
 } from "../../redux/user/selectors";
 import {
-  selectVideoUrlFromChallengeTemplate,
+  selectProofUrlFromChallengeTemplate,
   selectNameFromChallengeTemplate,
-  selectCategoryFromChallengeTemplate
+  selectCategoryFromChallengeTemplate,
+  selectProofFileTypeFromChallengeTemplate
 } from "../../redux/firestore/challenges-templates/selectors";
 
 import {
@@ -19,7 +20,8 @@ import {
   InstanceItemVideoPlayer,
   InstanceItemStatusText,
   InstanceCustomButton,
-  InstanceExpiresAtContainer
+  InstanceExpiresAtContainer,
+  InstanceItemImageContianer
 } from "./instance-item.styles";
 
 const selectInstanceItemData = createStructuredSelector({
@@ -38,14 +40,14 @@ const InstanceItem = ({ challengeInstanceData }) => {
     contenders
   } = challengeInstanceData;
 
-  const memoizedSelectVideoUrlFromChallengeTemplate = useMemo(
-    () => selectVideoUrlFromChallengeTemplate,
+  const memoizedSelectProofUrlFromChallengeTemplate = useMemo(
+    () => selectProofUrlFromChallengeTemplate,
     []
   );
 
-  const videoUrlFromChallengeTemplate = useSelector(
+  const proofUrlFromChallengeTemplate = useSelector(
     state =>
-      memoizedSelectVideoUrlFromChallengeTemplate(state, challengeTemplateId),
+      memoizedSelectProofUrlFromChallengeTemplate(state, challengeTemplateId),
     shallowEqual
   );
 
@@ -74,14 +76,30 @@ const InstanceItem = ({ challengeInstanceData }) => {
     []
   );
 
-  const authorDisplayName = useSelector(state =>
-    memoizedSelectUsersDisplayNamesById(state, administrator)
+  const authorDisplayName = useSelector(
+    state => memoizedSelectUsersDisplayNamesById(state, administrator),
+    shallowEqual
   );
 
   const contendersIdArray = contenders.map(contender => contender.id);
 
-  const contendersDisplayNamesArray = useSelector(state =>
-    memoizedSelectUsersDisplayNamesById(state, contendersIdArray)
+  const contendersDisplayNamesArray = useSelector(
+    state => memoizedSelectUsersDisplayNamesById(state, contendersIdArray),
+    shallowEqual
+  );
+
+  const memoizedSelectProofFileTypeFromChallengeTemplate = useMemo(
+    () => selectProofFileTypeFromChallengeTemplate,
+    []
+  );
+
+  const proofFileType = useSelector(
+    state =>
+      memoizedSelectProofFileTypeFromChallengeTemplate(
+        state,
+        challengeTemplateId
+      ),
+    shallowEqual
   );
 
   const contendersDisplayNamesString = contendersDisplayNamesArray.join(" ,");
@@ -96,7 +114,7 @@ const InstanceItem = ({ challengeInstanceData }) => {
     expiresAt
   } = userInstanceData;
 
-  const videoUrl = url !== "" ? url : videoUrlFromChallengeTemplate;
+  const proofUrl = url !== "" ? url : proofUrlFromChallengeTemplate;
 
   const handleOnClick = useCallback(
     () => push(`/instance/${challengeInstanceId}`),
@@ -105,11 +123,15 @@ const InstanceItem = ({ challengeInstanceData }) => {
 
   return (
     <InstanceItemContainer>
-      <InstanceItemVideoPlayer
-        src={videoUrl}
-        controls
-        controlsList="nodownload"
-      />
+      {proofFileType === "video" ? (
+        <InstanceItemVideoPlayer
+          src={proofUrl}
+          controls
+          controlsList="nodownload"
+        />
+      ) : (
+        <InstanceItemImageContianer src={proofUrl} alt="instance proof image" />
+      )}
       <strong>Name:</strong>
       <span>{nameFromChallengeTemplate}</span>
       <strong>Category:</strong>

@@ -58,6 +58,14 @@ const FileUploader = ({
     if (file) {
       if (fileTypesRegex[fileType]) {
         if (fileTypesRegex[fileType].test(file.name)) {
+          let proofFileType = "";
+          if (fileType === "imageOrvideo") {
+            proofFileType = fileTypesRegex.image.test(file.name)
+              ? "image"
+              : "video";
+          } else {
+            proofFileType = fileType
+          }
           const fileSize = file.size / 1024 / 1024;
           if (fileSize > maxFileSizeInMB) {
             const invalidFileSizeModalData = {
@@ -78,7 +86,7 @@ const FileUploader = ({
             setProgress,
             setLoading,
             setFile,
-            urlAction,
+            urlAction(proofFileType),
             additionalAction
           );
         } else {

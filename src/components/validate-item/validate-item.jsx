@@ -4,8 +4,9 @@ import { useSelector, shallowEqual } from "react-redux";
 import { useHistory } from "react-router-dom";
 
 import {
-  selectVideoUrlFromChallengeTemplate,
-  selectNameFromChallengeTemplate
+  selectProofUrlFromChallengeTemplate,
+  selectNameFromChallengeTemplate,
+  selectProofFileTypeFromChallengeTemplate
 } from "../../redux/firestore/challenges-templates/selectors";
 
 import { selectUsersDisplayNamesById } from "../../redux/user/selectors";
@@ -15,7 +16,8 @@ import CustomButton from "../custom-button/custom-button";
 import {
   ValidateItemContainer,
   ValidateItemStatusText,
-  ValidateItemVideoPlayer
+  ValidateItemVideoPlayer,
+  ValidateItemImageContainer
 } from "./validate-item.styles";
 
 const ValidateItem = ({ challengeInstanceData }) => {
@@ -28,8 +30,8 @@ const ValidateItem = ({ challengeInstanceData }) => {
     contenders
   } = challengeInstanceData;
 
-  const memoizedSelectVideoUrlFromChallengeTemplate = useMemo(
-    () => selectVideoUrlFromChallengeTemplate,
+  const memoizedSelectProofUrlFromChallengeTemplate = useMemo(
+    () => selectProofUrlFromChallengeTemplate,
     []
   );
 
@@ -43,9 +45,11 @@ const ValidateItem = ({ challengeInstanceData }) => {
     []
   );
 
-  const videoUrlFromChallengeTemplayte = useSelector(
+  const memoizedSelectProofFileTypeFromChallengeTemplate = useMemo(()=> selectProofFileTypeFromChallengeTemplate,[])
+
+  const proofUrlFromChallengeTemplayte = useSelector(
     state =>
-      memoizedSelectVideoUrlFromChallengeTemplate(state, challengeTemplateId),
+      memoizedSelectProofUrlFromChallengeTemplate(state, challengeTemplateId),
     shallowEqual
   );
 
@@ -56,14 +60,16 @@ const ValidateItem = ({ challengeInstanceData }) => {
   );
 
   const authorDisplayName = useSelector(state =>
-    memoizedSelectUsersDisplayNamesById(state, administrator)
+    memoizedSelectUsersDisplayNamesById(state, administrator), shallowEqual
   );
 
   const contendersIdArray = contenders.map(contender => contender.id);
 
   const contendersDisplayNamesArray = useSelector(state =>
-    memoizedSelectUsersDisplayNamesById(state, contendersIdArray)
+    memoizedSelectUsersDisplayNamesById(state, contendersIdArray), shallowEqual
   );
+
+  const proofFileType = useSelector(state => memoizedSelectProofFileTypeFromChallengeTemplate(state, challengeTemplateId),shallowEqual)
 
   const contendersDisplayNamesString = contendersDisplayNamesArray.join(" ,");
 
@@ -90,11 +96,17 @@ const ValidateItem = ({ challengeInstanceData }) => {
 
   return (
     <ValidateItemContainer>
-      <ValidateItemVideoPlayer
-        src={videoUrlFromChallengeTemplayte}
+    {
+      proofFileType === "video" ? (
+        <ValidateItemVideoPlayer
+        src={proofUrlFromChallengeTemplayte}
         controls
         controlsList="nodownload"
       />
+      ) : (
+        <ValidateItemImageContainer src={proofUrlFromChallengeTemplayte} alt="proof image" />
+      )
+    }
       <strong>Name:</strong>
       <span>{nameFromChallengeTemplate}</span>
       <strong>Administrator:</strong>

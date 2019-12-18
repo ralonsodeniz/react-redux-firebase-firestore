@@ -25,7 +25,7 @@ const UserAvatar = () => {
   const { userPhotoURL, userId } = userData;
   const directory = `users/${userId}/userPhoto`;
   const dispatchedUpdateAvatarStart = useCallback(
-    url => dispatch(updateAvatarStarts(url)),
+    fileType => url => dispatch(updateAvatarStarts(url)),
     [dispatch]
   );
 

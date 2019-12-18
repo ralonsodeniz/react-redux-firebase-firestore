@@ -9,7 +9,8 @@ import CustomButton from "../custom-button/custom-button";
 
 import {
   CategoryItemContainer,
-  CategoryItemVideoPlayer
+  CategoryItemVideoPlayer,
+  CategoryItemImageContainer
 } from "./category-item.styles";
 
 const CategoryItem = ({ challengeTemplateId, challengeTemplateData }) => {
@@ -21,8 +22,9 @@ const CategoryItem = ({ challengeTemplateId, challengeTemplateData }) => {
     minimumParticipants,
     timesCompleted,
     rating,
-    videoUrl,
-    category
+    proofUrl,
+    category,
+    proofFileType
   } = challengeTemplateData;
 
   const history = useHistory();
@@ -39,11 +41,16 @@ const CategoryItem = ({ challengeTemplateId, challengeTemplateData }) => {
 
   return (
     <CategoryItemContainer>
-      <CategoryItemVideoPlayer
-        src={videoUrl}
-        controls
-        controlsList="nodownload"
-      />
+      {console.log(proofFileType)}
+      {proofFileType === "video" ? (
+        <CategoryItemVideoPlayer
+          src={proofUrl}
+          controls
+          controlsList="nodownload"
+        />
+      ) : (
+        <CategoryItemImageContainer src={proofUrl} alt="proof image" />
+      )}
       <strong>Name:</strong>
       <span>{name}</span>
       <strong>Category:</strong>

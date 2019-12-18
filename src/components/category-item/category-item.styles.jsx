@@ -21,3 +21,11 @@ export const CategoryItemVideoPlayer = styled.video`
   left: 0;
   top: 0;
 `;
+
+export const CategoryItemImageContainer = styled.img`
+  border: 0;
+  height: 12vh;
+  width: 100%;
+  left: 0;
+  top: 0;
+`;

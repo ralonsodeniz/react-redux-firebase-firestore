@@ -18,14 +18,16 @@ import {
   InstanceContenderInfoStateText,
   InstanceContenderInfoFormDropdownContainer,
   InstanceContenderInfoVideoPlayer,
-  InstanceContenderInfoButtonsContainer
+  InstanceContenderInfoButtonsContainer,
+  InstanceContenderInfoImageContainer
 } from "./instance-contender-info.styles";
 
 const InstanceContenderInfo = ({
   challengeInstanceContenders,
   userProfileId,
   isUserValidator,
-  instanceId
+  instanceId,
+  proofFileType
 }) => {
   const dispatch = useDispatch();
 
@@ -85,11 +87,18 @@ const InstanceContenderInfo = ({
                 <InstanceContenderInfoTitle>Proof</InstanceContenderInfoTitle>
                 {contender.proof.url ? (
                   isUserValidator || isUserContender || contender.public ? (
-                    <InstanceContenderInfoVideoPlayer
-                      src={contender.proof.url}
-                      controls
-                      controlsList="nodownload"
-                    />
+                    proofFileType === "video" ? (
+                      <InstanceContenderInfoVideoPlayer
+                        src={contender.proof.url}
+                        controls
+                        controlsList="nodownload"
+                      />
+                    ) : (
+                      <InstanceContenderInfoImageContainer
+                        src={contender.proof.url}
+                        alt="contender proof image"
+                      />
+                    )
                   ) : (
                     <InstanceContenderInfoText>
                       Proof is private
@@ -158,7 +167,8 @@ InstanceContenderInfo.propTypes = {
   challengeInstanceContenders: PropTypes.array.isRequired,
   userProfileId: PropTypes.string.isRequired,
   isUserValidator: PropTypes.bool.isRequired,
-  instanceId: PropTypes.string.isRequired
+  instanceId: PropTypes.string.isRequired,
+  proofFileType: PropTypes.string.isRequired
 };
 
 export default InstanceContenderInfo;

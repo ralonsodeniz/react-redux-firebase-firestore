@@ -50,6 +50,13 @@ export const InstanceContenderInfoVideoPlayer = styled.video`
   border: 1px solid black;
 `;
 
+export const InstanceContenderInfoImageContainer = styled.img`
+  grid-area: templateProof;
+  height: 9vh;
+  width: 16vw;
+  border: 1px solid black;
+`;
+
 export const InstanceContenderInfoButtonsContainer = styled.div`
   grid-area: buttons;
   display: flex;

@@ -22,6 +22,14 @@ export const ValidateItemVideoPlayer = styled.video`
   top: 0;
 `;
 
+export const ValidateItemImageContainer = styled.img`
+  border: 0;
+  height: 12vh;
+  width: 100%;
+  left: 0;
+  top: 0;
+`;
+
 export const ValidateItemStatusText = styled.span`
   ${({ status }) =>
     status === "Validations pending"

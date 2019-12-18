@@ -38,9 +38,9 @@ export const selectChallengeTemplateFromCategoryAndId = createSelector(
     challengesTemplates ? challengesTemplates[category][id] : {}
 );
 
-export const selectVideoUrlFromChallengeTemplateWithCategoryAndId = createSelector(
+export const selectProofUrlFromChallengeTemplateWithCategoryAndId = createSelector(
   [selectChallengeTemplateFromCategoryAndId],
-  challengeTemplate => (challengeTemplate ? challengeTemplate.videoUrl : "")
+  challengeTemplate => (challengeTemplate ? challengeTemplate.proofUrl : "")
 );
 
 export const selectNameFromChallengeTemplateWithCategoryAndId = createSelector(
@@ -51,6 +51,12 @@ export const selectNameFromChallengeTemplateWithCategoryAndId = createSelector(
 export const selectCategoryFromChallengeTemplateWithCategoryAndId = createSelector(
   [selectChallengeTemplateFromCategoryAndId],
   challengeTemplate => (challengeTemplate ? challengeTemplate.category : "")
+);
+
+export const selectProofFileTypeFromChallengeTemplateWithCategoryAndId = createSelector(
+  [selectChallengeTemplateFromCategoryAndId],
+  challengeTemplate =>
+    challengeTemplate ? challengeTemplate.proofFileType : ""
 );
 
 export const selectChallengeTemplateFromId = createSelector(
@@ -65,9 +71,9 @@ export const selectChallengeTemplateFromId = createSelector(
   }
 );
 
-export const selectVideoUrlFromChallengeTemplate = createSelector(
+export const selectProofUrlFromChallengeTemplate = createSelector(
   [selectChallengeTemplateFromId],
-  challengeTemplate => (challengeTemplate ? challengeTemplate.videoUrl : "")
+  challengeTemplate => (challengeTemplate ? challengeTemplate.proofUrl : "")
 );
 
 export const selectNameFromChallengeTemplate = createSelector(
@@ -78,4 +84,10 @@ export const selectNameFromChallengeTemplate = createSelector(
 export const selectCategoryFromChallengeTemplate = createSelector(
   [selectChallengeTemplateFromId],
   challengeTemplate => (challengeTemplate ? challengeTemplate.category : "")
+);
+
+export const selectProofFileTypeFromChallengeTemplate = createSelector(
+  [selectChallengeTemplateFromId],
+  challengeTemplate =>
+    challengeTemplate ? challengeTemplate.proofFileType : ""
 );

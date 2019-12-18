@@ -33,6 +33,13 @@ export const ChallengeInstanceVideoPlayer = styled.video`
   border: 1px solid black;
 `;
 
+export const ChallengeInstanceImageContainer = styled.img`
+  grid-area: templateProof;
+  height: 13vh;
+  width: 23vw;
+  border: 1px solid black;
+`;
+
 export const ChallengeInstanceTemplateDataContainer = styled.div`
   grid-area: templateData;
   display: flex;

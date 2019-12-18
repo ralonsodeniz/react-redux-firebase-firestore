@@ -85,12 +85,18 @@ const AddChallenge = ({ urlCategory }) => {
   // doing like this we do not have external dependencies
 
   const handleSubmit = useCallback(
-    (dispatch, formChallengeData, userProfileId, urlCategory) => url => {
+    (
+      dispatch,
+      formChallengeData,
+      userProfileId,
+      urlCategory
+    ) => proofFileType => url => {
       const challengeData = {
         ...formChallengeData,
         author: userProfileId,
         category: urlCategory,
-        videoUrl: url
+        proofUrl: url,
+        proofFileType
       };
       dispatch(addNewChallengeStarts(challengeData));
       setFormChallengeData({
@@ -158,7 +164,6 @@ const AddChallenge = ({ urlCategory }) => {
           required
           disabled={formValidated}
         />
-
         {/* <FormInput
           type="number"
           id="daysToComplete"

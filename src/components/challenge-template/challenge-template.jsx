@@ -25,7 +25,8 @@ import {
   ChallengeTemplateDataContainer,
   ChallengeTemplateData,
   ChallengeTemplateRanking,
-  ChallengeTemplateButtonsContainer
+  ChallengeTemplateButtonsContainer,
+  ChallengeTemplateImageContainer
 } from "./challenge-template.styles";
 import Spinner from "../spinner/spinner";
 
@@ -75,7 +76,8 @@ const ChallengeTemplate = () => {
     ranking,
     rating,
     timesCompleted,
-    videoUrl
+    proofUrl,
+    proofFileType
   } = challengeTemplate;
 
   const authorDisplayName = useSelector(state =>
@@ -128,11 +130,15 @@ const ChallengeTemplate = () => {
 
   return !challengesTempletesAreLoading ? (
     <ChallengeTemplateContainer>
-      <ChallengeTemplateVideoPlayer
-        src={videoUrl}
-        controls
-        controlsList="nodownload"
-      />
+      {proofFileType === "video" ? (
+        <ChallengeTemplateVideoPlayer
+          src={proofUrl}
+          controls
+          controlsList="nodownload"
+        />
+      ) : (
+        <ChallengeTemplateImageContainer src={proofUrl} alt="proof image" />
+      )}
       <ChallengeTemplateDataContainer>
         <ChallengeTemplateData>
           <h4>Name:</h4>

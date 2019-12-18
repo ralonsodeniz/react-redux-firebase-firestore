@@ -23,6 +23,14 @@ export const InstanceItemVideoPlayer = styled.video`
   top: 0;
 `;
 
+export const InstanceItemImageContianer = styled.img`
+  border: 0;
+  height: 12vh;
+  width: 100%;
+  left: 0;
+  top: 0;
+`;
+
 export const InstanceItemStatusText = styled.span`
   ${({ status }) =>
     status === "Pending"
