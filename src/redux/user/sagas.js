@@ -24,7 +24,11 @@ import {
   deleteUserInFs,
   updateUserPasswordInFs,
   resetUserPasswordFromFB,
-  resendVerificationEmailFromFB
+  resendVerificationEmailFromFB,
+  acceptFriendRequestInFs,
+  declineFriendRequestInFs,
+  deleteFriendInFs,
+  sendFriendRequestInFs
 } from "../../firebase/firebase.utils";
 
 // sign up with email and password
@@ -363,6 +367,110 @@ export function* resendVerificationEmail({ payload }) {
   }
 }
 
+// accepte friend request
+export function* onAcceptFriendRequestStarts() {
+  yield takeLatest(USER.ACCEPT_FRIEND_REQUEST_STARTS, acceptFriendRequest);
+}
+
+export function* acceptFriendRequest({ payload }) {
+  try {
+    yield call(acceptFriendRequestInFs, payload);
+    const acceptFriendRequestSuccessModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: "Friend request accepted"
+      }
+    };
+    yield put(openModal(acceptFriendRequestSuccessModalData));
+  } catch (error) {
+    const acceptFriendRequestFailureModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: error.message
+      }
+    };
+    yield put(openModal(acceptFriendRequestFailureModalData));
+  }
+}
+
+// decline friend request
+export function* onDeclineFriendRequestStarts() {
+  yield takeLatest(USER.DECLINE_FRIEND_REQUEST_STARTS, declineFriendRequest);
+}
+
+export function* declineFriendRequest({ payload }) {
+  try {
+    yield call(declineFriendRequestInFs, payload);
+    const declineFriendRequestSuccessModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: "Friend request declined"
+      }
+    };
+    yield put(openModal(declineFriendRequestSuccessModalData));
+  } catch (error) {
+    const declineFriendRequestFailureModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: error.message
+      }
+    };
+    yield put(openModal(declineFriendRequestFailureModalData));
+  }
+}
+
+// delete friend
+export function* onDeleteFriendStarts() {
+  yield takeLatest(USER.DELETE_FRIEND_STARTS, deleteFriend);
+}
+
+export function* deleteFriend({ payload }) {
+  try {
+    yield call(deleteFriendInFs, payload);
+    const deleteFriendSuccessModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: "Friend deleted"
+      }
+    };
+    yield put(openModal(deleteFriendSuccessModalData));
+  } catch (error) {
+    const deleteFriendFailureModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: error.message
+      }
+    };
+    yield put(openModal(deleteFriendFailureModalData));
+  }
+}
+
+// send friend request
+export function* onSendFriendRequestStarts() {
+  yield takeLatest(USER.SEND_FRIEND_REQUEST_STARTS, sendFriendRequest);
+}
+
+export function* sendFriendRequest({ payload }) {
+  try {
+    yield call(sendFriendRequestInFs, payload);
+    const sendFriendRequestSuccessModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: "Friend request sent"
+      }
+    };
+    yield put(openModal(sendFriendRequestSuccessModalData));
+  } catch (error) {
+    const sendFriendRequestFailureModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: error.message
+      }
+    };
+    yield put(openModal(sendFriendRequestFailureModalData));
+  }
+}
+
 // root saga creator for users with all the tiggering generation functions of the saga
 export function* userSagas() {
   yield all([
@@ -376,6 +484,10 @@ export function* userSagas() {
     call(onDeleteUserStarts),
     call(onUpdateUserPasswordStarts),
     call(onResetUserPasswordStarts),
-    call(onResendVerificationEmailStarts)
+    call(onResendVerificationEmailStarts),
+    call(onAcceptFriendRequestStarts),
+    call(onDeclineFriendRequestStarts),
+    call(onDeleteFriendStarts),
+    call(onSendFriendRequestStarts)
   ]);
 }

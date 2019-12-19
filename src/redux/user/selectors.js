@@ -101,6 +101,14 @@ export const selectUserAcceptedFriends = createSelector(
       : []
 );
 
+export const selectUserPendingFriends = createSelector(
+  [selectUserProfile, selectUserAuth],
+  (profile, auth) =>
+    profile.isLoaded && !profile.isEmpty && !auth.isEmpty
+      ? profile.friends.pending
+      : []
+);
+
 export const selectUserAcceptedInstancesByCategory = category =>
   createSelector([selectUserProfile, selectUserAuth], (profile, auth) =>
     profile.isLoaded && !profile.isEmpty && !auth.isEmpty
@@ -145,4 +153,10 @@ export const selectUsersDisplayNamesById = createSelector(
             users[user] ? users[user].displayName : "User not found"
           )
       : []
+);
+
+export const selectAllUsersId = createSelector(
+  [selectUsers, selectUsersAreLoading],
+  (users, usersAreLoading) =>
+    !usersAreLoading && users ? Object.keys(users) : []
 );

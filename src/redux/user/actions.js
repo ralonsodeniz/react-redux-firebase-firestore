@@ -101,3 +101,23 @@ export const resendVerificationEmailStarts = userCredentials => ({
   type: USER.RESEND_VERIFICATION_EMAIL_STARTS,
   payload: userCredentials
 });
+
+export const acceptFriendRequestStarts = friendId => ({
+  type: USER.ACCEPT_FRIEND_REQUEST_STARTS,
+  payload: friendId
+});
+
+export const declineFriendRequestStarts = friendId => ({
+  type: USER.DECLINE_FRIEND_REQUEST_STARTS,
+  payload: friendId
+});
+
+export const deleteFriendStarts = friendId => ({
+  type: USER.DELETE_FRIEND_STARTS,
+  payload: friendId
+});
+
+export const sendFriendRequestStarts = friendId => ({
+  type: USER.SEND_FRIEND_REQUEST_STARTS,
+  payload: friendId
+});

@@ -651,6 +651,147 @@ export const resendVerificationEmailFromFB = async userCredentials => {
   return alreadyVerified;
 };
 
+export const acceptFriendRequestInFs = async friendId => {
+  const userId = auth.currentUser.uid;
+
+  try {
+    const userRef = firestore.doc(`users/${userId}`);
+
+    const userAcceptedFriends = (await userRef.get()).data().friends.accepted;
+
+    const userPendingFriends = (await userRef.get()).data().friends.pending;
+
+    const newUserAcceptedFriends = [...userAcceptedFriends, friendId];
+
+    const newUserPendingFriends = userPendingFriends.filter(
+      friend => friend !== friendId
+    );
+
+    await userRef.update({
+      friends: {
+        accepted: newUserAcceptedFriends,
+        pending: newUserPendingFriends
+      }
+    });
+
+    const friendRef = firestore.doc(`users/${friendId}`);
+
+    const friendAcceptedFriends = (await friendRef.get()).data().friends
+      .accepted;
+
+    const friendPendingFriends = (await friendRef.get()).data().friends.pending;
+
+    const newFriendAcceptedFriends = [...friendAcceptedFriends, userId];
+
+    await friendRef.update({
+      friends: {
+        accepted: newFriendAcceptedFriends,
+        pending: friendPendingFriends
+      }
+    });
+  } catch (error) {
+    console.log("Error while accepting friend request", error);
+    throw new Error("Ooops something happened while accepting friend request");
+  }
+};
+
+export const declineFriendRequestInFs = async friendId => {
+  const userId = auth.currentUser.uid;
+
+  try {
+    const userRef = firestore.doc(`users/${userId}`);
+
+    const userAcceptedFriends = (await userRef.get()).data().friends.accepted;
+
+    const userPendingFriends = (await userRef.get()).data().friends.pending;
+
+    const newUserPendingFriends = userPendingFriends.filter(
+      friend => friend !== friendId
+    );
+
+    await userRef.update({
+      friends: {
+        accepted: userAcceptedFriends,
+        pending: newUserPendingFriends
+      }
+    });
+  } catch (error) {
+    console.log("Error while declining friend request", error);
+    throw new Error("Ooops something happened while declining friend request");
+  }
+};
+
+export const deleteFriendInFs = async friendId => {
+  const userId = auth.currentUser.uid;
+
+  try {
+    const userRef = firestore.doc(`users/${userId}`);
+
+    const userAcceptedFriends = (await userRef.get()).data().friends.accepted;
+
+    const userPendingFriends = (await userRef.get()).data().friends.pending;
+
+    const newUserAcceptedFriends = userAcceptedFriends.filter(
+      friend => friend !== friendId
+    );
+
+    await userRef.update({
+      friends: {
+        accepted: newUserAcceptedFriends,
+        pending: userPendingFriends
+      }
+    });
+
+    const friendRef = firestore.doc(`users/${friendId}`);
+
+    const friendAcceptedFriends = (await friendRef.get()).data().friends
+      .accepted;
+
+    const friendPendingFriends = (await friendRef.get()).data().friends.pending;
+
+    const newFriendAcceptedFriends = friendAcceptedFriends.filter(
+      friend => friend !== userId
+    );
+
+    await friendRef.update({
+      friends: {
+        accepted: newFriendAcceptedFriends,
+        pending: friendPendingFriends
+      }
+    });
+  } catch (error) {
+    console.log("Error while deleting friend", error);
+    throw new Error("Ooops something happened while deleting friend");
+  }
+};
+
+export const sendFriendRequestInFs = async friendId => {
+  const userId = auth.currentUser.uid;
+
+  try {
+     const friendRef = firestore.doc(`users/${friendId}`);
+
+    const friendAcceptedFriends = (await friendRef.get()).data().friends
+      .accepted;
+
+    const friendPendingFriends = (await friendRef.get()).data().friends.pending;
+
+    const newFriendPendingFriends = [...friendPendingFriends, userId]
+
+    await friendRef.update({
+      friends: {
+        accepted: friendAcceptedFriends,
+        pending: newFriendPendingFriends
+      }
+    });
+  } catch (error) {
+    console.log("Error while sending friend request", error);
+    throw new Error("Ooops something happened while sending friend request");
+  }
+};
+
+
+
 // firebase init
 firebase.initializeApp(firebaseConfig);
 export const auth = firebase.auth();

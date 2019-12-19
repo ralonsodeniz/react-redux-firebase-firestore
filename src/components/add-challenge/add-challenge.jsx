@@ -180,7 +180,15 @@ const AddChallenge = ({ urlCategory }) => {
           text="Validate challenge info"
           disabled={formValidated}
         />
-        {!formValidated ? <span>&#9744;</span> : <span>&#9745;</span>}
+        {!formValidated ? (
+          <span role="img" aria-label="empty box">
+            &#11036;
+          </span>
+        ) : (
+          <span role="img" aria-label="checked box">
+            &#9989;
+          </span>
+        )}
       </form>
       <FileUploader
         fileType="imageOrvideo"
