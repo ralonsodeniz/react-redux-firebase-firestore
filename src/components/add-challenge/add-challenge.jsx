@@ -180,11 +180,7 @@ const AddChallenge = ({ urlCategory }) => {
           text="Validate challenge info"
           disabled={formValidated}
         />
-        {!formValidated ? (
-          <span role="img" aria-label="empty box">
-            &#11036;
-          </span>
-        ) : (
+        {formValidated && (
           <span role="img" aria-label="checked box">
             &#9989;
           </span>
