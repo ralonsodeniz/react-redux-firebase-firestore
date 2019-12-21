@@ -83,12 +83,14 @@ const CategoryOverview = () => {
       ) : (
         <Spinner />
       )}
-      <CustomButton
-        type="button"
-        text="Propose new challenge"
-        large
-        onClick={handleProposeNewChallenge}
-      />
+      {category !== "all" && (
+        <CustomButton
+          type="button"
+          text="Propose new challenge"
+          large
+          onClick={handleProposeNewChallenge}
+        />
+      )}
     </CategoryOverviewContainer>
   );
 };

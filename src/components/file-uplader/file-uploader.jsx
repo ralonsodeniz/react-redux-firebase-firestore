@@ -64,7 +64,7 @@ const FileUploader = ({
               ? "image"
               : "video";
           } else {
-            proofFileType = fileType
+            proofFileType = fileType;
           }
           const fileSize = file.size / 1024 / 1024;
           if (fileSize > maxFileSizeInMB) {

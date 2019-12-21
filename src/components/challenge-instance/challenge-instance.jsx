@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import { createStructuredSelector } from "reselect";
@@ -29,6 +29,7 @@ import Spinner from "../spinner/spinner";
 import CustomButton from "../custom-button/custom-button";
 import FileUploader from "../file-uplader/file-uploader";
 import InstanceContenderInfo from "../instance-contender-info/instance-contender-info";
+import FormDropdown from "../form-dropdown/form-dropdown";
 
 import {
   ChallengeInstanceContainer,
@@ -38,7 +39,8 @@ import {
   ChallengeInstanceButtonsContainer,
   ChallengeInstanceData,
   ChallengeInstanceButtonsGroup,
-  ChallengeInstanceImageContainer
+  ChallengeInstanceImageContainer,
+  ChallengeInstanceContenderDropdownContainer
 } from "./challenge-instance.styles";
 
 const selectChallengeInstanceData = createStructuredSelector({
@@ -52,6 +54,8 @@ const ChallengeInstance = () => {
   const dispatch = useDispatch();
 
   const { instanceId } = useParams();
+
+  const [selectedContender, setSelectedContender] = useState("default");
 
   const {
     userProfileId,
@@ -160,6 +164,13 @@ const ChallengeInstance = () => {
     validator => validator === userProfileId
   );
 
+  const dropdownOptions = enhancedChallengeInstanceContenders.map(
+    contender => ({
+      value: contender.id,
+      text: contender.name
+    })
+  );
+
   const handleAcceptChallenge = useCallback(
     () =>
       dispatch(acceptInstanceStarts(userProfileId, instanceId, daysToComplete)),
@@ -187,6 +198,11 @@ const ChallengeInstance = () => {
     () => dispatch(toggleProofPublicPrivateStarts(userProfileId, instanceId)),
     [userProfileId, instanceId, dispatch]
   );
+
+  const handleChange = useCallback(event => {
+    const { value } = event.target;
+    setSelectedContender(value);
+  }, []);
 
   return challengesInstancesAreLoading ||
     challengesTemplatesAreLoading ||
@@ -278,12 +294,23 @@ const ChallengeInstance = () => {
           </ChallengeInstanceButtonsContainer>
         ) : null)}
       <ChallengeInstanceData>
+        <ChallengeInstanceContenderDropdownContainer>
+          <FormDropdown
+            handleChange={handleChange}
+            label="Select contender"
+            options={dropdownOptions}
+            multiple={false}
+            size={0}
+            defaultValue={"default"}
+          />
+        </ChallengeInstanceContenderDropdownContainer>
         <InstanceContenderInfo
           challengeInstanceContenders={enhancedChallengeInstanceContenders}
           userProfileId={userProfileId}
           isUserValidator={isUserValidator}
           instanceId={instanceId}
           proofFileType={proofFileType}
+          selectedContender={selectedContender}
         />
       </ChallengeInstanceData>
     </ChallengeInstanceContainer>

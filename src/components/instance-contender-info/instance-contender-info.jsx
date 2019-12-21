@@ -1,8 +1,7 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback } from "react";
 import PropTypes from "prop-types";
 import { useDispatch } from "react-redux";
 
-import FormDropdown from "../form-dropdown/form-dropdown";
 import CustomButton from "../custom-button/custom-button";
 
 import {
@@ -16,10 +15,10 @@ import {
   InstanceContenderInfoText,
   InstanceContenderInfoStatusText,
   InstanceContenderInfoStateText,
-  InstanceContenderInfoFormDropdownContainer,
   InstanceContenderInfoVideoPlayer,
   InstanceContenderInfoButtonsContainer,
-  InstanceContenderInfoImageContainer
+  InstanceContenderInfoImageContainer,
+  InstanceContenderInfoRankingContainer
 } from "./instance-contender-info.styles";
 
 const InstanceContenderInfo = ({
@@ -27,31 +26,14 @@ const InstanceContenderInfo = ({
   userProfileId,
   isUserValidator,
   instanceId,
-  proofFileType
+  proofFileType,
+  selectedContender
 }) => {
   const dispatch = useDispatch();
 
   const isUserContender = challengeInstanceContenders.some(
     contender => contender.id === userProfileId
   );
-
-  const selectedContenderInitialValue = isUserContender
-    ? userProfileId
-    : "default";
-
-  const [selectedContender, setSelectedContender] = useState(
-    selectedContenderInitialValue
-  );
-
-  const dropdownOptions = challengeInstanceContenders.map(contender => ({
-    value: contender.id,
-    text: contender.name
-  }));
-
-  const handleChange = useCallback(event => {
-    const { value } = event.target;
-    setSelectedContender(value);
-  }, []);
 
   const handleValidateProof = useCallback(
     () => dispatch(validateProofStarts(selectedContender, instanceId)),
@@ -65,18 +47,18 @@ const InstanceContenderInfo = ({
 
   return (
     <InstanceContenderInfoContainer>
-      <InstanceContenderInfoFormDropdownContainer>
-        <FormDropdown
-          handleChange={handleChange}
-          label="Select contender"
-          options={dropdownOptions}
-          multiple={false}
-          size={0}
-          defaultValue={selectedContenderInitialValue}
-        />
-      </InstanceContenderInfoFormDropdownContainer>
       {challengeInstanceContenders.reduce(
         (accumulator, contender, contenderIndex) => {
+          const isVisible =
+            isUserValidator || isUserContender || contender.public
+              ? true
+              : false;
+          const isVisibleAndAuthed =
+            isUserValidator ||
+            isUserContender ||
+            (contender.public && userProfileId)
+              ? true
+              : false;
           if (contender.id === selectedContender) {
             accumulator.push(
               <InstanceContenderInfoContainer key={contenderIndex}>
@@ -86,7 +68,7 @@ const InstanceContenderInfo = ({
                 </InstanceContenderInfoText>
                 <InstanceContenderInfoTitle>Proof</InstanceContenderInfoTitle>
                 {contender.proof.url ? (
-                  isUserValidator || isUserContender || contender.public ? (
+                  isVisible ? (
                     proofFileType === "video" ? (
                       <InstanceContenderInfoVideoPlayer
                         src={contender.proof.url}
@@ -132,10 +114,26 @@ const InstanceContenderInfo = ({
                   </div>
                 )}
                 <InstanceContenderInfoTitle>Rating</InstanceContenderInfoTitle>
-                <InstanceContenderInfoText>
-                  {contender.rating}
-                </InstanceContenderInfoText>
-
+                <InstanceContenderInfoRankingContainer>
+                  <InstanceContenderInfoText>
+                    Likes: {contender.rating.likes}
+                  </InstanceContenderInfoText>
+                  {isVisibleAndAuthed && (
+                    <span role="img" aria-label="like">
+                      &#128077;
+                    </span>
+                  )}
+                </InstanceContenderInfoRankingContainer>
+                <InstanceContenderInfoRankingContainer>
+                  <InstanceContenderInfoText>
+                    Dislikes: {contender.rating.dislikes}
+                  </InstanceContenderInfoText>
+                  {isVisibleAndAuthed && (
+                    <span role="img" aria-label="dislike">
+                      &#128078;
+                    </span>
+                  )}
+                </InstanceContenderInfoRankingContainer>
                 {isUserValidator &&
                   contender.id !== userProfileId &&
                   contender.proof.state === "Pending" && (
@@ -168,7 +166,8 @@ InstanceContenderInfo.propTypes = {
   userProfileId: PropTypes.string.isRequired,
   isUserValidator: PropTypes.bool.isRequired,
   instanceId: PropTypes.string.isRequired,
-  proofFileType: PropTypes.string.isRequired
+  proofFileType: PropTypes.string.isRequired,
+  selectedContender: PropTypes.string.isRequired
 };
 
 export default InstanceContenderInfo;

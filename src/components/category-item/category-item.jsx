@@ -41,7 +41,6 @@ const CategoryItem = ({ challengeTemplateId, challengeTemplateData }) => {
 
   return (
     <CategoryItemContainer>
-      {console.log(proofFileType)}
       {proofFileType === "video" ? (
         <CategoryItemVideoPlayer
           src={proofUrl}

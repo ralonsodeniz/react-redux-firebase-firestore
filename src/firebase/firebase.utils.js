@@ -201,7 +201,6 @@ export const addNewChallengeInstanceInFs = async (
     const administrator = userProfileId;
     const { contenders, validators } = instanceData;
     const comments = [];
-    const likes = 0;
     const { category, challengeTemplateId } = challengeData;
     let { daysToComplete } = challengeData;
 
@@ -211,7 +210,12 @@ export const addNewChallengeInstanceInFs = async (
         dateUploaded: null,
         state: "No proof provided"
       },
-      rating: 0,
+      rating: {
+        likes: 0,
+        usersThatLiked:[],
+        dislikes: 0,
+        usersThatDisliked:[]
+      },
       public: false
     };
     let enhancedContenders = contenders.map(contender => ({
@@ -235,7 +239,6 @@ export const addNewChallengeInstanceInFs = async (
       contenders: enhancedContenders,
       validators,
       comments,
-      likes
     });
 
     enhancedContenders.forEach(async contender => {

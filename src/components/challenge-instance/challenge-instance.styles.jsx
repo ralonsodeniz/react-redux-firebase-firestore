@@ -76,3 +76,7 @@ export const ChallengeInstanceButtonsGroup = styled.div`
   justify-content: space-evenly;
   align-items: center;
 `;
+
+export const ChallengeInstanceContenderDropdownContainer = styled.div`
+  margin-left: auto;
+`;

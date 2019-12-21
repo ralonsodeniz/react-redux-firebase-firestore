@@ -9,6 +9,7 @@ import FormInput from "../form-input/form-input";
 // import FormDropdown from "../form-dropdown/form-dropdown";
 import FileUploader from "../file-uplader/file-uploader";
 import CustomButton from "../custom-button/custom-button";
+import FormTextarea from "../form-textarea/form-textarea";
 
 import {
   AddChallengeContainer,
@@ -134,7 +135,7 @@ const AddChallenge = ({ urlCategory }) => {
           required
           disabled={formValidated}
         /> */}
-        <FormInput
+        {/* <FormInput
           type="text"
           id="description"
           name="description"
@@ -143,6 +144,16 @@ const AddChallenge = ({ urlCategory }) => {
           label="Description"
           required
           disabled={formValidated}
+        /> */}
+        <FormTextarea
+          id="description"
+          name="description"
+          value={description}
+          handleChange={handleChange}
+          required
+          disabled={formValidated}
+          maxLength={155}
+          label="Description"
         />
         {/* <FormInput
           type="text"
