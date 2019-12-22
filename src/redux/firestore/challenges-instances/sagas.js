@@ -9,7 +9,9 @@ import {
   updateProofInFs,
   toggleProofPublicPrivateInFs,
   validateProofInFs,
-  invalidateProofInFs
+  invalidateProofInFs,
+  addLikeToProofInFs,
+  addDislikeToProofInFs
 } from "../../../firebase/firebase.utils";
 
 // add new challenge to instances
@@ -213,6 +215,60 @@ export function* invalidateProof({ payload }) {
   }
 }
 
+// add like to a proof
+export function* onAddLikeToProofStarts() {
+  yield takeLatest(INSTANCES.ADD_LIKE_TO_PROOF_STARTS, addLikeToProof);
+}
+
+export function* addLikeToProof({ payload }) {
+  const { contenderId, instanceId, hasUserDisliked } = payload;
+  try {
+    yield call(addLikeToProofInFs, contenderId, instanceId, hasUserDisliked);
+    const addLikeToProofSuccessModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: `Proof liked`
+      }
+    };
+    yield put(openModal(addLikeToProofSuccessModalData));
+  } catch (error) {
+    const addLikeToProofFailureModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: error.message
+      }
+    };
+    yield put(openModal(addLikeToProofFailureModalData));
+  }
+}
+
+// add dislike to a proof
+export function* onAddDislikeToProofStarts() {
+  yield takeLatest(INSTANCES.ADD_DISLIKE_TO_PROOF_STARTS, addDislikeToProof);
+}
+
+export function* addDislikeToProof({ payload }) {
+  const { contenderId, instanceId, hasUserLiked } = payload;
+  try {
+    yield call(addDislikeToProofInFs, contenderId, instanceId, hasUserLiked);
+    const addDislikeToProofSuccessModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: `Proof disliked`
+      }
+    };
+    yield put(openModal(addDislikeToProofSuccessModalData));
+  } catch (error) {
+    const addDislikeToProofFailureModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: error.message
+      }
+    };
+    yield put(openModal(addDislikeToProofFailureModalData));
+  }
+}
+
 // root saga creator for challenges instances
 export function* challengesInstancesSagas() {
   yield all([
@@ -222,6 +278,8 @@ export function* challengesInstancesSagas() {
     call(onUploadProofStarts),
     call(onToggleProofPublicPrivateStarts),
     call(onValidateProofStarts),
-    call(onInvalidateProofStarts)
+    call(onInvalidateProofStarts),
+    call(onAddLikeToProofStarts),
+    call(onAddDislikeToProofStarts)
   ]);
 }

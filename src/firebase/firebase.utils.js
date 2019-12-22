@@ -212,9 +212,9 @@ export const addNewChallengeInstanceInFs = async (
       },
       rating: {
         likes: 0,
-        usersThatLiked:[],
+        usersThatLiked: [],
         dislikes: 0,
-        usersThatDisliked:[]
+        usersThatDisliked: []
       },
       public: false
     };
@@ -238,7 +238,7 @@ export const addNewChallengeInstanceInFs = async (
       administrator,
       contenders: enhancedContenders,
       validators,
-      comments,
+      comments
     });
 
     enhancedContenders.forEach(async contender => {
@@ -772,14 +772,14 @@ export const sendFriendRequestInFs = async friendId => {
   const userId = auth.currentUser.uid;
 
   try {
-     const friendRef = firestore.doc(`users/${friendId}`);
+    const friendRef = firestore.doc(`users/${friendId}`);
 
     const friendAcceptedFriends = (await friendRef.get()).data().friends
       .accepted;
 
     const friendPendingFriends = (await friendRef.get()).data().friends.pending;
 
-    const newFriendPendingFriends = [...friendPendingFriends, userId]
+    const newFriendPendingFriends = [...friendPendingFriends, userId];
 
     await friendRef.update({
       friends: {
@@ -793,7 +793,128 @@ export const sendFriendRequestInFs = async friendId => {
   }
 };
 
+export const addLikeToProofInFs = async (
+  contenderId,
+  instanceId,
+  hasUserDisliked
+) => {
+  const userId = auth.currentUser.uid;
 
+  try {
+    const challengeInstanceRef = firestore.doc(
+      `challengesInstances/${instanceId}`
+    );
+    const challengeInstanceSnapshot = await challengeInstanceRef.get();
+    const challengeInstanceContenders = challengeInstanceSnapshot.data()
+      .contenders;
+    const newChallengeInstanceContenders = challengeInstanceContenders.reduce(
+      (accumulator, contender) => {
+        if (contender.id === contenderId) {
+          if (hasUserDisliked) {
+            const newUsersThatDisliked = contender.rating.usersThatDisliked.filter(
+              user => user !== userId
+            );
+
+            accumulator.push({
+              ...contender,
+              rating: {
+                likes: contender.rating.likes + 1,
+                usersThatLiked: [...contender.rating.usersThatLiked, userId],
+                dislikes: contender.rating.dislikes - 1,
+                usersThatDisliked: newUsersThatDisliked
+              }
+            });
+          } else {
+            accumulator.push({
+              ...contender,
+              rating: {
+                ...contender.rating,
+                likes: contender.rating.likes + 1,
+                usersThatLiked: [...contender.rating.usersThatLiked, userId]
+              }
+            });
+          }
+        } else {
+          accumulator.push(contender);
+        }
+        return accumulator;
+      },
+      []
+    );
+
+    await challengeInstanceRef.update({
+      contenders: newChallengeInstanceContenders
+    });
+  } catch (error) {
+    console.log("Error while liking the instance proof", error);
+    throw new Error("Ooops something happened while liking the instance proof");
+  }
+};
+
+export const addDislikeToProofInFs = async (
+  contenderId,
+  instanceId,
+  hasUserLiked
+) => {
+  const userId = auth.currentUser.uid;
+
+  try {
+    const challengeInstanceRef = firestore.doc(
+      `challengesInstances/${instanceId}`
+    );
+    const challengeInstanceSnapshot = await challengeInstanceRef.get();
+    const challengeInstanceContenders = challengeInstanceSnapshot.data()
+      .contenders;
+    const newChallengeInstanceContenders = challengeInstanceContenders.reduce(
+      (accumulator, contender) => {
+        if (contender.id === contenderId) {
+          if (hasUserLiked) {
+            const newUsersThatLiked = contender.rating.usersThatLiked.filter(
+              user => user !== userId
+            );
+
+            accumulator.push({
+              ...contender,
+              rating: {
+                ...contender.rating,
+                likes: contender.rating.likes - 1,
+                usersThatLiked: newUsersThatLiked,
+                dislikes: contender.rating.dislikes + 1,
+                usersThatDisliked: [
+                  ...contender.rating.usersThatDisliked,
+                  userId
+                ]
+              }
+            });
+          } else {
+            accumulator.push({
+              ...contender,
+              rating: {
+                ...contender.rating,
+                dislikes: contender.rating.dislikes + 1,
+                usersThatDisliked: [
+                  ...contender.rating.usersThatDisliked,
+                  userId
+                ]
+              }
+            });
+          }
+        } else {
+          accumulator.push(contender);
+        }
+        return accumulator;
+      },
+      []
+    );
+
+    await challengeInstanceRef.update({
+      contenders: newChallengeInstanceContenders
+    });
+  } catch (error) {
+    console.log("Error while disliking the instance proof", error);
+    throw new Error("Ooops something happened while disliking the instance proof");
+  }
+};
 
 // firebase init
 firebase.initializeApp(firebaseConfig);

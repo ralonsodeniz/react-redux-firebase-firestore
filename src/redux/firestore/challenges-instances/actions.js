@@ -59,3 +59,29 @@ export const invalidateProofStarts = (userToInvalidateId, instanceId) => ({
     instanceId
   }
 });
+
+export const addLikeToProofStarts = (
+  contenderId,
+  instanceId,
+  hasUserDisliked
+) => ({
+  type: INSTANCES.ADD_LIKE_TO_PROOF_STARTS,
+  payload: {
+    contenderId,
+    instanceId,
+    hasUserDisliked
+  }
+});
+
+export const addDislikeToProofStarts = (
+  contenderId,
+  instanceId,
+  hasUserLiked
+) => ({
+  type: INSTANCES.ADD_DISLIKE_TO_PROOF_STARTS,
+  payload: {
+    contenderId,
+    instanceId,
+    hasUserLiked
+  }
+});

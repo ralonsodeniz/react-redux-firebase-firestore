@@ -8,6 +8,10 @@ import {
   validateProofStarts,
   invalidateProofStarts
 } from "../../redux/firestore/challenges-instances/actions";
+import {
+  addLikeToProofStarts,
+  addDislikeToProofStarts
+} from "../../redux/firestore/challenges-instances/actions";
 
 import {
   InstanceContenderInfoContainer,
@@ -18,7 +22,8 @@ import {
   InstanceContenderInfoVideoPlayer,
   InstanceContenderInfoButtonsContainer,
   InstanceContenderInfoImageContainer,
-  InstanceContenderInfoRankingContainer
+  InstanceContenderInfoRankingContainer,
+  InstanceContenderInfoEmojiContainer
 } from "./instance-contender-info.styles";
 
 const InstanceContenderInfo = ({
@@ -45,6 +50,18 @@ const InstanceContenderInfo = ({
     [dispatch, selectedContender, instanceId]
   );
 
+  const handleAddLikeToProof = useCallback(
+    (contenderId, hasUserDisliked) =>
+      dispatch(addLikeToProofStarts(contenderId, instanceId, hasUserDisliked)),
+    [dispatch, instanceId]
+  );
+
+  const handleAddDisLikeToProof = useCallback(
+    (contenderId, hasUserLiked) =>
+      dispatch(addDislikeToProofStarts(contenderId, instanceId, hasUserLiked)),
+    [dispatch, instanceId]
+  );
+
   return (
     <InstanceContenderInfoContainer>
       {challengeInstanceContenders.reduce(
@@ -60,6 +77,14 @@ const InstanceContenderInfo = ({
               ? true
               : false;
           if (contender.id === selectedContender) {
+            const hasUserLiked = contender.rating.usersThatLiked.some(
+              user => user === userProfileId
+            );
+            const hasUserDisliked = contender.rating.usersThatDisliked.some(
+              user => user === userProfileId
+            );
+            const contenderId = contender.id;
+
             accumulator.push(
               <InstanceContenderInfoContainer key={contenderIndex}>
                 <InstanceContenderInfoTitle>Name</InstanceContenderInfoTitle>
@@ -92,7 +117,7 @@ const InstanceContenderInfo = ({
                   </InstanceContenderInfoText>
                 )}
                 <InstanceContenderInfoTitle>
-                  Instance tatus
+                  Instance status
                 </InstanceContenderInfoTitle>
                 <InstanceContenderInfoStatusText status={contender.status}>
                   {contender.status}
@@ -118,21 +143,39 @@ const InstanceContenderInfo = ({
                   <InstanceContenderInfoText>
                     Likes: {contender.rating.likes}
                   </InstanceContenderInfoText>
-                  {isVisibleAndAuthed && (
-                    <span role="img" aria-label="like">
-                      &#128077;
-                    </span>
-                  )}
+                  {isVisibleAndAuthed &&
+                    !hasUserLiked &&
+                    contender.id !== userProfileId && contender.proof.url &&(
+                      <InstanceContenderInfoEmojiContainer
+                        role="img"
+                        aria-label="like"
+                        aria-labelledby="like"
+                        onClick={() =>
+                          handleAddLikeToProof(contenderId, hasUserDisliked)
+                        }
+                      >
+                        &#128077;
+                      </InstanceContenderInfoEmojiContainer>
+                    )}
                 </InstanceContenderInfoRankingContainer>
                 <InstanceContenderInfoRankingContainer>
                   <InstanceContenderInfoText>
                     Dislikes: {contender.rating.dislikes}
                   </InstanceContenderInfoText>
-                  {isVisibleAndAuthed && (
-                    <span role="img" aria-label="dislike">
-                      &#128078;
-                    </span>
-                  )}
+                  {isVisibleAndAuthed &&
+                    !hasUserDisliked &&
+                    contender.id !== userProfileId && contender.proof.url &&  (
+                      <InstanceContenderInfoEmojiContainer
+                        role="img"
+                        aria-label="dislike"
+                        aria-labelledby="dislike"
+                        onClick={() =>
+                          handleAddDisLikeToProof(contenderId, hasUserLiked)
+                        }
+                      >
+                        &#128078;
+                      </InstanceContenderInfoEmojiContainer>
+                    )}
                 </InstanceContenderInfoRankingContainer>
                 {isUserValidator &&
                   contender.id !== userProfileId &&
