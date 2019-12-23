@@ -58,7 +58,3 @@ export const InstanceContenderCommentEmojiContainer = styled.div`
   width: min-content;
   margin-left: auto;
 `;
-
-export const InstanceContenderCommentEmoji = styled.span`
-  cursor: pointer;
-`;

@@ -23,7 +23,6 @@ import {
   InstanceContenderInfoButtonsContainer,
   InstanceContenderInfoImageContainer,
   InstanceContenderInfoRankingContainer,
-  InstanceContenderInfoEmojiContainer
 } from "./instance-contender-info.styles";
 
 const InstanceContenderInfo = ({
@@ -146,16 +145,17 @@ const InstanceContenderInfo = ({
                   {isVisibleAndAuthed &&
                     !hasUserLiked &&
                     contender.id !== userProfileId && contender.proof.url &&(
-                      <InstanceContenderInfoEmojiContainer
+                      <span
                         role="img"
                         aria-label="like"
                         aria-labelledby="like"
                         onClick={() =>
                           handleAddLikeToProof(contenderId, hasUserDisliked)
                         }
+                        style={{cursor:"pointer"}}
                       >
                         &#128077;
-                      </InstanceContenderInfoEmojiContainer>
+                      </span>
                     )}
                 </InstanceContenderInfoRankingContainer>
                 <InstanceContenderInfoRankingContainer>
@@ -165,16 +165,17 @@ const InstanceContenderInfo = ({
                   {isVisibleAndAuthed &&
                     !hasUserDisliked &&
                     contender.id !== userProfileId && contender.proof.url &&  (
-                      <InstanceContenderInfoEmojiContainer
+                      <span
                         role="img"
                         aria-label="dislike"
                         aria-labelledby="dislike"
                         onClick={() =>
                           handleAddDisLikeToProof(contenderId, hasUserLiked)
                         }
+                        style={{cursor:"pointer"}}
                       >
                         &#128078;
-                      </InstanceContenderInfoEmojiContainer>
+                      </span>
                     )}
                 </InstanceContenderInfoRankingContainer>
                 {isUserValidator &&

@@ -19,7 +19,6 @@ import {
   InstanceContenderCommentContainer,
   InstanceContenderCommentsTitle,
   InstanceContenderCommentsText,
-  InstanceContenderCommentEmoji,
   InstanceContenderCommentEmojiContainer
 } from "./instance-contender-commetns.styles";
 
@@ -211,7 +210,7 @@ const InstanceContenderComments = ({
                             {comment.posterId === userProfileId && (
                               <InstanceContenderCommentEmojiContainer>
                                 {!comment.reportAbuse ? (
-                                  <InstanceContenderCommentEmoji
+                                  <span
                                     role="img"
                                     aria-label="edit comment"
                                     aria-labelledby="eddit comment"
@@ -221,19 +220,20 @@ const InstanceContenderComments = ({
                                         comment.commentId
                                       )
                                     }
+                                    style={{cursor:"pointer"}}
                                   >
                                     &#128394;
-                                  </InstanceContenderCommentEmoji>
+                                  </span>
                                 ) : (
-                                  <InstanceContenderCommentEmoji
+                                  <span
                                     role="img"
                                     aria-label="abuse warning"
                                     aria-labelledby="abuse warning"
                                   >
                                     &#9940;
-                                  </InstanceContenderCommentEmoji>
+                                  </span>
                                 )}
-                                <InstanceContenderCommentEmoji
+                                <span
                                   role="img"
                                   aria-label="delete comment"
                                   aria-labelledby="delete comment"
@@ -243,14 +243,15 @@ const InstanceContenderComments = ({
                                       comment.commentId
                                     )
                                   }
+                                  style={{cursor:"pointer"}}
                                 >
                                   &#128465;
-                                </InstanceContenderCommentEmoji>
+                                </span>
                               </InstanceContenderCommentEmojiContainer>
                             )}
                             {contenderId === userProfileId && (
                               <InstanceContenderCommentEmojiContainer>
-                                <InstanceContenderCommentEmoji
+                                <span
                                   role="img"
                                   aria-label="report abuse"
                                   aria-labelledby="report abuse"
@@ -260,9 +261,10 @@ const InstanceContenderComments = ({
                                       comment.commentId
                                     )
                                   }
+                                  style={{cursor:"pointer"}}
                                 >
                                   &#129324;
-                                </InstanceContenderCommentEmoji>
+                                </span>
                               </InstanceContenderCommentEmojiContainer>
                             )}
                           </InstanceContenderCommentEmojiContainer>

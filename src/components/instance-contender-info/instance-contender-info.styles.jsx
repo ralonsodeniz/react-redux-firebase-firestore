@@ -66,7 +66,3 @@ export const InstanceContenderInfoRankingContainer = styled.div`
   justify-content: space-evenly;
   margin: 5px;
 `;
-
-export const InstanceContenderInfoEmojiContainer = styled.span`
-  cursor: pointer;
-`;

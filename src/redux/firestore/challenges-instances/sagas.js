@@ -335,18 +335,16 @@ export function* editCommentAtProof({ payload }) {
 
 // delete comment from challenge instance proof
 export function* onDeleteCommentFromProofStarts() {
-  yield takeLatest(INSTANCES.DELETE_COMMENT_FROM_PROOF_STARTS, deleteCommentFromProof);
+  yield takeLatest(
+    INSTANCES.DELETE_COMMENT_FROM_PROOF_STARTS,
+    deleteCommentFromProof
+  );
 }
 
 export function* deleteCommentFromProof({ payload }) {
-  const { contenderId, instanceId, text, commentId } = payload;
+  const { contenderId, instanceId, commentId } = payload;
   try {
-    yield call(
-      deleteCommentFromProofInFs,
-      contenderId,
-      instanceId,
-      commentId
-    );
+    yield call(deleteCommentFromProofInFs, contenderId, instanceId, commentId);
     const deleteCommentFromProofSuccessModalData = {
       modalType: "SYSTEM_MESSAGE",
       modalProps: {
@@ -367,11 +365,14 @@ export function* deleteCommentFromProof({ payload }) {
 
 // delete comment from challenge instance proof
 export function* onReportCommentAbuseAtProofStarts() {
-  yield takeLatest(INSTANCES.REPORT_COMMENT_ABUSE_AT_PROOF_STARTS, reportCommentAbuseAtProof);
+  yield takeLatest(
+    INSTANCES.REPORT_COMMENT_ABUSE_AT_PROOF_STARTS,
+    reportCommentAbuseAtProof
+  );
 }
 
 export function* reportCommentAbuseAtProof({ payload }) {
-  const { contenderId, instanceId, text, commentId } = payload;
+  const { contenderId, instanceId, commentId } = payload;
   try {
     yield call(
       reportCommentAbuseAtProofInFs,
