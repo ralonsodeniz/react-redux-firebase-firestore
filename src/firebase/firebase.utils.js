@@ -200,7 +200,6 @@ export const addNewChallengeInstanceInFs = async (
     const challengeInstanceRefId = challengeInstanceRef.id;
     const administrator = userProfileId;
     const { contenders, validators } = instanceData;
-    const comments = [];
     const { category, challengeTemplateId } = challengeData;
     let { daysToComplete } = challengeData;
 
@@ -216,7 +215,8 @@ export const addNewChallengeInstanceInFs = async (
         dislikes: 0,
         usersThatDisliked: []
       },
-      public: false
+      public: false,
+      comments: []
     };
     let enhancedContenders = contenders.map(contender => ({
       id: contender,
@@ -237,8 +237,7 @@ export const addNewChallengeInstanceInFs = async (
       challengeTemplateId,
       administrator,
       contenders: enhancedContenders,
-      validators,
-      comments
+      validators
     });
 
     enhancedContenders.forEach(async contender => {
@@ -912,7 +911,209 @@ export const addDislikeToProofInFs = async (
     });
   } catch (error) {
     console.log("Error while disliking the instance proof", error);
-    throw new Error("Ooops something happened while disliking the instance proof");
+    throw new Error(
+      "Ooops something happened while disliking the instance proof"
+    );
+  }
+};
+
+export const addCommentToProofInFs = async (contenderId, instanceId, text) => {
+  const userId = auth.currentUser.uid;
+
+  try {
+    const challengeInstanceRef = firestore.doc(
+      `challengesInstances/${instanceId}`
+    );
+    const challengeInstanceSnapshot = await challengeInstanceRef.get();
+    const challengeInstanceContenders = challengeInstanceSnapshot.data()
+      .contenders;
+    const challengeInstanceContender = challengeInstanceContenders.find(
+      contender => contender.id === contenderId
+    );
+    const challengeInstanceContenderComments =
+      challengeInstanceContender.comments;
+    const commentsIdsObj = challengeInstanceContenderComments.reduce(
+      (accumulator, comment) => ({ ...accumulator, [comment.id]: comment.id }),
+      {}
+    );
+    const id = assignNewIdToItem(commentsIdsObj, createRandomId, 28);
+    const newChallengeInstanceContenders = challengeInstanceContenders.reduce(
+      (accumulator, contender) => {
+        if (contender.id === contenderId) {
+          accumulator.push({
+            ...contender,
+            comments: [
+              ...contender.comments,
+              {
+                dateOfPost: new Date(),
+                posterId: userId,
+                reportAbuse: false,
+                text,
+                commentId: id
+              }
+            ]
+          });
+        } else {
+          accumulator.push(contender);
+        }
+        return accumulator;
+      },
+      []
+    );
+
+    await challengeInstanceRef.update({
+      contenders: newChallengeInstanceContenders
+    });
+  } catch (error) {
+    console.log("Error while adding new comment to the instance proof", error);
+    throw new Error(
+      "Ooops something happened while adding new comment to the instance proof"
+    );
+  }
+};
+
+export const editCommentAtProofInFs = async (
+  contenderId,
+  instanceId,
+  text,
+  commentId
+) => {
+  try {
+    const challengeInstanceRef = firestore.doc(
+      `challengesInstances/${instanceId}`
+    );
+    const challengeInstanceSnapshot = await challengeInstanceRef.get();
+    const challengeInstanceContenders = challengeInstanceSnapshot.data()
+      .contenders;
+
+    const newChallengeInstanceContenders = challengeInstanceContenders.reduce(
+      (accumulator, contender) => {
+        if (contender.id === contenderId) {
+          const newContenderComments = contender.comments.reduce(
+            (accumulator, comment) => {
+              if (comment.commentId === commentId) {
+                accumulator.push({
+                  ...comment,
+                  dateOfPost: new Date(),
+                  text
+                });
+              } else {
+                accumulator.push(comment);
+              }
+              return accumulator;
+            },
+            []
+          );
+
+          accumulator.push({
+            ...contender,
+            comments: newContenderComments
+          });
+        } else {
+          accumulator.push(contender);
+        }
+        return accumulator;
+      },
+      []
+    );
+
+    await challengeInstanceRef.update({
+      contenders: newChallengeInstanceContenders
+    });
+  } catch (error) {
+    console.log("Error while editing comment at instance proof", error);
+    throw new Error(
+      "Ooops something happened while editing comment at instance proof"
+    );
+  }
+};
+
+export const deleteCommentFromProofInFs = async (contenderId, instanceId, commentId) => {
+  try {
+    const challengeInstanceRef = firestore.doc(
+      `challengesInstances/${instanceId}`
+    );
+    const challengeInstanceSnapshot = await challengeInstanceRef.get();
+    const challengeInstanceContenders = challengeInstanceSnapshot.data()
+      .contenders;
+    const newChallengeInstanceContenders = challengeInstanceContenders.reduce(
+      (accumulator, contender) => {
+        if (contender.id === contenderId) {
+          const newComments = contender.comments.filter(comment => comment.commentId !== commentId)
+          accumulator.push({
+            ...contender,
+            comments: newComments
+          });
+        } else {
+          accumulator.push(contender);
+        }
+        return accumulator;
+      },
+      []
+    );
+
+    await challengeInstanceRef.update({
+      contenders: newChallengeInstanceContenders
+    });
+  } catch (error) {
+    console.log("Error while deleting comment from the instance proof", error);
+    throw new Error(
+      "Ooops something happened while deleting comment from the instance proof"
+    );
+  }
+};
+
+export const reportCommentAbuseAtProofInFs = async (
+  contenderId,
+  instanceId,
+  commentId
+) => {
+  try {
+    const challengeInstanceRef = firestore.doc(
+      `challengesInstances/${instanceId}`
+    );
+    const challengeInstanceSnapshot = await challengeInstanceRef.get();
+    const challengeInstanceContenders = challengeInstanceSnapshot.data()
+      .contenders;
+
+    const newChallengeInstanceContenders = challengeInstanceContenders.reduce(
+      (accumulator, contender) => {
+        if (contender.id === contenderId) {
+          const newContenderComments = contender.comments.reduce(
+            (accumulator, comment) => {
+              if (comment.commentId === commentId) {
+                accumulator.push({
+                  ...comment,
+                  reportAbuse: true,
+                });
+              } else {
+                accumulator.push(comment);
+              }
+              return accumulator;
+            },
+            []
+          );
+
+          accumulator.push({
+            ...contender,
+            comments: newContenderComments
+          });
+        } else {
+          accumulator.push(contender);
+        }
+        return accumulator;
+      },
+      []
+    );
+
+    await challengeInstanceRef.update({
+      contenders: newChallengeInstanceContenders
+    });
+  } catch (error) {
+    console.log("Error while reporting comment abuse at instance proof", error);
+    throw new Error(
+      "Ooops something happened while reporting comment abuse at instance proof"
+    );
   }
 };
 

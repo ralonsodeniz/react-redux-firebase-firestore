@@ -85,3 +85,53 @@ export const addDislikeToProofStarts = (
     hasUserLiked
   }
 });
+
+export const addCommentToProofStarts = (contenderId, instanceId, text) => ({
+  type: INSTANCES.ADD_COMMENT_TO_PROOF_STARTS,
+  payload: {
+    contenderId,
+    instanceId,
+    text
+  }
+});
+
+export const editCommentAtProofStarts = (
+  contenderId,
+  instanceId,
+  text,
+  commentId
+) => ({
+  type: INSTANCES.EDIT_COMMENT_AT_PROOF_STARTS,
+  payload: {
+    contenderId,
+    instanceId,
+    text,
+    commentId
+  }
+});
+
+export const deleteCommentFromProofStarts = (
+  contenderId,
+  instanceId,
+  commentId
+) => ({
+  type: INSTANCES.DELETE_COMMENT_FROM_PROOF_STARTS,
+  payload: {
+    contenderId,
+    instanceId,
+    commentId
+  }
+});
+
+export const reportCommentAbuseAtProofStarts = (
+  contenderId,
+  instanceId,
+  commentId
+) => ({
+  type: INSTANCES.REPORT_COMMENT_ABUSE_AT_PROOF_STARTS,
+  payload: {
+    contenderId,
+    instanceId,
+    commentId
+  }
+});

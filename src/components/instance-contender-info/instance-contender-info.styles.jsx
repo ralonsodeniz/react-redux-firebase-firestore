@@ -39,10 +39,6 @@ export const InstanceContenderInfoStateText = styled.span`
       : ""}
 `;
 
-export const InstanceContenderInfoFormDropdownContainer = styled.div`
-  margin-left: auto;
-`;
-
 export const InstanceContenderInfoVideoPlayer = styled.video`
   grid-area: templateProof;
   height: 9vh;

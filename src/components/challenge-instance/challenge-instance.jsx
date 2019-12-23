@@ -30,6 +30,7 @@ import CustomButton from "../custom-button/custom-button";
 import FileUploader from "../file-uplader/file-uploader";
 import InstanceContenderInfo from "../instance-contender-info/instance-contender-info";
 import FormDropdown from "../form-dropdown/form-dropdown";
+import InstanceContenderComments from "../instance-contender-comments/instance-contender-comments";
 
 import {
   ChallengeInstanceContainer,
@@ -40,7 +41,8 @@ import {
   ChallengeInstanceData,
   ChallengeInstanceButtonsGroup,
   ChallengeInstanceImageContainer,
-  ChallengeInstanceContenderDropdownContainer
+  ChallengeInstanceContenderDropdownContainer,
+  ChallengeInstanceComments
 } from "./challenge-instance.styles";
 
 const selectChallengeInstanceData = createStructuredSelector({
@@ -313,6 +315,15 @@ const ChallengeInstance = () => {
           selectedContender={selectedContender}
         />
       </ChallengeInstanceData>
+      <ChallengeInstanceComments>
+        <InstanceContenderComments
+          challengeInstanceContenders={enhancedChallengeInstanceContenders}
+          userProfileId={userProfileId}
+          isUserValidator={isUserValidator}
+          instanceId={instanceId}
+          selectedContender={selectedContender}
+        />
+      </ChallengeInstanceComments>
     </ChallengeInstanceContainer>
   );
 };

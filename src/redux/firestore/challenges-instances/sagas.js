@@ -11,7 +11,11 @@ import {
   validateProofInFs,
   invalidateProofInFs,
   addLikeToProofInFs,
-  addDislikeToProofInFs
+  addDislikeToProofInFs,
+  addCommentToProofInFs,
+  editCommentAtProofInFs,
+  deleteCommentFromProofInFs,
+  reportCommentAbuseAtProofInFs
 } from "../../../firebase/firebase.utils";
 
 // add new challenge to instances
@@ -269,6 +273,130 @@ export function* addDislikeToProof({ payload }) {
   }
 }
 
+// add new comment to challenge instance proof
+export function* onAddCommentToProofStarts() {
+  yield takeLatest(INSTANCES.ADD_COMMENT_TO_PROOF_STARTS, addCommentToProof);
+}
+
+export function* addCommentToProof({ payload }) {
+  const { contenderId, instanceId, text } = payload;
+  try {
+    yield call(addCommentToProofInFs, contenderId, instanceId, text);
+    const addCommentToProofSuccessModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: `Added comment to proof`
+      }
+    };
+    yield put(openModal(addCommentToProofSuccessModalData));
+  } catch (error) {
+    const addCommentToProofFailureModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: error.message
+      }
+    };
+    yield put(openModal(addCommentToProofFailureModalData));
+  }
+}
+
+// edit comment at challenge instance proof
+export function* onEditCommentAtProofStarts() {
+  yield takeLatest(INSTANCES.EDIT_COMMENT_AT_PROOF_STARTS, editCommentAtProof);
+}
+
+export function* editCommentAtProof({ payload }) {
+  const { contenderId, instanceId, text, commentId } = payload;
+  try {
+    yield call(
+      editCommentAtProofInFs,
+      contenderId,
+      instanceId,
+      text,
+      commentId
+    );
+    const editCommentAtProofSuccessModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: `Edited comment at proof`
+      }
+    };
+    yield put(openModal(editCommentAtProofSuccessModalData));
+  } catch (error) {
+    const editCommentAtProofFailureModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: error.message
+      }
+    };
+    yield put(openModal(editCommentAtProofFailureModalData));
+  }
+}
+
+// delete comment from challenge instance proof
+export function* onDeleteCommentFromProofStarts() {
+  yield takeLatest(INSTANCES.DELETE_COMMENT_FROM_PROOF_STARTS, deleteCommentFromProof);
+}
+
+export function* deleteCommentFromProof({ payload }) {
+  const { contenderId, instanceId, text, commentId } = payload;
+  try {
+    yield call(
+      deleteCommentFromProofInFs,
+      contenderId,
+      instanceId,
+      commentId
+    );
+    const deleteCommentFromProofSuccessModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: `Deleted comment from proof`
+      }
+    };
+    yield put(openModal(deleteCommentFromProofSuccessModalData));
+  } catch (error) {
+    const deleteCommentFromProofFailureModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: error.message
+      }
+    };
+    yield put(openModal(deleteCommentFromProofFailureModalData));
+  }
+}
+
+// delete comment from challenge instance proof
+export function* onReportCommentAbuseAtProofStarts() {
+  yield takeLatest(INSTANCES.REPORT_COMMENT_ABUSE_AT_PROOF_STARTS, reportCommentAbuseAtProof);
+}
+
+export function* reportCommentAbuseAtProof({ payload }) {
+  const { contenderId, instanceId, text, commentId } = payload;
+  try {
+    yield call(
+      reportCommentAbuseAtProofInFs,
+      contenderId,
+      instanceId,
+      commentId
+    );
+    const reportCommentAbuseAtProofSuccessModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: `Reported comment abuse at proof`
+      }
+    };
+    yield put(openModal(reportCommentAbuseAtProofSuccessModalData));
+  } catch (error) {
+    const reportCommentAbuseAtProofFailureModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: error.message
+      }
+    };
+    yield put(openModal(reportCommentAbuseAtProofFailureModalData));
+  }
+}
+
 // root saga creator for challenges instances
 export function* challengesInstancesSagas() {
   yield all([
@@ -280,6 +408,10 @@ export function* challengesInstancesSagas() {
     call(onValidateProofStarts),
     call(onInvalidateProofStarts),
     call(onAddLikeToProofStarts),
-    call(onAddDislikeToProofStarts)
+    call(onAddDislikeToProofStarts),
+    call(onAddCommentToProofStarts),
+    call(onEditCommentAtProofStarts),
+    call(onDeleteCommentFromProofStarts),
+    call(onReportCommentAbuseAtProofStarts)
   ]);
 }

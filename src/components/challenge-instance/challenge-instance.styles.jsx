@@ -23,6 +23,7 @@ export const ChallengeInstanceContainer = styled.div`
   grid-template-areas:
     "templateProof instanceData"
     "templateData instanceData"
+    "comments comments"
     "buttons buttons";
 `;
 
@@ -79,4 +80,10 @@ export const ChallengeInstanceButtonsGroup = styled.div`
 
 export const ChallengeInstanceContenderDropdownContainer = styled.div`
   margin-left: auto;
+`;
+
+export const ChallengeInstanceComments = styled.div`
+  grid-area: comments;
+  display: flex;
+  flex-direction: column;
 `;
