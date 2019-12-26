@@ -46,7 +46,11 @@ export const InstanceContenderInfoVideoPlayer = styled.video`
   border: 1px solid black;
 `;
 
-export const InstanceContenderInfoImageContainer = styled.img`
+export const InstanceContenderInfoImageContainer = styled.div`
+  position: relative;
+`;
+
+export const InstanceContenderInfoImageFrame = styled.img`
   grid-area: templateProof;
   height: 9vh;
   width: 16vw;

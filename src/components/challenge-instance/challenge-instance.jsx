@@ -41,6 +41,7 @@ import {
   ChallengeInstanceData,
   ChallengeInstanceButtonsGroup,
   ChallengeInstanceImageContainer,
+  ChallengeInstanceImageFrame,
   ChallengeInstanceContenderDropdownContainer,
   ChallengeInstanceComments
 } from "./challenge-instance.styles";
@@ -206,6 +207,26 @@ const ChallengeInstance = () => {
     setSelectedContender(value);
   }, []);
 
+  const handleImageFullScreen = useCallback(() => {
+    const image = document.getElementById("imageProof");
+    if (image.requestFullscreen) {
+      image.requestFullscreen();
+    } else if (image.mozRequestFullScreen) {
+      image.mozRequestFullScreen();
+    } else if (image.webkitRequestFullscreen) {
+      image.webkitRequestFullscreen();
+    } else if (image.msRequestFullscreen) {
+      image.msRequestFullscreen();
+    }
+  }, []);
+
+  const fullScreenEmojisStyles = {
+    position: "absolute",
+    top: "10vh",
+    left: "20vw",
+    cursor: "pointer"
+  };
+
   return challengesInstancesAreLoading ||
     challengesTemplatesAreLoading ||
     !userProfileIsLoaded ? (
@@ -221,7 +242,23 @@ const ChallengeInstance = () => {
           controlsList="nodownload"
         />
       ) : (
-        <ChallengeInstanceImageContainer src={proofUrl} alt="proof image" />
+        <ChallengeInstanceImageContainer>
+          <ChallengeInstanceImageFrame
+            src={proofUrl}
+            alt="proof image"
+            id="imageProof"
+            onClick={handleImageFullScreen}
+          />
+          <span
+            role="img"
+            aria-label="like"
+            aria-labelledby="like"
+            onClick={() => handleImageFullScreen}
+            style={fullScreenEmojisStyles}
+          >
+            &#128306;
+          </span>
+        </ChallengeInstanceImageContainer>
       )}
       <ChallengeInstanceTemplateDataContainer>
         <ChallengeInstanceTemplateData>

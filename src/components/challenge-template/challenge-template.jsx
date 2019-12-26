@@ -37,7 +37,8 @@ import {
   ChallengeTemplateRankingName,
   ChallengeTemplateRankingLikeDislikeContainer,
   ChallengeTemplateRankingLikeDislike,
-  ShowAllProofsContainer
+  ShowAllProofsContainer,
+  ChallengeTemplateImageFrame
 } from "./challenge-template.styles";
 
 const selectChallengeTemplateData = createStructuredSelector({
@@ -214,6 +215,26 @@ const ChallengeTemplate = () => {
     dispatch(openModal(openModalTemplateProofsRankingData));
   }, [dispatch, sortedRankingInfo, userProfileId, proofFileType]);
 
+  const handleImageFullScreen = useCallback(() => {
+    const image = document.getElementById("imageProof");
+    if (image.requestFullscreen) {
+      image.requestFullscreen();
+    } else if (image.mozRequestFullScreen) {
+      image.mozRequestFullScreen();
+    } else if (image.webkitRequestFullscreen) {
+      image.webkitRequestFullscreen();
+    } else if (image.msRequestFullscreen) {
+      image.msRequestFullscreen();
+    }
+  }, []);
+
+  const fullScreenEmojisStyles = {
+    position: "absolute",
+    top: "9vh",
+    left: "20vw",
+    cursor: "pointer"
+  };
+
   return !challengesTempletesAreLoading ? (
     <ChallengeTemplateContainer>
       {proofFileType === "video" ? (
@@ -223,7 +244,23 @@ const ChallengeTemplate = () => {
           controlsList="nodownload"
         />
       ) : (
-        <ChallengeTemplateImageContainer src={proofUrl} alt="proof image" />
+        <ChallengeTemplateImageContainer>
+          <ChallengeTemplateImageFrame
+            src={proofUrl}
+            alt="proof image"
+            id="imageProof"
+            onClick={handleImageFullScreen}
+          />
+          <span
+            role="img"
+            aria-label="like"
+            aria-labelledby="like"
+            onClick={handleImageFullScreen}
+            style={fullScreenEmojisStyles}
+          >
+            &#128306;
+          </span>
+        </ChallengeTemplateImageContainer>
       )}
       <ChallengeTemplateDataContainer>
         <ChallengeTemplateData>

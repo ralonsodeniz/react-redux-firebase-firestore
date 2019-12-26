@@ -14,7 +14,8 @@ import {
   TemplateProofsRankingLikeDislike,
   TemplateProofsRankingLikeDislikeContainer,
   TemplateProofsRankingName,
-  TemplateProofsRankingVideoFrame
+  TemplateProofsRankingVideoFrame,
+  TemplateProofsRankingImageContainer
 } from "./template-proofs-rankig.styles";
 
 const TemplateProofsRanking = ({
@@ -35,6 +36,26 @@ const TemplateProofsRanking = ({
       dispatch(addDislikeToProofStarts(contenderId, instanceId, hasUserLiked)),
     [dispatch]
   );
+
+  const handleImageFullScreen = useCallback(contenderIndex => {
+    const image = document.getElementById(contenderIndex);
+    if (image.requestFullscreen) {
+      image.requestFullscreen();
+    } else if (image.mozRequestFullScreen) {
+      image.mozRequestFullScreen();
+    } else if (image.webkitRequestFullscreen) {
+      image.webkitRequestFullscreen();
+    } else if (image.msRequestFullscreen) {
+      image.msRequestFullscreen();
+    }
+  }, []);
+
+  const fullScreenEmojisStyles = {
+    position: "absolute",
+    top: "10vh",
+    left: "10vw",
+    cursor: "pointer"
+  };
 
   return (
     <TemplateProofsRankingContainer>
@@ -58,10 +79,22 @@ const TemplateProofsRanking = ({
                 controlsList="nodownload"
               />
             ) : (
-              <TemplateProofsRankingImageFrame
-                src={contender.proofUrl}
-                alt="contender image proof"
-              />
+              <TemplateProofsRankingImageContainer>
+                <TemplateProofsRankingImageFrame
+                  src={contender.proofUrl}
+                  alt="contender image proof"
+                  id={contenderIndex}
+                />
+                <span
+                  role="img"
+                  aria-label="like"
+                  aria-labelledby="like"
+                  onClick={() => handleImageFullScreen(contenderIndex)}
+                  style={fullScreenEmojisStyles}
+                >
+                  &#128306;
+                </span>
+              </TemplateProofsRankingImageContainer>
             )}
             <TemplateProofsRankingLikeDislikeContainer>
               <TemplateProofsRankingLikeDislike>

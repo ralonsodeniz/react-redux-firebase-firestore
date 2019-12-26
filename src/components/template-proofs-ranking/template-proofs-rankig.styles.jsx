@@ -36,6 +36,10 @@ export const TemplateProofsRankingVideoFrame = styled.video`
   width: 13vw;
 `;
 
+export const TemplateProofsRankingImageContainer = styled.div`
+  position: relative;
+`;
+
 export const TemplateProofsRankingImageFrame = styled.img`
   border: 0;
   height: 13vh;

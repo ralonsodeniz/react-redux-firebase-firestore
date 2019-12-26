@@ -23,6 +23,7 @@ import {
   InstanceContenderInfoButtonsContainer,
   InstanceContenderInfoImageContainer,
   InstanceContenderInfoRankingContainer,
+  InstanceContenderInfoImageFrame
 } from "./instance-contender-info.styles";
 
 const InstanceContenderInfo = ({
@@ -60,6 +61,26 @@ const InstanceContenderInfo = ({
       dispatch(addDislikeToProofStarts(contenderId, instanceId, hasUserLiked)),
     [dispatch, instanceId]
   );
+
+  const handleImageFullScreen = useCallback(contenderIndex => {
+    const image = document.getElementById(contenderIndex);
+    if (image.requestFullscreen) {
+      image.requestFullscreen();
+    } else if (image.mozRequestFullScreen) {
+      image.mozRequestFullScreen();
+    } else if (image.webkitRequestFullscreen) {
+      image.webkitRequestFullscreen();
+    } else if (image.msRequestFullscreen) {
+      image.msRequestFullscreen();
+    }
+  }, []);
+
+  const fullScreenEmojisStyles = {
+    position: "absolute",
+    top: "6.1vh",
+    left: "13vw",
+    cursor: "pointer"
+  };
 
   return (
     <InstanceContenderInfoContainer>
@@ -100,10 +121,22 @@ const InstanceContenderInfo = ({
                         controlsList="nodownload"
                       />
                     ) : (
-                      <InstanceContenderInfoImageContainer
-                        src={contender.proof.url}
-                        alt="contender proof image"
-                      />
+                      <InstanceContenderInfoImageContainer>
+                        <InstanceContenderInfoImageFrame
+                          src={contender.proof.url}
+                          alt="contender proof image"
+                          id={contenderIndex}
+                        />
+                        <span
+                          role="img"
+                          aria-label="like"
+                          aria-labelledby="like"
+                          onClick={() => handleImageFullScreen(contenderIndex)}
+                          style={fullScreenEmojisStyles}
+                        >
+                          &#128306;
+                        </span>
+                      </InstanceContenderInfoImageContainer>
                     )
                   ) : (
                     <InstanceContenderInfoText>
@@ -144,7 +177,8 @@ const InstanceContenderInfo = ({
                   </InstanceContenderInfoText>
                   {isVisibleAndAuthed &&
                     !hasUserLiked &&
-                    contender.id !== userProfileId && contender.proof.url &&(
+                    contender.id !== userProfileId &&
+                    contender.proof.url && (
                       <span
                         role="img"
                         aria-label="like"
@@ -152,7 +186,7 @@ const InstanceContenderInfo = ({
                         onClick={() =>
                           handleAddLikeToProof(contenderId, hasUserDisliked)
                         }
-                        style={{cursor:"pointer"}}
+                        style={{ cursor: "pointer" }}
                       >
                         &#128077;
                       </span>
@@ -164,7 +198,8 @@ const InstanceContenderInfo = ({
                   </InstanceContenderInfoText>
                   {isVisibleAndAuthed &&
                     !hasUserDisliked &&
-                    contender.id !== userProfileId && contender.proof.url &&  (
+                    contender.id !== userProfileId &&
+                    contender.proof.url && (
                       <span
                         role="img"
                         aria-label="dislike"
@@ -172,7 +207,7 @@ const InstanceContenderInfo = ({
                         onClick={() =>
                           handleAddDisLikeToProof(contenderId, hasUserLiked)
                         }
-                        style={{cursor:"pointer"}}
+                        style={{ cursor: "pointer" }}
                       >
                         &#128078;
                       </span>

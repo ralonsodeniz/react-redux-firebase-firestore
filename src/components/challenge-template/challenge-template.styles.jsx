@@ -33,7 +33,11 @@ export const ChallengeTemplateVideoPlayer = styled.video`
   border: 1px solid black;
 `;
 
-export const ChallengeTemplateImageContainer = styled.img`
+export const ChallengeTemplateImageContainer = styled.div`
+  position: relative;
+`;
+
+export const ChallengeTemplateImageFrame = styled.img`
   grid-area: proof;
   height: 12vh;
   width: 24vw;
