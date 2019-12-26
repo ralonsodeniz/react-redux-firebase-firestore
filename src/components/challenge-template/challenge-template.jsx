@@ -249,7 +249,6 @@ const ChallengeTemplate = () => {
             src={proofUrl}
             alt="proof image"
             id="imageProof"
-            onClick={handleImageFullScreen}
           />
           <span
             role="img"

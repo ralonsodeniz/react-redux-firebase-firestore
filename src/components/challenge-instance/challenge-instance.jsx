@@ -247,13 +247,12 @@ const ChallengeInstance = () => {
             src={proofUrl}
             alt="proof image"
             id="imageProof"
-            onClick={handleImageFullScreen}
           />
           <span
             role="img"
             aria-label="like"
             aria-labelledby="like"
-            onClick={() => handleImageFullScreen}
+            onClick={handleImageFullScreen}
             style={fullScreenEmojisStyles}
           >
             &#128306;
