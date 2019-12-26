@@ -59,7 +59,31 @@ export const ChallengeTemplateRanking = styled.div`
   grid-area: ranking;
   display: flex;
   flex-direction: column;
-  ${ChallengeTemplateDataStyles}
+`;
+
+export const ChallengeTemplateRankingContender = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border-bottom: 1px solid black;
+  margin-bottom: 5px;
+`;
+
+export const ChallengeTemplateRankingName = styled.span`
+  font-weight: 200;
+  cursor: pointer;
+  margin-right: auto;
+`;
+
+export const ChallengeTemplateRankingLikeDislikeContainer = styled.span`
+  display: flex;
+  justify-content: space-evenly;
+  margin-right: auto;
+`;
+
+export const ChallengeTemplateRankingLikeDislike = styled.span`
+  font-weight: 200;
+  margin-right: 10px;
 `;
 
 export const ChallengeTemplateButtonsContainer = styled.div`
@@ -67,4 +91,11 @@ export const ChallengeTemplateButtonsContainer = styled.div`
   display: flex;
   justify-content: space-evenly;
   align-items: center;
+`;
+
+export const ShowAllProofsContainer = styled.span`
+  justify-self: center;
+  align-self: center;
+  cursor: pointer;
+  font-weight: 300;
 `;

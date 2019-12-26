@@ -284,7 +284,7 @@ const ChallengeInstance = () => {
               )}
             </ChallengeInstanceButtonsGroup>
             <FileUploader
-              fileType="imageOrvideo"
+              fileType={proofFileType}
               directory={`challengesInstances/${instanceId}/${userProfileId}`}
               fileName={userDisplayNameForFileName}
               urlAction={handleUploadProof(dispatch, instanceId, userProfileId)}

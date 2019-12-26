@@ -51,3 +51,57 @@ export const selectInstanceValidators = createSelector(
   [selectInstanceFromId],
   challengeInstance => (challengeInstance ? challengeInstance.validators : [])
 );
+
+export const selectAllChallengesInstancesFromTemplateId = createSelector(
+  [
+    selectChallengesInstances,
+    selectChallengesInstancesAreLoading,
+    (_, templateId) => templateId
+  ],
+  (challengesInstances, challengesInstancesAreLoading, templateId) =>
+    challengesInstances && templateId && !challengesInstancesAreLoading
+      ? Object.values(challengesInstances).filter(
+          challengeInstance =>
+            challengeInstance.challengeTemplateId === templateId
+        )
+      : null
+);
+
+export const selectInfoForRankingFromAllInstancesFromTemplateId = createSelector(
+  [selectAllChallengesInstancesFromTemplateId],
+  challengesInstancesFromTemplateId => {
+    if (challengesInstancesFromTemplateId) {
+      const contendersAndRatingsArray = challengesInstancesFromTemplateId.reduce(
+        (accumulator, challengeInstance) => {
+          const contendersWithRatingArray = challengeInstance.contenders.reduce(
+            (accumulator, contender) => {
+              if (
+                contender.public &&
+                contender.proof.state !== "No proof provided"
+              ) {
+                accumulator.push({
+                  id: contender.id,
+                  proofUrl: contender.proof.url,
+                  likes: contender.rating.likes,
+                  dislikes: contender.rating.dislikes,
+                  dateUploaded: contender.proof.dateUploaded,
+                  challengeInstanceId: challengeInstance.challengeInstanceId,
+                  usersThatLiked: contender.rating.usersThatLiked,
+                  usersThatDisliked: contender.rating.usersThatDisliked
+                });
+              }
+              return accumulator;
+            },
+            []
+          );
+          accumulator.push(...contendersWithRatingArray);
+          return accumulator;
+        },
+        []
+      );
+      return contendersAndRatingsArray;
+    } else {
+      return [];
+    }
+  }
+);

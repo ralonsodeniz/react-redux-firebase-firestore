@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const VideoFrame = styled.video`
+export const ImageFrame = styled.img`
   border: 0;
   height: 50vh;
   width: 50vw;

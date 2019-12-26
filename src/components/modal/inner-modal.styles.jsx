@@ -25,5 +25,5 @@ export const InnerModalComponentContainer = styled.div`
   border-radius: 10px;
   padding: 10px 20px;
   position: relative;
-  top: -13vh;
+  /* top: -13vh; */
 `;

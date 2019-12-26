@@ -25,7 +25,6 @@ const AccountPage = lazy(() => import("../../pages/account/account"));
 const SigninPage = lazy(() => import("../../pages/signin/signin"));
 const SignupPage = lazy(() => import("../../pages/signup/signup"));
 const InstancePage = lazy(() => import("../../pages/instance/instance"));
-const Playground = lazy(() => import("../../pages/playground/playground"));
 
 const selectAppData = createStructuredSelector({
   showModal: selectShowModal,
@@ -89,17 +88,6 @@ const App = () => {
                   <Redirect to="/signin" />
                 ) : (
                   <AccountPage />
-                )
-              }
-            />
-            <Route
-              exact
-              path="/playground"
-              render={() =>
-                userAuthIsLoaded && userAuthIsEmpty ? (
-                  <Redirect to="/signin" />
-                ) : (
-                  <Playground />
                 )
               }
             />
