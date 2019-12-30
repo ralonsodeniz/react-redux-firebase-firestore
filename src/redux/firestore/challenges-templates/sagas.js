@@ -2,7 +2,10 @@ import { takeLatest, put, call, all } from "redux-saga/effects";
 
 import { CHALLENGES } from "./types";
 import { openModal } from "../../modal/actions";
-import { addNewChallengeTemplateInFs } from "../../../firebase/firebase.utils";
+import {
+  addNewChallengeTemplateInFs,
+  submitChallengeRatingInFs
+} from "../../../firebase/firebase.utils";
 
 // add new challenge to templates
 export function* onAddNewChallengeStarts() {
@@ -30,7 +33,46 @@ export function* addNewChallenge({ payload }) {
   }
 }
 
+// submit challenge template rating
+export function* onSubmitChallengeRatingStarts() {
+  yield takeLatest(
+    CHALLENGES.SUBMIT_CHALLENGE_RATING_STARTS,
+    submitChallengeRating
+  );
+}
+
+export function* submitChallengeRating({ payload }) {
+  const { starsSelected, templateId, category, userProfileId } = payload;
+  try {
+    yield call(
+      submitChallengeRatingInFs,
+      starsSelected,
+      templateId,
+      category,
+      userProfileId
+    );
+    const submitChallengeRatingSuccessModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: "Submitted challenge rating"
+      }
+    };
+    yield put(openModal(submitChallengeRatingSuccessModalData));
+  } catch (error) {
+    const submitChallengeRatingFailureModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: error.message
+      }
+    };
+    yield put(openModal(submitChallengeRatingFailureModalData));
+  }
+}
+
 // root saga creator for challenges templates
 export function* challengesTemplatesSagas() {
-  yield all([call(onAddNewChallengeStarts)]);
+  yield all([
+    call(onAddNewChallengeStarts),
+    call(onSubmitChallengeRatingStarts)
+  ]);
 }

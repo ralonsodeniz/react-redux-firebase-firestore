@@ -24,6 +24,7 @@ import {
 
 import CustomButton from "../custom-button/custom-button";
 import Spinner from "../spinner/spinner";
+import StarRating from "../star-rating/star-rating";
 
 import {
   ChallengeTemplateContainer,
@@ -280,7 +281,13 @@ const ChallengeTemplate = () => {
           <h4>Times completed:</h4>
           <span>{timesCompleted}</span>
           <h4>Rating:</h4>
-          <span>{rating}</span>
+          <StarRating
+            totalStars={5}
+            interactive={false}
+            initialStars={rating.ratingAverage}
+            color="red"
+            reset={false}
+          />
         </ChallengeTemplateData>
       </ChallengeTemplateDataContainer>
       <ChallengeTemplateRanking>

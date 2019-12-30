@@ -14,7 +14,7 @@ CustomButton.propTypes = {
   large: PropTypes.bool,
   onClick: PropTypes.func,
   type: PropTypes.string,
-  diabled: PropTypes.bool
+  disabled: PropTypes.bool
 };
 
 CustomButton.defaultProps = {

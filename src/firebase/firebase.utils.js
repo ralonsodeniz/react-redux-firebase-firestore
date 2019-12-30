@@ -174,7 +174,10 @@ export const addNewChallengeTemplateInFs = async challengeData => {
           challengeTemplateId: id,
           approved: false,
           ranking: [],
-          rating: 0,
+          rating: {
+            usersThatRated: [],
+            ratingAverage: 0
+          },
           timesCompleted: 0,
           difficulty: "",
           daysToComplete: 0
@@ -1028,7 +1031,11 @@ export const editCommentAtProofInFs = async (
   }
 };
 
-export const deleteCommentFromProofInFs = async (contenderId, instanceId, commentId) => {
+export const deleteCommentFromProofInFs = async (
+  contenderId,
+  instanceId,
+  commentId
+) => {
   try {
     const challengeInstanceRef = firestore.doc(
       `challengesInstances/${instanceId}`
@@ -1039,7 +1046,9 @@ export const deleteCommentFromProofInFs = async (contenderId, instanceId, commen
     const newChallengeInstanceContenders = challengeInstanceContenders.reduce(
       (accumulator, contender) => {
         if (contender.id === contenderId) {
-          const newComments = contender.comments.filter(comment => comment.commentId !== commentId)
+          const newComments = contender.comments.filter(
+            comment => comment.commentId !== commentId
+          );
           accumulator.push({
             ...contender,
             comments: newComments
@@ -1084,7 +1093,7 @@ export const reportCommentAbuseAtProofInFs = async (
               if (comment.commentId === commentId) {
                 accumulator.push({
                   ...comment,
-                  reportAbuse: true,
+                  reportAbuse: true
                 });
               } else {
                 accumulator.push(comment);
@@ -1113,6 +1122,73 @@ export const reportCommentAbuseAtProofInFs = async (
     console.log("Error while reporting comment abuse at instance proof", error);
     throw new Error(
       "Ooops something happened while reporting comment abuse at instance proof"
+    );
+  }
+};
+
+export const submitChallengeRatingInFs = async (
+  starsSelected,
+  templateId,
+  category,
+  userProfileId
+) => {
+  try {
+    const challengesTemplatesCategoryRef = firestore.doc(
+      `challengesTemplates/${category}`
+    );
+    const challengesTemplatesCategorySnapshot = await challengesTemplatesCategoryRef.get();
+    const challengesTemplatesCategorySnapshotData = challengesTemplatesCategorySnapshot.data();
+    const challengeTemplateData =
+      challengesTemplatesCategorySnapshotData[templateId];
+    const challengeTemplateRating = challengeTemplateData.rating;
+    const hasUserRated = challengeTemplateRating.usersThatRated.some(user => user.userId === userProfileId)
+    const newRatingUsersThatRated = hasUserRated ? 
+    challengeTemplateRating.usersThatRated.reduce((accumulator, user) => {
+      if (user.userId === userProfileId) {
+        accumulator.push({
+          ...user,
+          userRating: starsSelected
+        })
+      } else {
+        accumulator.push(user)
+      }
+      return accumulator
+    }, [])    
+    : [
+      ...challengeTemplateRating.usersThatRated,
+      {
+        userId: userProfileId,
+        userRating: starsSelected
+      }
+    ];
+    const newRatingAverage = newRatingUsersThatRated.reduce(
+      (accumulator, user, userIndex, userArray) => {
+        if (userIndex !== userArray.length - 1) {
+          accumulator = accumulator + user.userRating;
+        } else if (userIndex === userArray.length - 1) {
+          accumulator = (accumulator + user.userRating) / userArray.length;
+        }
+        return accumulator;
+      },
+      0
+    );
+
+    await challengesTemplatesCategoryRef.set(
+      {
+        [templateId]: {
+          ...challengeTemplateData,
+          rating: {
+            usersThatRated: newRatingUsersThatRated,
+            ratingAverage: newRatingAverage
+          }
+        }
+      },
+      { merge: true }
+    );
+  } catch (error) {
+    console.log("Error while submitting challenge rating", error);
+    throw new Error(
+      "Ooops something happened while submitting challenge rating"
     );
   }
 };

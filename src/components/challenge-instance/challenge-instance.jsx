@@ -24,6 +24,7 @@ import {
   uploadProofStarts,
   toggleProofPublicPrivateStarts
 } from "../../redux/firestore/challenges-instances/actions";
+import { submitChallengeRatingStarts } from "../../redux/firestore/challenges-templates/actions";
 
 import Spinner from "../spinner/spinner";
 import CustomButton from "../custom-button/custom-button";
@@ -31,6 +32,7 @@ import FileUploader from "../file-uplader/file-uploader";
 import InstanceContenderInfo from "../instance-contender-info/instance-contender-info";
 import FormDropdown from "../form-dropdown/form-dropdown";
 import InstanceContenderComments from "../instance-contender-comments/instance-contender-comments";
+import StarRating from "../star-rating/star-rating";
 
 import {
   ChallengeInstanceContainer,
@@ -163,6 +165,14 @@ const ChallengeInstance = () => {
     ? userContenderObject.public
     : false;
 
+  const userChallengeRating = rating
+    ? rating.usersThatRated.find(user => user.userId === userProfileId)
+    : {};
+
+  const userChallengeRatingNumber = userChallengeRating
+    ? userChallengeRating.userRating
+    : 0;
+
   const isUserValidator = challengeInstanceValidators.some(
     validator => validator === userProfileId
   );
@@ -219,6 +229,20 @@ const ChallengeInstance = () => {
       image.msRequestFullscreen();
     }
   }, []);
+
+  const handleSubmitChallengeRating = useCallback(
+    starsSelected => {
+      dispatch(
+        submitChallengeRatingStarts(
+          starsSelected,
+          templateId,
+          category,
+          userProfileId
+        )
+      );
+    },
+    [dispatch, templateId, category, userProfileId]
+  );
 
   const fullScreenEmojisStyles = {
     position: "absolute",
@@ -280,7 +304,13 @@ const ChallengeInstance = () => {
           <h4>Times completed:</h4>
           <span>{timesCompleted}</span>
           <h4>Rating:</h4>
-          <span>{rating}</span>
+          <StarRating
+            totalStars={5}
+            interactive={false}
+            initialStars={rating.ratingAverage}
+            color="red"
+            reset={false}
+          />
         </ChallengeInstanceTemplateData>
       </ChallengeInstanceTemplateDataContainer>
       {userStatus &&
@@ -328,6 +358,18 @@ const ChallengeInstance = () => {
               submitText={"Upload"}
               disabled={false}
               maxFileSizeInMB={50}
+            />
+          </ChallengeInstanceButtonsContainer>
+        ) : userStatus === "Completed" ? (
+          <ChallengeInstanceButtonsContainer>
+            <span>Rate the challenge</span>
+            <StarRating
+              totalStars={5}
+              interactive={true}
+              initialStars={userChallengeRatingNumber}
+              color="orange"
+              action={handleSubmitChallengeRating}
+              reset={false}
             />
           </ChallengeInstanceButtonsContainer>
         ) : null)}

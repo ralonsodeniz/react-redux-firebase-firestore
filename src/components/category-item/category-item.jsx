@@ -65,7 +65,7 @@ const CategoryItem = ({ challengeTemplateId, challengeTemplateData }) => {
       <strong>Times completed</strong>
       <span>{timesCompleted}</span>
       <strong>Rating</strong>
-      <span>{rating}</span>
+      <span>{rating.ratingAverage}</span>
       <CustomButton
         text="Go to challenge"
         type="button"
