@@ -4,13 +4,15 @@ import { createStructuredSelector } from "reselect";
 
 import {
   selectUserInstancesToValidateArray,
-  selectChallengesInstancesAreLoading
+  selectChallengesInstancesAreLoading,
+  selectAllChallengeInstancesNotSelfValidated
 } from "../../redux/firestore/challenges-instances/selectors";
 
 import {
   selectUserIntancesToValidate,
   selectUserProfileIsLoaded,
-  selectUserProfileId
+  selectUserProfileId,
+  selectUserGlobalValidator
 } from "../../redux/user/selectors";
 import { validateStatusOptions } from "../../utils/options";
 
@@ -29,7 +31,9 @@ const selectValidateOverviewData = createStructuredSelector({
   userIntancesToValidate: selectUserIntancesToValidate,
   challengesInstancesAreLoading: selectChallengesInstancesAreLoading,
   userProfileIsLoaded: selectUserProfileIsLoaded,
-  userProfileId: selectUserProfileId
+  userProfileId: selectUserProfileId,
+  userGlobalValidator: selectUserGlobalValidator,
+  challengeInstancesNotSelfValidated: selectAllChallengeInstancesNotSelfValidated
 });
 
 const ValidateOverview = () => {
@@ -44,12 +48,37 @@ const ValidateOverview = () => {
     userIntancesToValidate,
     challengesInstancesAreLoading,
     userProfileIsLoaded,
-    userProfileId
+    userProfileId,
+    userGlobalValidator,
+    challengeInstancesNotSelfValidated
   } = useSelector(selectValidateOverviewData, shallowEqual);
 
   const userInstancesToValidateArray = useSelector(state =>
     memoizedSelectUserInstancesToValidateArray(userIntancesToValidate)(state)
   );
+
+  const filteredChallengeInstancesNotSelfValidated = challengeInstancesNotSelfValidated
+    ? challengeInstancesNotSelfValidated.reduce((accumulator, instance) => {
+        !instance.selfValidation &&
+          instance.contenders.every(
+            contender => contender.id !== userProfileId
+          ) &&
+          instance.contenders.some(
+            contender => contender.proof.state === "Pending"
+          ) &&
+          accumulator.push(instance);
+        return accumulator;
+      }, [])
+    : [];
+
+  const instancesToValidateArray =
+    userGlobalValidator.status !== "no validator" &&
+    userGlobalValidator.status !== "banned validator"
+      ? [
+          ...userInstancesToValidateArray,
+          ...filteredChallengeInstancesNotSelfValidated
+        ]
+      : userInstancesToValidateArray;
 
   const handleChange = useCallback(event => {
     const { value } = event.target;
@@ -76,7 +105,7 @@ const ValidateOverview = () => {
         />
       </ValidateOverviewHeaderContainer>
       <ValidateOverviewScrollContainer>
-        {userInstancesToValidateArray.reduce(
+        {instancesToValidateArray.reduce(
           (accumulator, instance, instanceIndex) => {
             const instanceStatus = instance.contenders.some(
               contender =>
@@ -108,25 +137,35 @@ const ValidateOverview = () => {
               );
             }
             if (selectedStatus === "Validations pending") {
-              const getOlderDateUploaded = instance => {
+              // const getOlderDateUploaded = instance => {
+              //  const filteredContenders = instance.contenders.filter(
+              //    contender => contender.proof.state === "Pending"
+              //  );
+              //  const sortedContenders = filteredContenders.sort((a, b) =>
+              //    a.proof.dateUploaded > b.proof.dateUploaded ? 1 : -1
+              //  );
+              //  return sortedContenders[0].proof.dateUploaded;
+              //};
+
+              const getSoonerExpiresAt = instance => {
                 const filteredContenders = instance.contenders.filter(
                   contender => contender.proof.state === "Pending"
                 );
                 const sortedContenders = filteredContenders.sort((a, b) =>
-                  a.proof.dateUploaded > b.proof.dateUploaded ? 1 : -1
+                  a.expiresAt > b.expiresAt ? 1 : -1
                 );
-                return sortedContenders[0].proof.dateUploaded;
+                return sortedContenders[0].expiresAt;
               };
 
               accumulator.sort((a, b) => {
-                const aOlderDateUploaded = getOlderDateUploaded(
+                const aSoonerExpiresAt = getSoonerExpiresAt(
                   a.props.challengeInstanceData
                 );
-                const bOlderDateUploaded = getOlderDateUploaded(
+                const bSoonerExpiresAt = getSoonerExpiresAt(
                   b.props.challengeInstanceData
                 );
 
-                return aOlderDateUploaded > bOlderDateUploaded ? 1 : -1;
+                return aSoonerExpiresAt > bSoonerExpiresAt ? 1 : -1;
               });
             }
             return accumulator;

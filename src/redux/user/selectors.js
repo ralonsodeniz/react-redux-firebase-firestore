@@ -109,6 +109,14 @@ export const selectUserPendingFriends = createSelector(
       : []
 );
 
+export const selectUserGlobalValidator = createSelector(
+  [selectUserProfile, selectUserAuth],
+  (profile, auth) =>
+    profile.isLoaded && !profile.isEmpty && !auth.isEmpty
+      ? profile.globalValidator
+      : {}
+);
+
 export const selectUserAcceptedInstancesByCategory = category =>
   createSelector([selectUserProfile, selectUserAuth], (profile, auth) =>
     profile.isLoaded && !profile.isEmpty && !auth.isEmpty

@@ -69,4 +69,12 @@ export const InstanceContenderInfoRankingContainer = styled.div`
   flex-direction: row;
   justify-content: space-evenly;
   margin: 5px;
+  align-items: center;
+`;
+
+export const InstanceContenderValidatorContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
 `;

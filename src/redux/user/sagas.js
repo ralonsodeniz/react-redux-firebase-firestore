@@ -28,7 +28,8 @@ import {
   acceptFriendRequestInFs,
   declineFriendRequestInFs,
   deleteFriendInFs,
-  sendFriendRequestInFs
+  sendFriendRequestInFs,
+  toggleUserGlobalValidatorInFs
 } from "../../firebase/firebase.utils";
 
 // sign up with email and password
@@ -471,6 +472,35 @@ export function* sendFriendRequest({ payload }) {
   }
 }
 
+// toogle global validator status
+export function* onToggleUserGlobalValidatorStarts() {
+  yield takeLatest(
+    USER.TOGGLE_USER_GLOBAL_VALIDATOR_STARTS,
+    toggleUserGlobalValidator
+  );
+}
+
+export function* toggleUserGlobalValidator() {
+  try {
+    yield call(toggleUserGlobalValidatorInFs);
+    const toggleUserGlobalValidatorSuccessModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: "Updated global validator status"
+      }
+    };
+    yield put(openModal(toggleUserGlobalValidatorSuccessModalData));
+  } catch (error) {
+    const toggleUserGlobalValidatorFailureModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: error.message
+      }
+    };
+    yield put(openModal(toggleUserGlobalValidatorFailureModalData));
+  }
+}
+
 // root saga creator for users with all the tiggering generation functions of the saga
 export function* userSagas() {
   yield all([
@@ -488,6 +518,7 @@ export function* userSagas() {
     call(onAcceptFriendRequestStarts),
     call(onDeclineFriendRequestStarts),
     call(onDeleteFriendStarts),
-    call(onSendFriendRequestStarts)
+    call(onSendFriendRequestStarts),
+    call(onToggleUserGlobalValidatorStarts)
   ]);
 }

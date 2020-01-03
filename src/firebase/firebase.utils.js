@@ -41,6 +41,10 @@ export const checkUserProfileDocumentInFS = async (user, additionalData) => {
       const providerId = providerData[0].providerId;
       let challengesInstances = {};
       let statistics = {};
+      const globalValidator = {
+        status: "no validator",
+        instancesValidated: 0
+      };
 
       const challengesTemplatesSnapshot = await firestore
         .collection(`challengesTemplates`)
@@ -70,7 +74,8 @@ export const checkUserProfileDocumentInFS = async (user, additionalData) => {
           challengesInstances,
           statistics,
           friends,
-          instancesToValidate
+          instancesToValidate,
+          globalValidator
         });
       } catch (error) {
         console.log("error while checking user", error);
@@ -194,7 +199,8 @@ export const addNewChallengeTemplateInFs = async challengeData => {
 export const addNewChallengeInstanceInFs = async (
   challengeData,
   instanceData,
-  userProfileId
+  userProfileId,
+  selfValidation
 ) => {
   try {
     const challengeInstanceRef = firestore
@@ -210,7 +216,11 @@ export const addNewChallengeInstanceInFs = async (
       proof: {
         url: "",
         dateUploaded: null,
-        state: "No proof provided"
+        state: "No proof provided",
+        validatedBy: {
+          id: "",
+          reported: false
+        }
       },
       rating: {
         likes: 0,
@@ -240,7 +250,8 @@ export const addNewChallengeInstanceInFs = async (
       challengeTemplateId,
       administrator,
       contenders: enhancedContenders,
-      validators
+      validators,
+      selfValidation
     });
 
     enhancedContenders.forEach(async contender => {
@@ -416,7 +427,11 @@ export const updateProofInFs = async (userProfileId, instanceId, url) => {
           proof: {
             dateUploaded,
             state: "Pending",
-            url
+            url,
+            validatedBy: {
+              id: "",
+              reported: false
+            }
           }
         };
       } else {
@@ -473,7 +488,13 @@ export const toggleProofPublicPrivateInFs = async (
   return proofPublicOrPrivate;
 };
 
-export const validateProofInFs = async (userToValidateId, instanceId) => {
+export const validateProofInFs = async (
+  userToValidateId,
+  instanceId,
+  globalValidation
+) => {
+  const userId = auth.currentUser.uid;
+
   try {
     const challengeInstanceRef = firestore.doc(
       `challengesInstances/${instanceId}`
@@ -486,7 +507,11 @@ export const validateProofInFs = async (userToValidateId, instanceId) => {
           ...contender,
           proof: {
             ...contender.proof,
-            state: "Accepted"
+            state: "Accepted",
+            validatedBy: {
+              ...contender.proof.validatedBy,
+              id: userId
+            }
           },
           status: "Completed",
           expiresAt: null
@@ -498,13 +523,32 @@ export const validateProofInFs = async (userToValidateId, instanceId) => {
     await challengeInstanceRef.update({
       contenders: updatedContenders
     });
+
+    if (globalValidation) {
+      const userRef = firestore.doc(`users/${userId}`);
+      const userSnapshot = await userRef.get();
+      const userGlobalValidatorData = userSnapshot.data().globalValidator;
+
+      await userRef.update({
+        globalValidator: {
+          ...userGlobalValidatorData,
+          instancesValidated: userGlobalValidatorData.instancesValidated + 1
+        }
+      });
+    }
   } catch (error) {
     console.log("Error while validating proof", error);
     throw new Error("Ooops something happened while validating proof");
   }
 };
 
-export const invalidateProofInFs = async (userToInvalidateId, instanceId) => {
+export const invalidateProofInFs = async (
+  userToInvalidateId,
+  instanceId,
+  globalValidation
+) => {
+  const userId = auth.currentUser.uid;
+
   try {
     const challengeInstanceRef = firestore.doc(
       `challengesInstances/${instanceId}`
@@ -517,7 +561,11 @@ export const invalidateProofInFs = async (userToInvalidateId, instanceId) => {
           ...contender,
           proof: {
             ...contender.proof,
-            state: "Cancelled"
+            state: "Cancelled",
+            validatedBy: {
+              ...contender.proof.validatedBy,
+              id: userId
+            }
           }
         };
       } else {
@@ -527,6 +575,19 @@ export const invalidateProofInFs = async (userToInvalidateId, instanceId) => {
     await challengeInstanceRef.update({
       contenders: updatedContenders
     });
+
+    if (globalValidation) {
+      const userRef = firestore.doc(`users/${userId}`);
+      const userSnapshot = await userRef.get();
+      const userGlobalValidatorData = userSnapshot.data().globalValidator;
+
+      await userRef.update({
+        globalValidator: {
+          ...userGlobalValidatorData,
+          instancesValidated: userGlobalValidatorData.instancesValidated + 1
+        }
+      });
+    }
   } catch (error) {
     console.log("Error while invalidating proof", error);
     throw new Error("Ooops something happened while invalidating proof");
@@ -1141,26 +1202,28 @@ export const submitChallengeRatingInFs = async (
     const challengeTemplateData =
       challengesTemplatesCategorySnapshotData[templateId];
     const challengeTemplateRating = challengeTemplateData.rating;
-    const hasUserRated = challengeTemplateRating.usersThatRated.some(user => user.userId === userProfileId)
-    const newRatingUsersThatRated = hasUserRated ? 
-    challengeTemplateRating.usersThatRated.reduce((accumulator, user) => {
-      if (user.userId === userProfileId) {
-        accumulator.push({
-          ...user,
-          userRating: starsSelected
-        })
-      } else {
-        accumulator.push(user)
-      }
-      return accumulator
-    }, [])    
-    : [
-      ...challengeTemplateRating.usersThatRated,
-      {
-        userId: userProfileId,
-        userRating: starsSelected
-      }
-    ];
+    const hasUserRated = challengeTemplateRating.usersThatRated.some(
+      user => user.userId === userProfileId
+    );
+    const newRatingUsersThatRated = hasUserRated
+      ? challengeTemplateRating.usersThatRated.reduce((accumulator, user) => {
+          if (user.userId === userProfileId) {
+            accumulator.push({
+              ...user,
+              userRating: starsSelected
+            });
+          } else {
+            accumulator.push(user);
+          }
+          return accumulator;
+        }, [])
+      : [
+          ...challengeTemplateRating.usersThatRated,
+          {
+            userId: userProfileId,
+            userRating: starsSelected
+          }
+        ];
     const newRatingAverage = newRatingUsersThatRated.reduce(
       (accumulator, user, userIndex, userArray) => {
         if (userIndex !== userArray.length - 1) {
@@ -1189,6 +1252,69 @@ export const submitChallengeRatingInFs = async (
     console.log("Error while submitting challenge rating", error);
     throw new Error(
       "Ooops something happened while submitting challenge rating"
+    );
+  }
+};
+
+export const reportGlobalValidatorsInFs = async (instanceId, contenderId) => {
+  try {
+    const challengeInstanceRef = firestore.doc(
+      `challengesInstances/${instanceId}`
+    );
+    const challengeInstanceData = (await challengeInstanceRef.get()).data();
+    const newChallengeInstanceContenders = challengeInstanceData.contenders.reduce(
+      (accumulator, contender) => {
+        if (contender.id === contenderId) {
+          accumulator.push({
+            ...contender,
+            proof: {
+              ...contender.proof,
+              validatedBy: {
+                ...contender.proof.validatedBy,
+                reported: true
+              }
+            }
+          });
+        } else {
+          accumulator.push(contender);
+        }
+        return accumulator;
+      },
+      []
+    );
+
+    await challengeInstanceRef.update({
+      contenders: newChallengeInstanceContenders
+    });
+  } catch (error) {
+    console.log("Error while reporting global validator", error);
+    throw new Error(
+      "Ooops something happened while reporting global validator"
+    );
+  }
+};
+
+export const toggleUserGlobalValidatorInFs = async () => {
+  const userId = auth.currentUser.uid;
+  try {
+    const userRef = firestore.doc(`users/${userId}`);
+    const userSnapshot = await userRef.get();
+    const userGlobalValidatorData = userSnapshot.data().globalValidator;
+    const newUserGlobalValidatorData = {
+      ...userGlobalValidatorData,
+      status:
+        userGlobalValidatorData.status === "no validator"
+          ? "junior validator"
+          : "no validator"
+    };
+
+    await userRef.update({
+      globalValidator: newUserGlobalValidatorData
+    });
+  } catch (error) {
+    console.log("Error while updating global validator status", error);
+    throw new Error(
+      "Ooops something happened while updating global validator status"
     );
   }
 };

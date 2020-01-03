@@ -93,7 +93,8 @@ export const UserDataContainer = styled.div`
   grid-template-areas:
     "displayName age"
     "gender country"
-    "email email";
+    "email email"
+    "userId userId";
 `;
 
 export const DisplayNameContainer = styled.div`
@@ -118,6 +119,13 @@ export const CountryContainer = styled.div`
 
 export const EmailContainer = styled.div`
   grid-area: email;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+`;
+
+export const UserIdContainer = styled.div`
+  grid-area: userId;
   display: flex;
   justify-content: space-evenly;
   align-items: center;

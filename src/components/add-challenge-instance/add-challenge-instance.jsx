@@ -36,7 +36,7 @@ const AddChallengeInstance = ({ challengeTemplate }) => {
 
   const [contendersValidated, setContendersValidated] = useState(false);
 
-  const [validateYourself, setValidateYourself] = useState(undefined);
+  const [validateYourself, setValidateYourself] = useState(false);
 
   const {
     userAcceptedFriends,
@@ -85,15 +85,21 @@ const AddChallengeInstance = ({ challengeTemplate }) => {
   const setSelfValidation = useCallback(() => setValidateYourself(true), []);
 
   const unsetSelfValidation = useCallback(() => {
-    setValidateYourself(false);
     dispatch(
       addNewInstanceStarts(
         challengeTemplate,
         formInstanceChallengeData,
-        userProfileId
+        userProfileId,
+        validateYourself
       )
     );
-  }, [challengeTemplate, dispatch, formInstanceChallengeData, userProfileId]);
+  }, [
+    challengeTemplate,
+    dispatch,
+    formInstanceChallengeData,
+    userProfileId,
+    validateYourself
+  ]);
 
   const handleChange = useCallback(
     event => {
@@ -120,11 +126,19 @@ const AddChallengeInstance = ({ challengeTemplate }) => {
         addNewInstanceStarts(
           challengeTemplate,
           formInstanceChallengeData,
-          userProfileId
+          userProfileId,
+          validateYourself
         )
       );
+      setValidateYourself(false);
     },
-    [challengeTemplate, formInstanceChallengeData, userProfileId, dispatch]
+    [
+      challengeTemplate,
+      formInstanceChallengeData,
+      userProfileId,
+      dispatch,
+      validateYourself
+    ]
   );
 
   return (
@@ -154,7 +168,7 @@ const AddChallengeInstance = ({ challengeTemplate }) => {
             />
           </div>
         ) : //): validateYourself === undefined && userAcceptedFriends.length > 0 ? (
-        validateYourself === undefined ? (
+        validateYourself === false ? (
           <div>
             <h4>Do you want to validate yourself the challenge?</h4>
             <CustomButton

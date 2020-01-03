@@ -121,3 +121,7 @@ export const sendFriendRequestStarts = friendId => ({
   type: USER.SEND_FRIEND_REQUEST_STARTS,
   payload: friendId
 });
+
+export const toggleUserGlobalValidatorStarts = () => ({
+  type: USER.TOGGLE_USER_GLOBAL_VALIDATOR_STARTS
+});

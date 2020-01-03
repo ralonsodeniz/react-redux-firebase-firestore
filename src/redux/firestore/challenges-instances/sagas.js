@@ -15,7 +15,8 @@ import {
   addCommentToProofInFs,
   editCommentAtProofInFs,
   deleteCommentFromProofInFs,
-  reportCommentAbuseAtProofInFs
+  reportCommentAbuseAtProofInFs,
+  reportGlobalValidatorsInFs
 } from "../../../firebase/firebase.utils";
 
 // add new challenge to instances
@@ -24,13 +25,19 @@ export function* onAddNewInstanceStarts() {
 }
 
 export function* addNewInstance({ payload }) {
-  const { challengeData, instanceData, userProfileId } = payload;
+  const {
+    challengeData,
+    instanceData,
+    userProfileId,
+    selfValidation
+  } = payload;
   try {
     yield call(
       addNewChallengeInstanceInFs,
       challengeData,
       instanceData,
-      userProfileId
+      userProfileId,
+      selfValidation
     );
     const addNewInstanceSuccessModalData = {
       modalType: "SYSTEM_MESSAGE",
@@ -172,8 +179,13 @@ export function* onValidateProofStarts() {
 
 export function* validateProof({ payload }) {
   try {
-    const { userToValidateId, instanceId } = payload;
-    yield call(validateProofInFs, userToValidateId, instanceId);
+    const { userToValidateId, instanceId, globalValidation } = payload;
+    yield call(
+      validateProofInFs,
+      userToValidateId,
+      instanceId,
+      globalValidation
+    );
     const validateProofInFSSuccessModalData = {
       modalType: "SYSTEM_MESSAGE",
       modalProps: {
@@ -199,8 +211,13 @@ export function* onInvalidateProofStarts() {
 
 export function* invalidateProof({ payload }) {
   try {
-    const { userToInvalidateId, instanceId } = payload;
-    yield call(invalidateProofInFs, userToInvalidateId, instanceId);
+    const { userToInvalidateId, instanceId, globalValidation } = payload;
+    yield call(
+      invalidateProofInFs,
+      userToInvalidateId,
+      instanceId,
+      globalValidation
+    );
     const invalidateProofInFSSuccessModalData = {
       modalType: "SYSTEM_MESSAGE",
       modalProps: {
@@ -398,6 +415,36 @@ export function* reportCommentAbuseAtProof({ payload }) {
   }
 }
 
+// report global validator at challenge instance proof
+export function* onReportGlobalValidationStarts() {
+  yield takeLatest(
+    INSTANCES.REPORT_GLOBAL_VALIDATOR_STARTS,
+    reportGlobalValidators
+  );
+}
+
+export function* reportGlobalValidators({ payload }) {
+  const { contenderId, instanceId } = payload;
+  try {
+    yield call(reportGlobalValidatorsInFs, instanceId, contenderId);
+    const reportGlobalValidatorsSuccessModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: `Reported comment abuse at proof`
+      }
+    };
+    yield put(openModal(reportGlobalValidatorsSuccessModalData));
+  } catch (error) {
+    const reportGlobalValidatorsFailureModalData = {
+      modalType: "SYSTEM_MESSAGE",
+      modalProps: {
+        text: error.message
+      }
+    };
+    yield put(openModal(reportGlobalValidatorsFailureModalData));
+  }
+}
+
 // root saga creator for challenges instances
 export function* challengesInstancesSagas() {
   yield all([
@@ -413,6 +460,7 @@ export function* challengesInstancesSagas() {
     call(onAddCommentToProofStarts),
     call(onEditCommentAtProofStarts),
     call(onDeleteCommentFromProofStarts),
-    call(onReportCommentAbuseAtProofStarts)
+    call(onReportCommentAbuseAtProofStarts),
+    call(onReportGlobalValidationStarts)
   ]);
 }

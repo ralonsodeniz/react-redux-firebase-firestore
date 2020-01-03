@@ -4,9 +4,11 @@ import { createStructuredSelector } from "reselect";
 
 import {
   selectUserProfileIsEmpty,
-  selectUserProviderId
+  selectUserProviderId,
+  selectUserGlobalValidator
 } from "../../redux/user/selectors";
 import { openModal } from "../../redux/modal/actions";
+import { toggleUserGlobalValidatorStarts } from "../../redux/user/actions";
 
 import UserAvatar from "./user-avatar";
 import UserData from "./user-data";
@@ -17,7 +19,8 @@ import { UserContainer, UserButtonsContainer } from "./user.styles";
 
 const userDataSelector = createStructuredSelector({
   userProfileIsEmpty: selectUserProfileIsEmpty,
-  userProviderId: selectUserProviderId
+  userProviderId: selectUserProviderId,
+  userGlobalValidator: selectUserGlobalValidator
 });
 
 const User = () => {
@@ -25,7 +28,13 @@ const User = () => {
 
   const dispatch = useDispatch();
 
-  const { userProfileIsEmpty, userProviderId } = userData;
+  const { userProfileIsEmpty, userProviderId, userGlobalValidator } = userData;
+
+  const isUserGlobalValidator =
+    userGlobalValidator.status !== "no validator" &&
+    userGlobalValidator.status !== "banned validator"
+      ? true
+      : false;
 
   const updateUserDataModalData = {
     modalType: "UPDATE_USER_DATA",
@@ -57,12 +66,27 @@ const User = () => {
     [dispatch, updateUserPasswordModalData]
   );
 
+  const handleUpdateValidatorNetwork = useCallback(() => {
+    dispatch(toggleUserGlobalValidatorStarts());
+  }, [dispatch]);
+
   return !userProfileIsEmpty ? (
     <UserContainer>
       {console.log("USER RENDER")}
       <UserAvatar />
       <UserData />
       <UserButtonsContainer>
+        {userGlobalValidator.status !== "banned validator" && (
+          <CustomButton
+            text={
+              isUserGlobalValidator
+                ? "Leave validators network"
+                : "Join validators network"
+            }
+            type="button"
+            onClick={handleUpdateValidatorNetwork}
+          />
+        )}
         <CustomButton
           text="Update user data"
           type="button"

@@ -52,6 +52,12 @@ export const selectInstanceValidators = createSelector(
   challengeInstance => (challengeInstance ? challengeInstance.validators : [])
 );
 
+export const selectInstanceSelfValidation = createSelector(
+  [selectInstanceFromId],
+  challengeInstance =>
+    challengeInstance ? challengeInstance.selfValidation : false
+);
+
 export const selectAllChallengesInstancesFromTemplateId = createSelector(
   [
     selectChallengesInstances,
@@ -63,6 +69,16 @@ export const selectAllChallengesInstancesFromTemplateId = createSelector(
       ? Object.values(challengesInstances).filter(
           challengeInstance =>
             challengeInstance.challengeTemplateId === templateId
+        )
+      : null
+);
+
+export const selectAllChallengeInstancesNotSelfValidated = createSelector(
+  [selectChallengesInstances, selectChallengesInstancesAreLoading],
+  (challengesInstances, challengesInstancesAreLoading) =>
+    challengesInstances && !challengesInstancesAreLoading
+      ? Object.values(challengesInstances).filter(
+          challengeInstance => !challengeInstance.selfValidation
         )
       : null
 );

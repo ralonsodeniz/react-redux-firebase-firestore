@@ -6,7 +6,8 @@ import { createStructuredSelector } from "reselect";
 import {
   selectInstanceContenders,
   selectInstanceTemplateId,
-  selectInstanceValidators
+  selectInstanceValidators,
+  selectInstanceSelfValidation
 } from "../../redux/firestore/challenges-instances/selectors";
 import {
   selectChallengeTemplateFromId,
@@ -15,7 +16,8 @@ import {
 import {
   selectUserProfileId,
   selectUserProfileIsLoaded,
-  selectUsersDisplayNamesById
+  selectUsersDisplayNamesById,
+  selectUserGlobalValidator
 } from "../../redux/user/selectors";
 import { selectChallengesInstancesAreLoading } from "../../redux/firestore/challenges-instances/selectors";
 import {
@@ -52,7 +54,8 @@ const selectChallengeInstanceData = createStructuredSelector({
   userProfileId: selectUserProfileId,
   userProfileIsLoaded: selectUserProfileIsLoaded,
   challengesTemplatesAreLoading: selectChallengesTemplatesAreLoading,
-  challengesInstancesAreLoading: selectChallengesInstancesAreLoading
+  challengesInstancesAreLoading: selectChallengesInstancesAreLoading,
+  userGlobalValidator: selectUserGlobalValidator
 });
 
 const ChallengeInstance = () => {
@@ -66,7 +69,8 @@ const ChallengeInstance = () => {
     userProfileId,
     userProfileIsLoaded,
     challengesTemplatesAreLoading,
-    challengesInstancesAreLoading
+    challengesInstancesAreLoading,
+    userGlobalValidator
   } = useSelector(selectChallengeInstanceData, shallowEqual);
 
   const memoizedSelectInstanceContenders = useMemo(
@@ -91,6 +95,11 @@ const ChallengeInstance = () => {
 
   const memoizedSelectUsersDisplayNameById = useMemo(
     () => selectUsersDisplayNamesById,
+    []
+  );
+
+  const memoizedSelectInstanceSelfValidation = useMemo(
+    () => selectInstanceSelfValidation,
     []
   );
 
@@ -136,15 +145,38 @@ const ChallengeInstance = () => {
     memoizedSelectUsersDisplayNameById(state, challengeInstanceContendersIds)
   );
 
-  const authorDisplayName = useSelector(state =>
-    memoizedSelectUsersDisplayNameById(state, author)
+  const authorDisplayName = useSelector(
+    state => memoizedSelectUsersDisplayNameById(state, author),
+    shallowEqual
+  );
+
+  const challengeInstanceValidatorsId = challengeInstanceContenders.map(
+    contender => contender.proof.validatedBy.id
+  );
+
+  const challengeInstanceValidatorsDisplayNames = useSelector(
+    state =>
+      memoizedSelectUsersDisplayNameById(state, challengeInstanceValidatorsId),
+    shallowEqual
+  );
+
+  const selfValidation = useSelector(
+    state => memoizedSelectInstanceSelfValidation(state, instanceId),
+    shallowEqual
   );
 
   const enhancedChallengeInstanceContenders = challengeInstanceContenders.map(
     (contender, contenderIndex) => {
       return {
         ...contender,
-        name: challengeInstanceContendersDisplayNames[contenderIndex]
+        name: challengeInstanceContendersDisplayNames[contenderIndex],
+        proof: {
+          ...contender.proof,
+          validatedBy: {
+            ...contender.proof.validatedBy,
+            name: challengeInstanceValidatorsDisplayNames[contenderIndex]
+          }
+        }
       };
     }
   );
@@ -183,6 +215,8 @@ const ChallengeInstance = () => {
       text: contender.name
     })
   );
+
+  const isUserGlobalValidator = userGlobalValidator.status !== "no validator" || userGlobalValidator.status !== "banned validator" ? true : false
 
   const handleAcceptChallenge = useCallback(
     () =>
@@ -391,6 +425,8 @@ const ChallengeInstance = () => {
           instanceId={instanceId}
           proofFileType={proofFileType}
           selectedContender={selectedContender}
+          selfValidation={selfValidation}
+          isUserGlobalValidator={isUserGlobalValidator}
         />
       </ChallengeInstanceData>
       <ChallengeInstanceComments>

@@ -3,13 +3,15 @@ import { INSTANCES } from "./types";
 export const addNewInstanceStarts = (
   challengeData,
   instanceData,
-  userProfileId
+  userProfileId,
+  selfValidation
 ) => ({
   type: INSTANCES.ADD_NEW_INSTANCE_STARTS,
   payload: {
     challengeData,
     instanceData,
-    userProfileId
+    userProfileId,
+    selfValidation
   }
 });
 
@@ -44,19 +46,29 @@ export const toggleProofPublicPrivateStarts = (userProfileId, instanceId) => ({
   payload: { userProfileId, instanceId }
 });
 
-export const validateProofStarts = (userToValidateId, instanceId) => ({
+export const validateProofStarts = (
+  userToValidateId,
+  instanceId,
+  globalValidation
+) => ({
   type: INSTANCES.VALIDATE_PROOF_STARTS,
   payload: {
     userToValidateId,
-    instanceId
+    instanceId,
+    globalValidation
   }
 });
 
-export const invalidateProofStarts = (userToInvalidateId, instanceId) => ({
+export const invalidateProofStarts = (
+  userToInvalidateId,
+  instanceId,
+  globalValidation
+) => ({
   type: INSTANCES.INVALIDATE_PROOF_STARTS,
   payload: {
     userToInvalidateId,
-    instanceId
+    instanceId,
+    globalValidation
   }
 });
 
@@ -133,5 +145,13 @@ export const reportCommentAbuseAtProofStarts = (
     contenderId,
     instanceId,
     commentId
+  }
+});
+
+export const reportGlobalValidatorStarts = (instanceId, contenderId) => ({
+  type: INSTANCES.REPORT_GLOBAL_VALIDATOR_STARTS,
+  payload: {
+    instanceId,
+    contenderId
   }
 });

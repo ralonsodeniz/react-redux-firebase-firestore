@@ -7,7 +7,8 @@ import {
   selectUserProfileAge,
   selectUserProfileEmail,
   selectUserProfileCountry,
-  selectUserProfileGender
+  selectUserProfileGender,
+  selectUserProfileId
 } from "../../redux/user/selectors";
 
 import {
@@ -18,7 +19,8 @@ import {
   AgeContainer,
   EmailContainer,
   CountryContainer,
-  GenderContainer
+  GenderContainer,
+  UserIdContainer
 } from "./user.styles";
 
 const userDataSelector = createStructuredSelector({
@@ -26,12 +28,13 @@ const userDataSelector = createStructuredSelector({
   age: selectUserProfileAge,
   email: selectUserProfileEmail,
   country: selectUserProfileCountry,
-  gender: selectUserProfileGender
+  gender: selectUserProfileGender,
+  userId: selectUserProfileId
 });
 
 const UserData = () => {
   const selectUserData = useSelector(userDataSelector, shallowEqual);
-  const { displayName, age, email, country, gender } = selectUserData;
+  const { displayName, age, email, country, gender, userId } = selectUserData;
 
   return (
     <UserDataContainer>
@@ -48,6 +51,10 @@ const UserData = () => {
         <UserDataTextTitle>Email:</UserDataTextTitle>
         <UserDataText>{email}</UserDataText>
       </EmailContainer>
+      <UserIdContainer>
+        <UserDataTextTitle>User Id:</UserDataTextTitle>
+        <UserDataText>{userId}</UserDataText>
+      </UserIdContainer>
       <CountryContainer>
         <UserDataTextTitle>Country:</UserDataTextTitle>
         <UserDataText>{country}</UserDataText>
