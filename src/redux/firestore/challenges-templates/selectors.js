@@ -1,6 +1,6 @@
 import { createSelector } from "reselect";
 
-const selectChallengesTemplates = state =>
+export const selectChallengesTemplates = state =>
   state.firestore.data.challengesTemplates;
 // const selectChallengesTemplatesOrdered = state =>
 //   state.firestore.ordered.challengesTemplates;

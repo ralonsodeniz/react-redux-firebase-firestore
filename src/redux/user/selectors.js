@@ -134,6 +134,14 @@ export const selectUserAcceptedInstancesByCategory = category =>
       : []
   );
 
+export const selectAllUserAcceptedInstances = createSelector(
+  [selectUserProfile, selectUserAuth],
+  (profile, auth) =>
+    profile.isLoaded && !profile.isEmpty && !auth.isEmpty
+      ? profile.challengesInstances
+      : {}
+);
+
 export const selectUserIntancesToValidate = createSelector(
   [selectUserProfile, selectUserAuth],
   (profile, auth) =>

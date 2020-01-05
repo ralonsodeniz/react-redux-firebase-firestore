@@ -15,6 +15,7 @@ export const UserContainer = styled.div`
   padding: 16px 32px;
   display: flex;
   flex-direction: column;
+  justify-content: space-evenly;
   align-items: center;
 `;
 
@@ -149,4 +150,46 @@ export const UpdateUserDataContainer = styled.div`
   flex-direction: column;
   width: max-content;
   justify-content: space-evenly;
+`;
+
+export const UserStatisticsContainer = styled.div`
+  width: 52vw;
+  height: auto;
+  background-color: #fafafa;
+  box-shadow: 0 0 32px 8px rgba(0, 0, 0, 0.3);
+  border-radius: 32px;
+  margin: 50px auto;
+  padding: 16px 32px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-items: center;
+`;
+
+export const StatisticsContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  width: 100%;
+`;
+
+export const StatisticCategoryContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+`;
+
+export const StatisticsCategoryTitle = styled.h4`
+  font-weight: 400;
+`;
+
+export const StatisticsTextTitle = styled.span`
+  font-weight: 350;
+  margin-bottom: 5px;
+`;
+
+export const StatisticsText = styled.span`
+  font-weight: 100;
 `;

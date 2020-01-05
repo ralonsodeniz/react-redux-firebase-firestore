@@ -1,13 +1,26 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import { Route, useRouteMatch, Link } from "react-router-dom";
 
 import User from "../../components/user/user";
-import CategoryList from "../../components/category-list/category-list";
-import InstancesOverview from "../../components/instances-overview/instances-overview";
-import ValidateOverview from "../../components/validate-overview/validate-overview";
-import FriendList from "../../components/friend-list/friend-list";
+import Spinner from "../../components/spinner/spinner";
 
 import { AccountContainer, AccountNavigationContainer } from "./account.styles";
+
+const lazyCategoryList = lazy(() =>
+  import("../../components/category-list/category-list")
+);
+const lazyInstancesOverview = lazy(() =>
+  import("../../components/instances-overview/instances-overview")
+);
+const lazyValidateOverview = lazy(() =>
+  import("../../components/validate-overview/validate-overview")
+);
+const lazyFriendList = lazy(() =>
+  import("../../components/friend-list/friend-list")
+);
+const lazyUserStatistics = lazy(() =>
+  import("../../components/user/user-statistics")
+);
 
 const AccountPAge = () => {
   const { path } = useRouteMatch();
@@ -18,16 +31,34 @@ const AccountPAge = () => {
         <Link to={`/account/instances/all`}>Challenge instances</Link>
         <Link to={`/account/validation`}>Instances to validate</Link>
         <Link to={`/account/friends`}>Friends</Link>
+        <Link to={`/account/statistics`}>Statistics</Link>
       </AccountNavigationContainer>
-      <Route exact path={path} component={User} />
-      <Route path={`${path}/instances`} component={CategoryList} />
-      <Route
-        exact
-        path={`${path}/instances/:category`}
-        component={InstancesOverview}
-      />
-      <Route exact path={`${path}/validation`} component={ValidateOverview} />
-      <Route exact path={`${path}/friends`} component={FriendList} />
+      <Suspense
+        fallback={
+          <AccountNavigationContainer>
+            <Spinner />
+          </AccountNavigationContainer>
+        }
+      >
+        <Route exact path={path} component={User} />
+        <Route path={`${path}/instances`} component={lazyCategoryList} />
+        <Route
+          exact
+          path={`${path}/instances/:category`}
+          component={lazyInstancesOverview}
+        />
+        <Route
+          exact
+          path={`${path}/validation`}
+          component={lazyValidateOverview}
+        />
+        <Route exact path={`${path}/friends`} component={lazyFriendList} />
+        <Route
+          exact
+          path={`${path}/statistics`}
+          component={lazyUserStatistics}
+        />
+      </Suspense>
     </AccountContainer>
   );
 };

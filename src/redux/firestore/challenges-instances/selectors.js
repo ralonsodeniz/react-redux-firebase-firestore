@@ -121,3 +121,51 @@ export const selectInfoForRankingFromAllInstancesFromTemplateId = createSelector
     }
   }
 );
+
+export const selectCompletedTemplatesFromUserInstancesObject = createSelector(
+  [
+    selectChallengesInstances,
+    selectChallengesInstancesAreLoading,
+    (_, instances, userProfileId) => ({ instances, userProfileId })
+  ],
+  (
+    challengesInstances,
+    challengesInstancesAreLoading,
+    { instances, userProfileId }
+  ) => {
+    return challengesInstances &&
+      !challengesInstancesAreLoading &&
+      instances &&
+      userProfileId
+      ? Object.entries(instances).reduce((accumulator, category) => {
+          const [key, value] = category;
+          accumulator[key] = [];
+          value.forEach(instance => {
+            if (
+              !accumulator[key].some(
+                storedInstance =>
+                  storedInstance.templateId ===
+                  challengesInstances[instance].challengeTemplateId
+              )
+            ) {
+              const contender = challengesInstances[instance].contenders.find(
+                challengeContender => challengeContender.id === userProfileId
+              );
+
+              if (contender.status === "Completed") {
+                accumulator[key] = [
+                  ...accumulator[key],
+                  {
+                    instanceId: instance,
+                    templateId: challengesInstances[instance].challengeTemplateId,
+                  }
+                ];
+  
+              }
+            }
+          });
+          return accumulator;
+        }, {})
+      : {};
+  }
+);
