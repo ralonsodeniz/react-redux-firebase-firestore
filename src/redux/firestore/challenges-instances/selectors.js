@@ -201,8 +201,6 @@ export const selectCompletedTemplatesFromUserInstancesObject = createSelector(
                       : 1
                 );
 
-                console.log("sortedTemplateRankingArray",sortedTemplateRankingArray)
-
                 const userObject = sortedTemplateRankingArray.find(
                   user =>
                     user.id === userProfileId &&

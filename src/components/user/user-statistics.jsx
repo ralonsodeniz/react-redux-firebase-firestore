@@ -51,8 +51,6 @@ const UserStatistics = () => {
     shallowEqual
   );
 
-  console.log("userCompletedTemplates", userCompletedTemplates);
-
   const handleOnClick = useCallback(
     instanceId => push(`/instance/${instanceId}`),
     [push]
