@@ -91,10 +91,7 @@ export const selectInfoForRankingFromAllInstancesFromTemplateId = createSelector
         (accumulator, challengeInstance) => {
           const contendersWithRatingArray = challengeInstance.contenders.reduce(
             (accumulator, contender) => {
-              if (
-                contender.public &&
-                contender.proof.state !== "No proof provided"
-              ) {
+              if (contender.public && contender.status === "Completed") {
                 accumulator.push({
                   id: contender.id,
                   proofUrl: contender.proof.url,
@@ -141,26 +138,126 @@ export const selectCompletedTemplatesFromUserInstancesObject = createSelector(
           const [key, value] = category;
           accumulator[key] = [];
           value.forEach(instance => {
-            if (
-              !accumulator[key].some(
-                storedInstance =>
-                  storedInstance.templateId ===
-                  challengesInstances[instance].challengeTemplateId
-              )
-            ) {
-              const contender = challengesInstances[instance].contenders.find(
-                challengeContender => challengeContender.id === userProfileId
-              );
+            const duplicatedInstance = accumulator[key].find(
+              storedInstance =>
+                storedInstance.templateId ===
+                challengesInstances[instance].challengeTemplateId
+            );
 
-              if (contender.status === "Completed") {
+            const duplicatedInstanceIndex = accumulator[key].indexOf(
+              duplicatedInstance
+            );
+
+            const contender = challengesInstances[instance].contenders.find(
+              challengeContender => challengeContender.id === userProfileId
+            );
+
+            if (contender.status === "Completed") {
+              let rankingPosition = null;
+              if (contender.public) {
+                const instancesFromTemplateArray = Object.values(
+                  challengesInstances
+                ).filter(
+                  challenge =>
+                    challenge.challengeTemplateId ===
+                    challengesInstances[instance].challengeTemplateId
+                );
+
+                const templateRankingArray = instancesFromTemplateArray.reduce(
+                  (accumulator, instance) => {
+                    const contendersAndRankingFromInstance = instance.contenders.reduce(
+                      (accumulator, instanceContender) => {
+                        if (
+                          instanceContender.public &&
+                          instanceContender.status === "Completed"
+                        ) {
+                          accumulator.push({
+                            id: instanceContender.id,
+                            rating: instanceContender.rating,
+                            instanceId: instance.challengeInstanceId
+                          });
+                        }
+                        return accumulator;
+                      },
+                      []
+                    );
+                    accumulator = [
+                      ...accumulator,
+                      ...contendersAndRankingFromInstance
+                    ];
+                    return accumulator;
+                  },
+                  []
+                );
+
+                const sortedTemplateRankingArray = templateRankingArray.sort(
+                  (a, b) =>
+                    a.rating.likes > b.rating.likes
+                      ? -1
+                      : a.rating.likes === b.rating.likes
+                      ? a.dislikes > b.dislikes
+                        ? 1
+                        : -1
+                      : 1
+                );
+
+                console.log("sortedTemplateRankingArray",sortedTemplateRankingArray)
+
+                const userObject = sortedTemplateRankingArray.find(
+                  user =>
+                    user.id === userProfileId &&
+                    user.instanceId ===
+                      challengesInstances[instance].challengeInstanceId
+                );
+
+                rankingPosition =
+                  sortedTemplateRankingArray.indexOf(userObject) + 1;
+              }
+
+              if (duplicatedInstance) {
+                if (duplicatedInstance.rating.likes > contender.rating.likes) {
+                  return accumulator;
+                } else if (
+                  duplicatedInstance.rating.likes < contender.rating.likes
+                ) {
+                  accumulator[key].splice(duplicatedInstanceIndex, 1, {
+                    instanceId: instance,
+                    templateId:
+                      challengesInstances[instance].challengeTemplateId,
+                    public: contender.proof.public,
+                    rating: contender.rating,
+                    rankingPosition
+                  });
+                } else if (
+                  duplicatedInstance.rating.likes === contender.rating.likes
+                ) {
+                  if (
+                    duplicatedInstance.rating.dislikes >
+                    contender.rating.dislikes
+                  ) {
+                    accumulator[key].splice(duplicatedInstanceIndex, 1, {
+                      instanceId: instance,
+                      templateId:
+                        challengesInstances[instance].challengeTemplateId,
+                      public: contender.proof.public,
+                      rating: contender.rating,
+                      rankingPosition
+                    });
+                  } else return accumulator;
+                }
+                // }
+              } else {
                 accumulator[key] = [
                   ...accumulator[key],
                   {
                     instanceId: instance,
-                    templateId: challengesInstances[instance].challengeTemplateId,
+                    templateId:
+                      challengesInstances[instance].challengeTemplateId,
+                    public: contender.public,
+                    rating: contender.rating,
+                    rankingPosition
                   }
                 ];
-  
               }
             }
           });

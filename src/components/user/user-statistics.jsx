@@ -1,6 +1,7 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useCallback } from "react";
 import { useSelector, shallowEqual } from "react-redux";
 import { createStructuredSelector } from "reselect";
+import { useHistory } from "react-router-dom";
 
 import {
   selectAllUserAcceptedInstances,
@@ -13,9 +14,11 @@ import {
   UserStatisticsContainer,
   StatisticsContainer,
   StatisticCategoryContainer,
-  StatisticsTextTitle,
   StatisticsText,
-  StatisticsCategoryTitle
+  StatisticsTextPointer,
+  StatisticsCategoryTitle,
+  StatisticsTitle,
+  StatisticsInstanceContainer
 } from "./user.styles";
 
 const userStatisticsData = createStructuredSelector({
@@ -25,6 +28,8 @@ const userStatisticsData = createStructuredSelector({
 });
 
 const UserStatistics = () => {
+  const { push } = useHistory();
+
   const {
     allUserAcceptedInstancesByCategory,
     userProfileId,
@@ -46,27 +51,102 @@ const UserStatistics = () => {
     shallowEqual
   );
 
+  console.log("userCompletedTemplates", userCompletedTemplates);
+
+  const handleOnClick = useCallback(
+    instanceId => push(`/instance/${instanceId}`),
+    [push]
+  );
+
   return (
     <UserStatisticsContainer>
-      {Object.entries(userCompletedTemplates).map((category, categoryIndex) => {
-        const [key, value] = category;
-        return (
-          <StatisticCategoryContainer key={categoryIndex}>
-            <StatisticsCategoryTitle>{key}</StatisticsCategoryTitle>
-            <StatisticsContainer>
-              <StatisticsTextTitle>
-                Completed {value.length}/
-                {Object.values(challengesTemplates[key]).length}
-              </StatisticsTextTitle>
-            </StatisticsContainer>
-            {value.map((completedTemplate, completedTemplateIndex) => (
-              <StatisticsText key={completedTemplateIndex}>
-                · {challengesTemplates[key][completedTemplate.templateId].name}
-              </StatisticsText>
-            ))}
-          </StatisticCategoryContainer>
-        );
-      })}
+      <StatisticsTitle>Completed challenges templates</StatisticsTitle>
+      <StatisticsContainer>
+        {Object.entries(userCompletedTemplates).map(
+          (category, categoryIndex) => {
+            const [key, value] = category;
+            return (
+              <StatisticCategoryContainer key={categoryIndex}>
+                <StatisticsCategoryTitle>
+                  {key} - {value.length}/
+                  {Object.values(challengesTemplates[key]).length}
+                </StatisticsCategoryTitle>
+                <ul>
+                  {value.map((completedTemplate, completedTemplateIndex) => (
+                    <li key={completedTemplateIndex}>
+                      <StatisticsText>
+                        {
+                          challengesTemplates[key][completedTemplate.templateId]
+                            .name
+                        }
+                      </StatisticsText>
+                    </li>
+                  ))}
+                </ul>
+              </StatisticCategoryContainer>
+            );
+          }
+        )}
+      </StatisticsContainer>
+      <StatisticsTitle>Best rated public challenges instances</StatisticsTitle>
+      <StatisticsContainer>
+        {Object.entries(userCompletedTemplates).reduce(
+          (accumulator, category, categoryIndex) => {
+            const [key, value] = category;
+            value.length > 0 &&
+              value.some(completedTemplate => completedTemplate.public) &&
+              accumulator.push(
+                <StatisticCategoryContainer key={categoryIndex}>
+                  <StatisticsCategoryTitle>{key}</StatisticsCategoryTitle>
+                  <ul>
+                    {value.reduce(
+                      (
+                        accumulator,
+                        completedTemplate,
+                        completedTemplateIndex
+                      ) => {
+                        completedTemplate.public &&
+                          accumulator.push(
+                            <li key={completedTemplateIndex}>
+                              <StatisticsInstanceContainer>
+                                <StatisticsTextPointer
+                                  onClick={() =>
+                                    handleOnClick(completedTemplate.instanceId)
+                                  }
+                                >
+                                  {
+                                    challengesTemplates[key][
+                                      completedTemplate.templateId
+                                    ].name
+                                  }
+                                </StatisticsTextPointer>
+                                <span
+                                  role="img"
+                                  aria-label="rating"
+                                  aria-labelledby="rating"
+                                >
+                                  {completedTemplate.rating.likes} &#128077; -{" "}
+                                  {completedTemplate.rating.dislikes} &#128078;
+                                </span>
+                                <StatisticsText>
+                                  Ranking position:{" "}
+                                  {completedTemplate.rankingPosition}
+                                </StatisticsText>
+                              </StatisticsInstanceContainer>
+                            </li>
+                          );
+                        return accumulator;
+                      },
+                      []
+                    )}
+                  </ul>
+                </StatisticCategoryContainer>
+              );
+            return accumulator;
+          },
+          []
+        )}
+      </StatisticsContainer>
     </UserStatisticsContainer>
   );
 };

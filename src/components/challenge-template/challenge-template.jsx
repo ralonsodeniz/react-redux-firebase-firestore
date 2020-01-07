@@ -163,7 +163,8 @@ const ChallengeTemplate = () => {
             contenders: [],
             validators: []
           },
-          userProfileId
+          userProfileId,
+          false
         )
       );
     }

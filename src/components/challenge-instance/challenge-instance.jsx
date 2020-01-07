@@ -2,6 +2,7 @@ import React, { useMemo, useCallback, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import { createStructuredSelector } from "reselect";
+import { useHistory } from "react-router-dom";
 
 import {
   selectInstanceContenders,
@@ -60,6 +61,8 @@ const selectChallengeInstanceData = createStructuredSelector({
 
 const ChallengeInstance = () => {
   const dispatch = useDispatch();
+
+  const history = useHistory();
 
   const { instanceId } = useParams();
 
@@ -216,7 +219,11 @@ const ChallengeInstance = () => {
     })
   );
 
-  const isUserGlobalValidator = userGlobalValidator.status !== "no validator" || userGlobalValidator.status !== "banned validator" ? true : false
+  const isUserGlobalValidator =
+    userGlobalValidator.status !== "no validator" ||
+    userGlobalValidator.status !== "banned validator"
+      ? true
+      : false;
 
   const handleAcceptChallenge = useCallback(
     () =>
@@ -320,7 +327,12 @@ const ChallengeInstance = () => {
       <ChallengeInstanceTemplateDataContainer>
         <ChallengeInstanceTemplateData>
           <h4>Name:</h4>
-          <span>{name}</span>
+          <span
+            onClick={() => history.push(`/main/${category}/${templateId}`)}
+            style={{ cursor: "pointer" }}
+          >
+            {name}
+          </span>
           <h4>Description:</h4>
           <span>{description}</span>
           <h4>Minimum participants:</h4>

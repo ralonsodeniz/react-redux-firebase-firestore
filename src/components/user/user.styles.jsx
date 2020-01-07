@@ -161,8 +161,7 @@ export const UserStatisticsContainer = styled.div`
   margin: 50px auto;
   padding: 16px 32px;
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-direction: column;
   justify-content: space-evenly;
   align-items: center;
 `;
@@ -170,8 +169,10 @@ export const UserStatisticsContainer = styled.div`
 export const StatisticsContainer = styled.div`
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   justify-content: space-evenly;
   width: 100%;
+  align-items: flex-start;
 `;
 
 export const StatisticCategoryContainer = styled.div`
@@ -181,15 +182,25 @@ export const StatisticCategoryContainer = styled.div`
   align-items: center;
 `;
 
+export const StatisticsTitle = styled.h4`
+  font-weight: 700;
+`;
+
 export const StatisticsCategoryTitle = styled.h4`
   font-weight: 400;
 `;
 
-export const StatisticsTextTitle = styled.span`
-  font-weight: 350;
-  margin-bottom: 5px;
-`;
-
 export const StatisticsText = styled.span`
   font-weight: 100;
+`;
+
+export const StatisticsTextPointer = styled(StatisticsText)`
+  cursor: pointer;
+`;
+
+export const StatisticsInstanceContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: flex-start;
 `;
