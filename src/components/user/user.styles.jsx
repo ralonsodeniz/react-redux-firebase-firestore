@@ -184,11 +184,16 @@ export const StatisticCategoryContainer = styled.div`
 
 export const StatisticsTitle = styled.h4`
   font-weight: 700;
+  margin-bottom: -5px;
 `;
 
 export const StatisticsCategoryTitle = styled.h4`
   font-weight: 400;
+  margin-bottom: -10px;
 `;
+
+export const StatisticsCategoryTitlePointer = styled(StatisticsCategoryTitle)`
+cursor:pointer`
 
 export const StatisticsText = styled.span`
   font-weight: 100;

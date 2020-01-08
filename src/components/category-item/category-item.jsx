@@ -69,7 +69,7 @@ const CategoryItem = ({ challengeTemplateId, challengeTemplateData }) => {
       <CustomButton
         text="Go to challenge"
         type="button"
-        onClick={() => history.push(`${category}/${challengeTemplateId}`)}
+        onClick={() => history.push(`/main/${category}/${challengeTemplateId}`)}
       />
     </CategoryItemContainer>
   );

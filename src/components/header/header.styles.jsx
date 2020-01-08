@@ -11,7 +11,7 @@ export const HeaderContainer = styled.div`
   margin: 20px auto 10px;
   padding: 16px 32px;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-evenly;
   align-items: center;
 `;
 
@@ -38,4 +38,49 @@ export const HeaderSigninSignOutSpan = styled.span`
 export const HeaderLogo = styled(Logo)`
   width: 18vw;
   height: 7vh;
+`;
+
+export const HeaderStatisticsContainer = styled.div`
+  width: 23vw;
+  height: 4vh;
+  background-color: #fafafa;
+  box-shadow: 0 0 8px 4px rgba(0, 0, 0, 0.3);
+  border-radius: 16px;
+  margin: 20px auto 10px;
+  padding: 7px 13px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  /* align-items: center; */
+`;
+
+export const HeaderStatisticsInfoContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  /* align-items: center; */
+  height: 100%;
+`;
+
+export const HeaderStatisticsStatContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  /* align-items: center; */
+`;
+
+export const HeaderStatisticsTitle = styled.h4`
+  font-weight: 400;
+  margin: 0px;
+`;
+
+export const HeaderStatisticsText = styled.span`
+  font-weight: 100;
+  margin: 0px;
+`;
+
+export const HeaderStatisticsTitlePointer = styled(HeaderStatisticsTitle)`
+  cursor: pointer;
 `;

@@ -18,7 +18,8 @@ import {
   StatisticsTextPointer,
   StatisticsCategoryTitle,
   StatisticsTitle,
-  StatisticsInstanceContainer
+  StatisticsInstanceContainer,
+  StatisticsCategoryTitlePointer
 } from "./user.styles";
 
 const userStatisticsData = createStructuredSelector({
@@ -51,8 +52,20 @@ const UserStatistics = () => {
     shallowEqual
   );
 
-  const handleOnClick = useCallback(
+  const handleOnClickInstance = useCallback(
     instanceId => push(`/instance/${instanceId}`),
+    [push]
+  );
+
+  const handleOnClickTemplate = useCallback(
+    (templateId, category) => push(`/main/${category}/${templateId}`),
+    [push]
+  );
+
+  const handleOnClickCategory = useCallback(
+    category => {
+      push(`/main/${category}/`);
+    },
     [push]
   );
 
@@ -65,10 +78,12 @@ const UserStatistics = () => {
             const [key, value] = category;
             return (
               <StatisticCategoryContainer key={categoryIndex}>
-                <StatisticsCategoryTitle>
+                <StatisticsCategoryTitlePointer
+                  onClick={() => handleOnClickCategory(key)}
+                >
                   {key} - {value.length}/
                   {Object.values(challengesTemplates[key]).length}
-                </StatisticsCategoryTitle>
+                </StatisticsCategoryTitlePointer>
                 <ul>
                   {value.map((completedTemplate, completedTemplateIndex) => (
                     <li key={completedTemplateIndex}>
@@ -109,7 +124,9 @@ const UserStatistics = () => {
                               <StatisticsInstanceContainer>
                                 <StatisticsTextPointer
                                   onClick={() =>
-                                    handleOnClick(completedTemplate.instanceId)
+                                    handleOnClickInstance(
+                                      completedTemplate.instanceId
+                                    )
                                   }
                                 >
                                   {
@@ -126,10 +143,17 @@ const UserStatistics = () => {
                                   {completedTemplate.rating.likes} &#128077; -{" "}
                                   {completedTemplate.rating.dislikes} &#128078;
                                 </span>
-                                <StatisticsText>
+                                <StatisticsTextPointer
+                                  onClick={() =>
+                                    handleOnClickTemplate(
+                                      completedTemplate.templateId,
+                                      key
+                                    )
+                                  }
+                                >
                                   Ranking position:{" "}
                                   {completedTemplate.rankingPosition}
-                                </StatisticsText>
+                                </StatisticsTextPointer>
                               </StatisticsInstanceContainer>
                             </li>
                           );
