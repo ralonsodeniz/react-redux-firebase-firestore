@@ -32,7 +32,8 @@ import {
   HeaderStatisticsTitle,
   HeaderStatisticsText,
   HeaderStatisticsStatContainer,
-  HeaderStatisticsTitlePointer
+  HeaderStatisticsTitlePointer,
+  HeaderStatisticsEmptyContainer
 } from "./header.styles";
 
 const headerStatisticsData = createStructuredSelector({
@@ -306,7 +307,11 @@ const HeaderStatistics = () => {
         </HeaderStatisticsInfoContainer>
       </HeaderStatisticsContainer>
     ) : (
-      <HeaderStatisticsContainer>Sign in or register</HeaderStatisticsContainer>
+      <HeaderStatisticsContainer>
+        <HeaderStatisticsEmptyContainer>
+          Sign in or register
+        </HeaderStatisticsEmptyContainer>
+      </HeaderStatisticsContainer>
     )
   ) : (
     <Spinner />

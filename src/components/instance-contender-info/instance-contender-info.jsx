@@ -1,6 +1,7 @@
 import React, { useCallback } from "react";
 import PropTypes from "prop-types";
 import { useDispatch } from "react-redux";
+import { useHistory } from "react-router-dom";
 
 import CustomButton from "../custom-button/custom-button";
 
@@ -25,7 +26,8 @@ import {
   InstanceContenderInfoImageContainer,
   InstanceContenderInfoRankingContainer,
   InstanceContenderInfoImageFrame,
-  InstanceContenderValidatorContainer
+  InstanceContenderValidatorContainer,
+  InstanceContenderInfoTextPointer
 } from "./instance-contender-info.styles";
 
 const InstanceContenderInfo = ({
@@ -39,6 +41,8 @@ const InstanceContenderInfo = ({
   isUserGlobalValidator
 }) => {
   const dispatch = useDispatch();
+
+  const { push } = useHistory();
 
   const isUserContender = challengeInstanceContenders.some(
     contender => contender.id === userProfileId
@@ -128,9 +132,11 @@ const InstanceContenderInfo = ({
             accumulator.push(
               <InstanceContenderInfoContainer key={contenderIndex}>
                 <InstanceContenderInfoTitle>Name</InstanceContenderInfoTitle>
-                <InstanceContenderInfoText>
+                <InstanceContenderInfoTextPointer
+                  onClick={() => push(`/profile/${contender.id}`)}
+                >
                   {contender.name}
-                </InstanceContenderInfoText>
+                </InstanceContenderInfoTextPointer>
                 <InstanceContenderInfoTitle>Proof</InstanceContenderInfoTitle>
                 {contender.proof.url ? (
                   isVisible || (!selfValidation && isUserGlobalValidator) ? (

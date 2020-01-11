@@ -31,7 +31,6 @@ const UserAvatar = () => {
 
   return (
     <UserAvatarContainer>
-      {console.log("AVATAR RENDER")}
       {userPhotoURL !== "" ? (
         <ClippedImage url={userPhotoURL} alt={"User Avatar"} />
       ) : (

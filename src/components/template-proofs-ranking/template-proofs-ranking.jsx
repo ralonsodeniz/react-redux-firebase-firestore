@@ -1,11 +1,14 @@
 import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
+import { useHistory } from "react-router-dom";
 import PropTypes from "prop-types";
 
 import {
   addLikeToProofStarts,
   addDislikeToProofStarts
 } from "../../redux/firestore/challenges-instances/actions";
+
+import { closeModal } from "../../redux/modal/actions";
 
 import {
   TemplateProofsRankingContainer,
@@ -24,6 +27,8 @@ const TemplateProofsRanking = ({
   proofFileType
 }) => {
   const dispatch = useDispatch();
+
+  const { push } = useHistory();
 
   const handleAddLikeToProof = useCallback(
     (contenderId, hasUserDisliked, instanceId) =>
@@ -50,6 +55,14 @@ const TemplateProofsRanking = ({
     }
   }, []);
 
+  const handleClickToProfile = useCallback(
+    contenderId => {
+      push(`/profile/${contenderId}`);
+      dispatch(closeModal());
+    },
+    [dispatch, push]
+  );
+
   const fullScreenEmojisStyles = {
     position: "absolute",
     top: "10vh",
@@ -69,7 +82,9 @@ const TemplateProofsRanking = ({
 
         return (
           <TemplateProofsRankingContender key={contenderIndex}>
-            <TemplateProofsRankingName>
+            <TemplateProofsRankingName
+              onClick={() => handleClickToProfile(contender.id)}
+            >
               {`${contenderIndex + 1} - ${contender.name}`}
             </TemplateProofsRankingName>
             {proofFileType === "video" ? (

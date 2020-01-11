@@ -72,7 +72,6 @@ const User = () => {
 
   return !userProfileIsEmpty ? (
     <UserContainer>
-      {console.log("USER RENDER")}
       <UserAvatar />
       <UserData />
       <UserButtonsContainer>

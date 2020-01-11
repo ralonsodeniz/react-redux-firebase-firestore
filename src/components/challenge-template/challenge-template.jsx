@@ -276,7 +276,12 @@ const ChallengeTemplate = () => {
         </ChallengeTemplateData>
         <ChallengeTemplateData>
           <h4>Author:</h4>
-          <span>{authorDisplayName}</span>
+          <span
+            onClick={() => push(`/profile/${author}`)}
+            style={{ cursor: "pointer" }}
+          >
+            {authorDisplayName}
+          </span>
           <h4>Difficulty:</h4>
           <span>{difficulty}</span>
           <h4>Times completed:</h4>
@@ -305,10 +310,15 @@ const ChallengeTemplate = () => {
 
             return (
               <ChallengeTemplateRankingContender key={contenderIndex}>
-                <ChallengeTemplateRankingName
-                  onClick={() => handleShowContenderProof(contender.proofUrl)}
-                >
-                  {`${contenderIndex + 1} - ${contender.name}`}
+                <ChallengeTemplateRankingName>
+                  <span
+                    onClick={() => push(`/profile/${contender.id}`)}
+                  >{`${contenderIndex + 1} - ${contender.name}`}</span>{" "}
+                  <span
+                    onClick={() => handleShowContenderProof(contender.proofUrl)}
+                  >
+                    - View proof
+                  </span>
                 </ChallengeTemplateRankingName>
                 <ChallengeTemplateRankingLikeDislikeContainer>
                   <ChallengeTemplateRankingLikeDislike>

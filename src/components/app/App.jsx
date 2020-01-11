@@ -25,6 +25,7 @@ const AccountPage = lazy(() => import("../../pages/account/account"));
 const SigninPage = lazy(() => import("../../pages/signin/signin"));
 const SignupPage = lazy(() => import("../../pages/signup/signup"));
 const InstancePage = lazy(() => import("../../pages/instance/instance"));
+const ProfilePage = lazy(() => import("../../pages/profile/profile"));
 
 const selectAppData = createStructuredSelector({
   showModal: selectShowModal,
@@ -49,7 +50,6 @@ const App = () => {
 
   return (
     <AppContainer>
-      {console.log("APP RENDER")}
       <GlobalStyles />
       <header>
         <Header />
@@ -92,6 +92,7 @@ const App = () => {
               }
             />
             <Route path="/instance" component={InstancePage} />
+            <Route path="/profile/:userId" component={ProfilePage} />
           </Suspense>
         </Switch>
       </ErrorBoundary>

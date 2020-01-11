@@ -38,7 +38,6 @@ const UserData = () => {
 
   return (
     <UserDataContainer>
-      {console.log("USERDATA RENDER")}
       <DisplayNameContainer>
         <UserDataTextTitle>Display name:</UserDataTextTitle>
         <UserDataText>{displayName}</UserDataText>

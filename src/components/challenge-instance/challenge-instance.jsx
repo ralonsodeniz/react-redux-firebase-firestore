@@ -342,7 +342,12 @@ const ChallengeInstance = () => {
         </ChallengeInstanceTemplateData>
         <ChallengeInstanceTemplateData>
           <h4>Author:</h4>
-          <span>{authorDisplayName}</span>
+          <span
+            onClick={() => history.push(`/profile/${author}`)}
+            style={{ cursor: "pointer" }}
+          >
+            {authorDisplayName}
+          </span>
           <h4>Category:</h4>
           <span>{category}</span>
           <h4>Difficulty:</h4>

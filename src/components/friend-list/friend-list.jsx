@@ -1,13 +1,16 @@
 import React, { useMemo, useCallback, useState } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import { createStructuredSelector } from "reselect";
+import {useHistory} from "react-router-dom"
 
 import {
   selectUserAcceptedFriends,
   selectUserPendingFriends,
   selectUsersDisplayNamesById,
   selectUserProfileIsLoaded,
-  selectAllUsersId
+  selectAllUsersId,
+  selectUserProfileId,
+  selectUserPendingFriendsById
 } from "../../redux/user/selectors";
 import {
   acceptFriendRequestStarts,
@@ -37,11 +40,14 @@ const selectFriendListData = createStructuredSelector({
   userAcceptedFriends: selectUserAcceptedFriends,
   userPendingFriends: selectUserPendingFriends,
   userProfileIsLoaded: selectUserProfileIsLoaded,
-  allUsersId: selectAllUsersId
+  allUsersId: selectAllUsersId,
+  userProfileId: selectUserProfileId
 });
 
 const FriendList = () => {
   const dispatch = useDispatch();
+
+  const {push} = useHistory()
 
   const [friendSearch, setFriendSearch] = useState("");
 
@@ -52,11 +58,17 @@ const FriendList = () => {
     []
   );
 
+  const memoizedSelectUserPendingFriendsById = useMemo(
+    () => selectUserPendingFriendsById,
+    []
+  );
+
   const {
     userAcceptedFriends,
     userPendingFriends,
     userProfileIsLoaded,
-    allUsersId
+    allUsersId,
+    userProfileId
   } = useSelector(selectFriendListData, shallowEqual);
 
   const userAcceptedFriendsDisplayNames = useSelector(
@@ -71,6 +83,11 @@ const FriendList = () => {
 
   const allUsersDisplayNames = useSelector(state =>
     memoizedSelectUserDisplayNamesById(state, allUsersId)
+  );
+
+  const userToAddPendingFriends = useSelector(
+    state => memoizedSelectUserPendingFriendsById(state, friendToAdd),
+    shallowEqual
   );
 
   const userAcceptedFriendsArray = userAcceptedFriends.map(
@@ -132,9 +149,38 @@ const FriendList = () => {
       event.preventDefault();
 
       if (friendToAdd !== "") {
-        dispatch(sendFriendRequestStarts(friendToAdd));
-        setFriendToAdd("");
-        setFriendSearch("");
+        if (friendToAdd === userProfileId) {
+          const userIsYourselfModalData = {
+            modalType: "SYSTEM_MESSAGE",
+            modalProps: {
+              text: "You cannot add yourself as friend"
+            }
+          };
+          dispatch(openModal(userIsYourselfModalData));
+        } else if (userAcceptedFriends.some(friend => friend === friendToAdd)) {
+          const userIsAlreadyYourFriendModalData = {
+            modalType: "SYSTEM_MESSAGE",
+            modalProps: {
+              text: "User is already your friend"
+            }
+          };
+          dispatch(openModal(userIsAlreadyYourFriendModalData));
+        } else if (
+          userPendingFriends.some(friend => friend === friendToAdd) ||
+          userToAddPendingFriends.some(friend => friend === userProfileId)
+        ) {
+          const userIsAlreadyPendingToAcceptModalData = {
+            modalType: "SYSTEM_MESSAGE",
+            modalProps: {
+              text: "User is already pending to be accepted as your friend"
+            }
+          };
+          dispatch(openModal(userIsAlreadyPendingToAcceptModalData));
+        } else {
+          dispatch(sendFriendRequestStarts(friendToAdd));
+          setFriendToAdd("");
+          setFriendSearch("");
+        }
       } else {
         const friendToAddEmptyModalData = {
           modalType: "SYSTEM_MESSAGE",
@@ -145,7 +191,14 @@ const FriendList = () => {
         dispatch(openModal(friendToAddEmptyModalData));
       }
     },
-    [dispatch, friendToAdd]
+    [
+      dispatch,
+      friendToAdd,
+      userAcceptedFriends,
+      userPendingFriends,
+      userProfileId,
+      userToAddPendingFriends
+    ]
   );
 
   return userProfileIsLoaded ? (
@@ -155,7 +208,7 @@ const FriendList = () => {
           <FriendListTitle>Accepted friends</FriendListTitle>
           {userAcceptedFriendsArray.map(friend => (
             <FriendContianer key={friend.id}>
-              <FriendListText onClick={() => console.log(friend)}>
+              <FriendListText onClick={() => push(`/profile/${friend.id}`)}>
                 {friend.name}
               </FriendListText>
               <FriendIcons
@@ -172,7 +225,7 @@ const FriendList = () => {
           <FriendListTitle>Friend requests</FriendListTitle>
           {userPendingFriendsArray.map(friend => (
             <FriendContianer key={friend.id}>
-              <FriendListText onClick={() => console.log(friend)}>
+            <FriendListText onClick={() => push(`/profile/${friend.id}`)}>
                 {friend.name}
               </FriendListText>
               <FriendIcons

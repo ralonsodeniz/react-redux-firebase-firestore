@@ -5,6 +5,7 @@ const selectUserAuth = state => state.firebase.auth;
 const selectUserProfile = state => state.firebase.profile;
 const selectUsers = state => state.firestore.data.users;
 
+// Selectors for auth and profile reducers
 // output selector
 export const selectUserAuthIsLoaded = createSelector(
   [selectUserAuth],
@@ -152,6 +153,8 @@ export const selectUserIntancesToValidate = createSelector(
       : []
 );
 
+// selectors for users reducer
+
 export const selectUsersAreLoading = createSelector(
   state => state.firestore.status.requesting,
   requesting => requesting.users
@@ -175,4 +178,59 @@ export const selectAllUsersId = createSelector(
   [selectUsers, selectUsersAreLoading],
   (users, usersAreLoading) =>
     !usersAreLoading && users ? Object.keys(users) : []
+);
+
+export const selectUserProfilePhotoUrlById = createSelector(
+  [selectUsers, selectUsersAreLoading, (_, userId) => userId],
+  (users, usersAreLoading, userId) => {
+    return users && !usersAreLoading && userId
+      ? users[userId]
+        ? users[userId].photoURL
+        : "user not found"
+      : "";
+  }
+);
+
+export const selectUserProfileDisplayNameById = createSelector(
+  [selectUsers, selectUsersAreLoading, (_, userId) => userId],
+  (users, usersAreLoading, userId) => {
+    return users && !usersAreLoading && userId
+      ? users[userId]
+        ? users[userId].displayName
+        : "user not found"
+      : "";
+  }
+);
+
+export const selectUserProfileIdById = createSelector(
+  [selectUsers, selectUsersAreLoading, (_, userId) => userId],
+  (users, usersAreLoading, userId) => {
+    return users && !usersAreLoading && userId
+      ? users[userId]
+        ? users[userId].uid
+        : "user not found"
+      : "";
+  }
+);
+
+export const selectAllUserAcceptedInstancesById = createSelector(
+  [selectUsers, selectUsersAreLoading, (_, userId) => userId],
+  (users, usersAreLoading, userId) => {
+    return users && !usersAreLoading && userId
+      ? users[userId]
+        ? users[userId].challengesInstances
+        : {}
+      : {};
+  }
+);
+
+export const selectUserPendingFriendsById = createSelector(
+  [selectUsers, selectUsersAreLoading, (_, userId) => userId],
+  (users, usersAreLoading, userId) => {
+    return users && !usersAreLoading && userId
+      ? users[userId]
+        ? users[userId].friends.pending
+        : []
+      : [];
+  }
 );

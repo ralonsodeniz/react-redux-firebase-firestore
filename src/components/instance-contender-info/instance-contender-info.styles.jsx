@@ -13,6 +13,12 @@ export const InstanceContenderInfoText = styled.span`
   font-weight: 100;
 `;
 
+export const InstanceContenderInfoTextPointer = styled(
+  InstanceContenderInfoText
+)`
+  cursor: pointer;
+`;
+
 export const InstanceContenderInfoStatusText = styled.span`
   font-weight: 100;
   ${({ status }) =>
