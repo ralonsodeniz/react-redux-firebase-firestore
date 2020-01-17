@@ -46,6 +46,7 @@ const CategoryItem = ({ challengeTemplateId, challengeTemplateData }) => {
           src={proofUrl}
           controls
           controlsList="nodownload"
+          preload="none"
         />
       ) : (
         <CategoryItemImageContainer src={proofUrl} alt="proof image" />

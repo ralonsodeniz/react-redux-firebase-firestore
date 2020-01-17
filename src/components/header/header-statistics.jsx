@@ -23,6 +23,7 @@ import {
   selectChallengesTemplates,
   selectNameFromChallengeTemplate
 } from "../../redux/firestore/challenges-templates/selectors";
+import { makeDate } from "../../utils/utils";
 
 import Spinner from "../spinner/spinner";
 
@@ -150,58 +151,9 @@ const HeaderStatistics = () => {
         )
       : {};
 
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec"
-  ];
-
-  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-  const instanceExpiringHour =
-    sortedUserAcceptedInstancesArray.length > 0
-      ? userContenderInfo.expiresAt.toDate().getHours() <= 9
-        ? `0${userContenderInfo.expiresAt.toDate().getHours()}`
-        : userContenderInfo.expiresAt.toDate().getHours()
-      : "";
-
-  const instanceExpiringMinutes =
-    sortedUserAcceptedInstancesArray.length > 0
-      ? userContenderInfo.expiresAt.toDate().getMinutes() <= 9
-        ? `0${userContenderInfo.expiresAt.toDate().getMinutes()}`
-        : userContenderInfo.expiresAt.toDate().getMinutes()
-      : "";
-
-  const instanceExpiringSeconds =
-    sortedUserAcceptedInstancesArray.length > 0
-      ? userContenderInfo.expiresAt.toDate().getSeconds() <= 9
-        ? `0${userContenderInfo.expiresAt.toDate().getSeconds()}`
-        : userContenderInfo.expiresAt.toDate().getSeconds()
-      : "";
-
-  const instanceExpiringDay =
-    sortedUserAcceptedInstancesArray.length > 0
-      ? userContenderInfo.expiresAt.toDate().getDate() <= 9
-        ? `0${userContenderInfo.expiresAt.toDate().getDate()}`
-        : userContenderInfo.expiresAt.toDate().getDate()
-      : "";
-
   const instanceExpiringDate =
     sortedUserAcceptedInstancesArray.length > 0
-      ? `${days[userContenderInfo.expiresAt.toDate().getDay()]} ${
-          months[userContenderInfo.expiresAt.toDate().getMonth()]
-        } ${instanceExpiringDay} ${userContenderInfo.expiresAt
-          .toDate()
-          .getFullYear()} ${instanceExpiringHour}:${instanceExpiringMinutes}:${instanceExpiringSeconds}`
+      ? makeDate(userContenderInfo.expiresAt.toDate(), true)
       : "";
 
   const instanceExpiringId =

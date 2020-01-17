@@ -42,6 +42,7 @@ const UserAvatar = () => {
         fileType="image"
         directory={directory}
         fileName="avatar"
+        oldFileName={userPhotoURL}
         urlAction={dispatchedUpdateAvatarStart}
         labelText="Choose your profile image"
         submitText="Upload image"

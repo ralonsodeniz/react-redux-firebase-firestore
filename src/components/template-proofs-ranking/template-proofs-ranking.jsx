@@ -92,6 +92,7 @@ const TemplateProofsRanking = ({
                 src={contender.proofUrl}
                 controls
                 controlsList="nodownload"
+                preload="none"
               />
             ) : (
               <TemplateProofsRankingImageContainer>

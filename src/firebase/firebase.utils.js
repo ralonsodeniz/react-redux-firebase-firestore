@@ -2,6 +2,7 @@ import firebase from "firebase/app";
 import "firebase/firestore";
 import "firebase/auth";
 import "firebase/storage";
+import "firebase/functions";
 
 import { createRandomId, assignNewIdToItem } from "../utils/utils";
 
@@ -107,6 +108,7 @@ export const checkUserProfileDocumentInFS = async (user, additionalData) => {
 export const uploadFileToStorage = (
   directory,
   fileName,
+  oldFileName,
   file,
   setProgress,
   setLoading,
@@ -114,6 +116,8 @@ export const uploadFileToStorage = (
   urlAction,
   additionalAction
 ) => {
+  // const uuid = assignNewIdToItem({}, createRandomId, 38);
+  // const enhancedFilename = fileName + uuid;
   try {
     const storageRef = storage.ref(`${directory}`); // we create the storage reference object seting the name of the folder where we want to save our
     const documentFile = storageRef.child(`${fileName}`); // we create the file
@@ -133,7 +137,24 @@ export const uploadFileToStorage = (
         unsubscribe(); // we close the observable connection once there is an error or the upload is finished
       },
       complete: async () => {
-        await documentFile.getDownloadURL().then(url => urlAction(url));
+        // await documentFile.getDownloadURL().then(url => urlAction(url));
+        const { data:{convertedUrl, posterUrl} } = await cloudUploadFile({
+          directory,
+          fileName,
+          oldFileName
+        });
+        // console.log("cloudUrl",data)
+        urlAction(convertedUrl);
+        console.log("posterUrl", posterUrl)
+        // const fbId = "react-redux-firebase-fir-2fc76.appspot.com";
+        // const url =
+        //   "https://firebasestorage.googleapis.com/v0/b/" +
+        //   fbId +
+        //   "/o/" +
+        //   encodeURIComponent(directory + "/converted@" + enhancedFilename) +
+        //   "?alt=media&token=" +
+        //   uuid;
+        // urlAction(url);
         if (additionalAction) additionalAction();
         setLoading(false);
         setFile(null);
@@ -1327,9 +1348,14 @@ export const firestore = firebase.firestore();
 firebase.firestore();
 export const storage = firebase.storage();
 firebase.storage();
+export const functions = firebase.functions();
+firebase.functions();
 
 // google auth config
 export const googleAuthProvider = new firebase.auth.GoogleAuthProvider();
 googleAuthProvider.setCustomParameters({ prompt: "select_account" });
 
 export default firebase;
+
+// firebase https callable functions
+export const cloudUploadFile = functions.httpsCallable("uploadFile");

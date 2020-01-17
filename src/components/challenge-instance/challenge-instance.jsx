@@ -200,6 +200,12 @@ const ChallengeInstance = () => {
     ? userContenderObject.public
     : false;
 
+  const userInstanceProofUrl = userContenderObject
+    ? userContenderObject.proof.url !== ""
+      ? userContenderObject.proof.url
+      : ""
+    : "";
+
   const userChallengeRating = rating
     ? rating.usersThatRated.find(user => user.userId === userProfileId)
     : {};
@@ -305,6 +311,7 @@ const ChallengeInstance = () => {
           src={proofUrl}
           controls
           controlsList="nodownload"
+          preload="none"
         />
       ) : (
         <ChallengeInstanceImageContainer>
@@ -404,6 +411,7 @@ const ChallengeInstance = () => {
               fileType={proofFileType}
               directory={`challengesInstances/${instanceId}/${userProfileId}`}
               fileName={userDisplayNameForFileName}
+              oldFileName={userInstanceProofUrl}
               urlAction={handleUploadProof(dispatch, instanceId, userProfileId)}
               labelText="Choose challenge proof"
               submitText={"Upload"}

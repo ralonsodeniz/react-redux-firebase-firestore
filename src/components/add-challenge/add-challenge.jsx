@@ -201,6 +201,7 @@ const AddChallenge = ({ urlCategory }) => {
         fileType="imageOrvideo"
         directory={`challengesTemplates/${urlCategory}/${name}`}
         fileName={name}
+        oldFileName=""
         // in this case, since we are returning a function, because handleSubmit is a curried function and we only pass the first set of parameters, we do not need to () => handleSubmit(dispatch, formChallengeData, userProfileId)
         // the function wont run until it is called in the children
         urlAction={handleSubmit(

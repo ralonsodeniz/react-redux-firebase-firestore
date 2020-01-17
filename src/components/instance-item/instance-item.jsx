@@ -128,6 +128,7 @@ const InstanceItem = ({ challengeInstanceData }) => {
           src={proofUrl}
           controls
           controlsList="nodownload"
+          preload="none"
         />
       ) : (
         <InstanceItemImageContianer src={proofUrl} alt="instance proof image" />

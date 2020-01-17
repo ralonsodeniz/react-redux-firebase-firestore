@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 
 import { openModal } from "../../redux/modal/actions";
 import { uploadFileToStorage } from "../../firebase/firebase.utils";
+import { makeDate } from "../../utils/utils";
 
 import CircularProgress from "../circular-progress/circular-progress";
 import CustomButton from "../custom-button/custom-button";
@@ -20,6 +21,7 @@ const FileUploader = ({
   fileType,
   directory,
   fileName,
+  oldFileName,
   urlAction,
   additionalAction,
   labelText,
@@ -31,6 +33,18 @@ const FileUploader = ({
   const [file, setFile] = useState(null);
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(false);
+
+  const enhancedFileName = fileName + makeDate(new Date(), false);
+
+  const enhancedOldFileName =
+    oldFileName !== "" && oldFileName.includes("converted")
+      ? decodeURIComponent(
+          oldFileName.slice(
+            oldFileName.search("converted"),
+            oldFileName.search("alt") - 1
+          )
+        )
+      : "";
 
   const handleFileChange = useCallback(
     event => {
@@ -81,7 +95,8 @@ const FileUploader = ({
 
           uploadFileToStorage(
             directory,
-            fileName,
+            enhancedFileName,
+            enhancedOldFileName,
             file,
             setProgress,
             setLoading,
@@ -97,6 +112,7 @@ const FileUploader = ({
             }
           };
           dispatch(openModal(invalidFileTypeModalData));
+          setFile(null);
         }
       } else {
         const incorrectFileTypeModalData = {
@@ -106,6 +122,7 @@ const FileUploader = ({
           }
         };
         dispatch(openModal(incorrectFileTypeModalData));
+        setFile(null);
       }
     } else {
       const notFileSelectedModalData = {
@@ -115,6 +132,7 @@ const FileUploader = ({
         }
       };
       dispatch(openModal(notFileSelectedModalData));
+      setFile(null);
     }
   }, [
     dispatch,
@@ -123,7 +141,8 @@ const FileUploader = ({
     fileTypesRegex,
     urlAction,
     directory,
-    fileName,
+    enhancedFileName,
+    enhancedOldFileName,
     additionalAction,
     maxFileSizeInMB
   ]);
@@ -141,20 +160,27 @@ const FileUploader = ({
         </CircularProgressContainer>
       ) : (
         <UpdateFileContainer>
-          <InputFileContainer
-            type="file"
-            id="file"
-            name="file"
-            onChange={handleFileChange}
-            disabled={disabled}
-          />
-          <LabelFileContainer htmlFor="file">{labelText}</LabelFileContainer>
-          <CustomButton
-            type="button"
-            text={submitText}
-            onClick={handleFileUpload}
-            disabled={disabled || !file}
-          />
+          {!file ? (
+            <UpdateFileContainer>
+              <InputFileContainer
+                type="file"
+                id="file"
+                name="file"
+                onChange={handleFileChange}
+                disabled={disabled}
+              />
+              <LabelFileContainer htmlFor="file">
+                {labelText}
+              </LabelFileContainer>
+            </UpdateFileContainer>
+          ) : (
+            <CustomButton
+              type="button"
+              text={submitText}
+              onClick={handleFileUpload}
+              disabled={disabled || !file}
+            />
+          )}
         </UpdateFileContainer>
       )}
     </UploadFileContainer>
@@ -165,6 +191,7 @@ FileUploader.propTypes = {
   fileType: PropTypes.string.isRequired,
   directory: PropTypes.string.isRequired,
   fileName: PropTypes.string.isRequired,
+  oldFileName: PropTypes.string.isRequired,
   urlAction: PropTypes.func.isRequired,
   additionalAction: PropTypes.func,
   labelText: PropTypes.string.isRequired,

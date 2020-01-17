@@ -244,6 +244,7 @@ const ChallengeTemplate = () => {
           src={proofUrl}
           controls
           controlsList="nodownload"
+          preload="none"
         />
       ) : (
         <ChallengeTemplateImageContainer>

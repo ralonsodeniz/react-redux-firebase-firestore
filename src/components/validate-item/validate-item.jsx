@@ -45,7 +45,10 @@ const ValidateItem = ({ challengeInstanceData }) => {
     []
   );
 
-  const memoizedSelectProofFileTypeFromChallengeTemplate = useMemo(()=> selectProofFileTypeFromChallengeTemplate,[])
+  const memoizedSelectProofFileTypeFromChallengeTemplate = useMemo(
+    () => selectProofFileTypeFromChallengeTemplate,
+    []
+  );
 
   const proofUrlFromChallengeTemplayte = useSelector(
     state =>
@@ -59,17 +62,26 @@ const ValidateItem = ({ challengeInstanceData }) => {
     shallowEqual
   );
 
-  const authorDisplayName = useSelector(state =>
-    memoizedSelectUsersDisplayNamesById(state, administrator), shallowEqual
+  const authorDisplayName = useSelector(
+    state => memoizedSelectUsersDisplayNamesById(state, administrator),
+    shallowEqual
   );
 
   const contendersIdArray = contenders.map(contender => contender.id);
 
-  const contendersDisplayNamesArray = useSelector(state =>
-    memoizedSelectUsersDisplayNamesById(state, contendersIdArray), shallowEqual
+  const contendersDisplayNamesArray = useSelector(
+    state => memoizedSelectUsersDisplayNamesById(state, contendersIdArray),
+    shallowEqual
   );
 
-  const proofFileType = useSelector(state => memoizedSelectProofFileTypeFromChallengeTemplate(state, challengeTemplateId),shallowEqual)
+  const proofFileType = useSelector(
+    state =>
+      memoizedSelectProofFileTypeFromChallengeTemplate(
+        state,
+        challengeTemplateId
+      ),
+    shallowEqual
+  );
 
   const contendersDisplayNamesString = contendersDisplayNamesArray.join(" ,");
 
@@ -96,17 +108,19 @@ const ValidateItem = ({ challengeInstanceData }) => {
 
   return (
     <ValidateItemContainer>
-    {
-      proofFileType === "video" ? (
+      {proofFileType === "video" ? (
         <ValidateItemVideoPlayer
-        src={proofUrlFromChallengeTemplayte}
-        controls
-        controlsList="nodownload"
-      />
+          src={proofUrlFromChallengeTemplayte}
+          controls
+          controlsList="nodownload"
+          preload="none"
+        />
       ) : (
-        <ValidateItemImageContainer src={proofUrlFromChallengeTemplayte} alt="proof image" />
-      )
-    }
+        <ValidateItemImageContainer
+          src={proofUrlFromChallengeTemplayte}
+          alt="proof image"
+        />
+      )}
       <strong>Name:</strong>
       <span>{nameFromChallengeTemplate}</span>
       <strong>Administrator:</strong>

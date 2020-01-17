@@ -145,6 +145,7 @@ const InstanceContenderInfo = ({
                         src={contender.proof.url}
                         controls
                         controlsList="nodownload"
+                        preload="none"
                       />
                     ) : (
                       <InstanceContenderInfoImageContainer>
