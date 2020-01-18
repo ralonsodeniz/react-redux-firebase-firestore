@@ -117,9 +117,9 @@ export function* onUploadProofStarts() {
 }
 
 export function* updateProof({ payload }) {
-  const { instanceId, userProfileId, url } = payload;
+  const { instanceId, userProfileId, url, posterUrl } = payload;
   try {
-    yield call(updateProofInFs, userProfileId, instanceId, url);
+    yield call(updateProofInFs, userProfileId, instanceId, url, posterUrl);
     const updateProofInFSSuccessModalData = {
       modalType: "SYSTEM_MESSAGE",
       modalProps: {

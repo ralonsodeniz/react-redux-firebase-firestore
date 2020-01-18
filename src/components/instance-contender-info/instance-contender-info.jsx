@@ -146,6 +146,7 @@ const InstanceContenderInfo = ({
                         controls
                         controlsList="nodownload"
                         preload="none"
+                        poster={contender.poster}
                       />
                     ) : (
                       <InstanceContenderInfoImageContainer>

@@ -93,6 +93,7 @@ const ChallengeTemplate = () => {
     rating,
     timesCompleted,
     proofUrl,
+    posterUrl,
     proofFileType
   } = challengeTemplate;
 
@@ -176,7 +177,8 @@ const ChallengeTemplate = () => {
         const openModalVideoData = {
           modalType: "VIDEO_PLAYER",
           modalProps: {
-            videoUrl: proofUrl
+            videoUrl: proofUrl,
+            videoPoster: posterUrl
           }
         };
         dispatch(openModal(openModalVideoData));
@@ -245,6 +247,7 @@ const ChallengeTemplate = () => {
           controls
           controlsList="nodownload"
           preload="none"
+          poster={posterUrl}
         />
       ) : (
         <ChallengeTemplateImageContainer>

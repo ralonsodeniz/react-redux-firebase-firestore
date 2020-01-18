@@ -12,7 +12,8 @@ import {
   selectProofUrlFromChallengeTemplate,
   selectNameFromChallengeTemplate,
   selectCategoryFromChallengeTemplate,
-  selectProofFileTypeFromChallengeTemplate
+  selectProofFileTypeFromChallengeTemplate,
+  selectPosterUrlFromChallengeTemplate
 } from "../../redux/firestore/challenges-templates/selectors";
 
 import {
@@ -45,9 +46,20 @@ const InstanceItem = ({ challengeInstanceData }) => {
     []
   );
 
+  const memoizedSelectPosterUrlFromChallengeTemplate = useMemo(
+    () => selectPosterUrlFromChallengeTemplate,
+    []
+  );
+
   const proofUrlFromChallengeTemplate = useSelector(
     state =>
       memoizedSelectProofUrlFromChallengeTemplate(state, challengeTemplateId),
+    shallowEqual
+  );
+
+  const posterUrlFromChallengeTemplate = useSelector(
+    state =>
+      memoizedSelectPosterUrlFromChallengeTemplate(state, challengeTemplateId),
     shallowEqual
   );
 
@@ -111,10 +123,12 @@ const InstanceItem = ({ challengeInstanceData }) => {
   const {
     status,
     proof: { url },
-    expiresAt
+    expiresAt,
+    poster
   } = userInstanceData;
 
   const proofUrl = url !== "" ? url : proofUrlFromChallengeTemplate;
+  const posterUrl = poster !== "" ? poster : posterUrlFromChallengeTemplate;
 
   const handleOnClick = useCallback(
     () => push(`/instance/${challengeInstanceId}`),
@@ -129,6 +143,7 @@ const InstanceItem = ({ challengeInstanceData }) => {
           controls
           controlsList="nodownload"
           preload="none"
+          poster={posterUrl}
         />
       ) : (
         <InstanceItemImageContianer src={proofUrl} alt="instance proof image" />

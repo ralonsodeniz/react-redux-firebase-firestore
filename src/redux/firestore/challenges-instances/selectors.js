@@ -95,6 +95,7 @@ export const selectInfoForRankingFromAllInstancesFromTemplateId = createSelector
                 accumulator.push({
                   id: contender.id,
                   proofUrl: contender.proof.url,
+                  poster: contender.poster,
                   likes: contender.rating.likes,
                   dislikes: contender.rating.dislikes,
                   dateUploaded: contender.proof.dateUploaded,

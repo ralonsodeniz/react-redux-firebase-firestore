@@ -76,6 +76,11 @@ export const selectProofUrlFromChallengeTemplate = createSelector(
   challengeTemplate => (challengeTemplate ? challengeTemplate.proofUrl : "")
 );
 
+export const selectPosterUrlFromChallengeTemplate = createSelector(
+  [selectChallengeTemplateFromId],
+  challengeTemplate => (challengeTemplate ? challengeTemplate.posterUrl : "")
+);
+
 export const selectNameFromChallengeTemplate = createSelector(
   [selectChallengeTemplateFromId],
   challengeTemplate => (challengeTemplate ? challengeTemplate.name : "")

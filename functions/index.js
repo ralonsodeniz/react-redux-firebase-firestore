@@ -121,6 +121,7 @@ exports.uploadFile = functions
 
     const tmpFilePath = path.join(os.tmpdir(), fileName);
     const newTmpFilePath = path.join(os.tmpdir(), "converted@" + fileName);
+    let posterTmpFilePath = "";
 
     const inputFilePath = directory + "/" + fileName;
     const sharpFileName = path.basename(newTmpFilePath);
@@ -133,13 +134,13 @@ exports.uploadFile = functions
     if (oldFileName !== "") {
       const oldFileNamePath = `${directory}/${oldFileName}`;
       await bucket.file(oldFileNamePath).delete();
-      if (fileMetadata[0].contentType.includes("video")) {
-        const oldPosterPath = `${directory}/${oldFileName.replace(
-          "converted@",
-          "poster@"
-        ) + ".webp"}`;
-        await bucket.file(oldPosterPath).delete();
-      }
+      // if (fileMetadata[0].contentType.includes("video")) {
+      //   const oldPosterPath = `${directory}/${oldFileName.replace(
+      //     "converted@",
+      //     "poster@"
+      //   ) + ".webp"}`;
+      //   await bucket.file(oldPosterPath).delete();
+      // }
     }
 
     await bucket.file(inputFilePath).download({
@@ -154,14 +155,14 @@ exports.uploadFile = functions
         }
       };
 
-      const posterTmpFilePath = path.join(
-        os.tmpdir(),
-        "poster@" + fileName + ".webp"
-      );
-      const posterFilePath = path.join(
-        directory,
-        "poster@" + fileName + ".webp"
-      );
+      // posterTmpFilePath = path.join(
+      //   os.tmpdir(),
+      //   "poster@" + fileName + ".webp"
+      // );
+      // const posterFilePath = path.join(
+      //   directory,
+      //   "poster@" + fileName + ".webp"
+      // );
 
       const command = ffmpeg(tmpFilePath)
         .setFfmpegPath(ffmpeg_static)
@@ -173,39 +174,39 @@ exports.uploadFile = functions
         .size("426x240")
         .videoBitrate(512)
         .audioBitrate(64)
-        .fps(30)
+        .fps(29.7)
         .format("mp4")
-        .screenshots({
-          count: 1,
-          folder: os.tmpdir(),
-          filename: "poster@" + fileName + ".webp",
-          size: "?x240"
-        })
+        // .screenshots({
+        //    timestamps: [0],
+        //    folder: os.tmpdir(),
+        //   filename: "poster@" + fileName + ".webp"
+        //    // size: "426x240"
+        //  })
         .output(newTmpFilePath);
 
       await promisifyCommand(command);
 
-      await bucket.upload(posterTmpFilePath, {
-        resumable: false,
-        gzip: true,
-        destination: posterFilePath,
-        metadata: {
-          contentType: "image/webp",
-          metadata: {
-            firebaseStorageDownloadTokens: uuid
-          }
-        }
-      });
+      // await bucket.upload(posterTmpFilePath, {
+      //   resumable: false,
+      //   gzip: true,
+      //   destination: posterFilePath,
+      //   metadata: {
+      //     contentType: "image/webp",
+      //     metadata: {
+      //       firebaseStorageDownloadTokens: uuid
+      //     }
+      //   }
+      // });
 
-      const posterFile = bucket.file(posterFilePath);
+      // const posterFile = bucket.file(posterFilePath);
 
-      posterUrl =
-        "https://firebasestorage.googleapis.com/v0/b/" +
-        bucket.name +
-        "/o/" +
-        encodeURIComponent(posterFile.name) +
-        "?alt=media&token=" +
-        uuid;
+      // posterUrl =
+      //   "https://firebasestorage.googleapis.com/v0/b/" +
+      //   bucket.name +
+      //   "/o/" +
+      //   encodeURIComponent(posterFile.name) +
+      //   "?alt=media&token=" +
+      //   uuid;
     } else if (fileMetadata[0].contentType.includes("image")) {
       const imageWidth = fileName.includes("avatar") ? 200 : 1500;
       const imageHeight = fileName.includes("avatar") ? 200 : 1500;
@@ -233,16 +234,6 @@ exports.uploadFile = functions
       metadata: convertedFileMetadata
     });
 
-    await fs.unlink(tmpFilePath, err => {
-      if (err) throw new Error(err.message);
-      console.log("original file deleted");
-    });
-
-    await fs.unlink(newTmpFilePath, err => {
-      if (err) throw new Error(err.message);
-      console.log("converted file deleted");
-    });
-
     await bucket.file(inputFilePath).delete();
 
     const convertedFile = bucket.file(sharpFilePath);
@@ -255,7 +246,14 @@ exports.uploadFile = functions
       "?alt=media&token=" +
       uuid;
 
-    return { convertedUrl, posterUrl };
+    fs.unlinkSync(tmpFilePath);
+    fs.unlinkSync(newTmpFilePath);
+    // if (fileMetadata[0].contentType.includes("video") && oldFileName !== "") {
+    //   fs.unlinkSync(posterTmpFilePath);
+    // }
+
+    console.log("conversion finished");
+    return Promise.resolve({ convertedUrl, posterUrl });
   });
 
 // exports.generateMonoAudio = functions.storage

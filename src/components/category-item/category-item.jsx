@@ -23,6 +23,7 @@ const CategoryItem = ({ challengeTemplateId, challengeTemplateData }) => {
     timesCompleted,
     rating,
     proofUrl,
+    posterUrl,
     category,
     proofFileType
   } = challengeTemplateData;
@@ -47,6 +48,7 @@ const CategoryItem = ({ challengeTemplateId, challengeTemplateData }) => {
           controls
           controlsList="nodownload"
           preload="none"
+          poster={posterUrl}
         />
       ) : (
         <CategoryItemImageContainer src={proofUrl} alt="proof image" />

@@ -138,14 +138,15 @@ export const uploadFileToStorage = (
       },
       complete: async () => {
         // await documentFile.getDownloadURL().then(url => urlAction(url));
-        const { data:{convertedUrl, posterUrl} } = await cloudUploadFile({
+        const {
+          data: { convertedUrl, posterUrl }
+        } = await cloudUploadFile({
           directory,
           fileName,
           oldFileName
         });
         // console.log("cloudUrl",data)
-        urlAction(convertedUrl);
-        console.log("posterUrl", posterUrl)
+        urlAction(convertedUrl, posterUrl);
         // const fbId = "react-redux-firebase-fir-2fc76.appspot.com";
         // const url =
         //   "https://firebasestorage.googleapis.com/v0/b/" +
@@ -243,6 +244,7 @@ export const addNewChallengeInstanceInFs = async (
           reported: false
         }
       },
+      poster: "",
       rating: {
         likes: 0,
         usersThatLiked: [],
@@ -433,7 +435,12 @@ export const cancelInstanceInFs = async (userProfileId, instanceId) => {
   }
 };
 
-export const updateProofInFs = async (userProfileId, instanceId, url) => {
+export const updateProofInFs = async (
+  userProfileId,
+  instanceId,
+  url,
+  posterUrl
+) => {
   try {
     const challengeInstanceRef = firestore.doc(
       `challengesInstances/${instanceId}`
@@ -453,7 +460,8 @@ export const updateProofInFs = async (userProfileId, instanceId, url) => {
               id: "",
               reported: false
             }
-          }
+          },
+          poster: posterUrl
         };
       } else {
         return contender;
@@ -466,6 +474,34 @@ export const updateProofInFs = async (userProfileId, instanceId, url) => {
     console.log("Error while updating challenge instance proof", error);
     throw new Error(
       "Ooops something happened while updating challenge instance proof"
+    );
+  }
+};
+
+export const updatePosterInFs = async (userProfileId, instanceId, url) => {
+  try {
+    const challengeInstanceRef = firestore.doc(
+      `challengesInstances/${instanceId}`
+    );
+    const challengeInstanceSnapshot = await challengeInstanceRef.get();
+    const contenders = challengeInstanceSnapshot.data().contenders;
+    const updatedContenders = contenders.map(contender => {
+      if (contender.id === userProfileId) {
+        return {
+          ...contender,
+          poster: url
+        };
+      } else {
+        return contender;
+      }
+    });
+    await challengeInstanceRef.update({
+      contenders: updatedContenders
+    });
+  } catch (error) {
+    console.log("Error while updating challenge instance poster", error);
+    throw new Error(
+      "Ooops something happened while updating challenge instance poster"
     );
   }
 };

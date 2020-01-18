@@ -93,6 +93,7 @@ const TemplateProofsRanking = ({
                 controls
                 controlsList="nodownload"
                 preload="none"
+                poster={contender.poster}
               />
             ) : (
               <TemplateProofsRankingImageContainer>

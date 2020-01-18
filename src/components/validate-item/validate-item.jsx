@@ -5,6 +5,7 @@ import { useHistory } from "react-router-dom";
 
 import {
   selectProofUrlFromChallengeTemplate,
+  selectPosterUrlFromChallengeTemplate,
   selectNameFromChallengeTemplate,
   selectProofFileTypeFromChallengeTemplate
 } from "../../redux/firestore/challenges-templates/selectors";
@@ -50,9 +51,20 @@ const ValidateItem = ({ challengeInstanceData }) => {
     []
   );
 
-  const proofUrlFromChallengeTemplayte = useSelector(
+  const memoizedSelectPosterUrlFromChallengeTemplate = useMemo(
+    () => selectPosterUrlFromChallengeTemplate,
+    []
+  );
+
+  const proofUrlFromChallengeTemplate = useSelector(
     state =>
       memoizedSelectProofUrlFromChallengeTemplate(state, challengeTemplateId),
+    shallowEqual
+  );
+
+  const posterUrlFromChallengeTemplate = useSelector(
+    state =>
+      memoizedSelectPosterUrlFromChallengeTemplate(state, challengeTemplateId),
     shallowEqual
   );
 
@@ -110,14 +122,15 @@ const ValidateItem = ({ challengeInstanceData }) => {
     <ValidateItemContainer>
       {proofFileType === "video" ? (
         <ValidateItemVideoPlayer
-          src={proofUrlFromChallengeTemplayte}
+          src={proofUrlFromChallengeTemplate}
           controls
           controlsList="nodownload"
           preload="none"
+          poster={posterUrlFromChallengeTemplate}
         />
       ) : (
         <ValidateItemImageContainer
-          src={proofUrlFromChallengeTemplayte}
+          src={proofUrlFromChallengeTemplate}
           alt="proof image"
         />
       )}

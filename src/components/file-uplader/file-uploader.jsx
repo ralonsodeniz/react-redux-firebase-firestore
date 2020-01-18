@@ -160,27 +160,22 @@ const FileUploader = ({
         </CircularProgressContainer>
       ) : (
         <UpdateFileContainer>
-          {!file ? (
-            <UpdateFileContainer>
-              <InputFileContainer
-                type="file"
-                id="file"
-                name="file"
-                onChange={handleFileChange}
-                disabled={disabled}
-              />
-              <LabelFileContainer htmlFor="file">
-                {labelText}
-              </LabelFileContainer>
-            </UpdateFileContainer>
-          ) : (
-            <CustomButton
-              type="button"
-              text={submitText}
-              onClick={handleFileUpload}
-              disabled={disabled || !file}
-            />
-          )}
+          <InputFileContainer
+            type="file"
+            id="file"
+            name="file"
+            onChange={handleFileChange}
+            disabled={disabled}
+          />
+          <LabelFileContainer htmlFor="file">
+            {file ? file.name : labelText}
+          </LabelFileContainer>
+          <CustomButton
+            type="button"
+            text={submitText}
+            onClick={handleFileUpload}
+            disabled={disabled || !file}
+          />
         </UpdateFileContainer>
       )}
     </UploadFileContainer>

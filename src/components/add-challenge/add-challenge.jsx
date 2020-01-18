@@ -91,12 +91,13 @@ const AddChallenge = ({ urlCategory }) => {
       formChallengeData,
       userProfileId,
       urlCategory
-    ) => proofFileType => url => {
+    ) => proofFileType => (url,posterUrl) => {
       const challengeData = {
         ...formChallengeData,
         author: userProfileId,
         category: urlCategory,
         proofUrl: url,
+        posterUrl,
         proofFileType
       };
       dispatch(addNewChallengeStarts(challengeData));

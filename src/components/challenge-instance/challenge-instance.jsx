@@ -131,6 +131,7 @@ const ChallengeInstance = () => {
     rating,
     timesCompleted,
     proofUrl,
+    posterUrl,
     category,
     proofFileType
   } = challengeTemplate;
@@ -243,11 +244,15 @@ const ChallengeInstance = () => {
   );
 
   const handleUploadProof = useCallback(
-    (dispatch, instanceId, userProfileId) => proofFileType => url => {
+    (dispatch, instanceId, userProfileId) => proofFileType => (
+      url,
+      posterUrl
+    ) => {
       const proofData = {
         instanceId,
         userProfileId,
-        url
+        url,
+        posterUrl
       };
       dispatch(uploadProofStarts(proofData));
     },
@@ -312,6 +317,7 @@ const ChallengeInstance = () => {
           controls
           controlsList="nodownload"
           preload="none"
+          poster={posterUrl}
         />
       ) : (
         <ChallengeInstanceImageContainer>
