@@ -192,7 +192,7 @@ const ChallengeTemplate = () => {
         dispatch(openModal(openModalImageData));
       }
     },
-    [dispatch, proofFileType]
+    [dispatch, proofFileType,posterUrl]
   );
 
   const handleAddLikeToProof = useCallback(

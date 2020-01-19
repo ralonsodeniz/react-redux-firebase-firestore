@@ -121,11 +121,15 @@ exports.uploadFile = functions
 
     const tmpFilePath = path.join(os.tmpdir(), fileName);
     const newTmpFilePath = path.join(os.tmpdir(), "converted@" + fileName);
-    let posterTmpFilePath = "";
+    let posterTmpFilePath = path.join(
+      os.tmpdir(),
+      "poster@" + fileName + ".webp"
+    );
 
     const inputFilePath = directory + "/" + fileName;
     const sharpFileName = path.basename(newTmpFilePath);
     const sharpFilePath = path.join(directory, sharpFileName);
+    const posterFilePath = path.join(directory, "poster@" + fileName + ".webp");
     const fileMetadata = await bucket.file(inputFilePath).getMetadata();
 
     let convertedFileMetadata = {};
@@ -134,13 +138,13 @@ exports.uploadFile = functions
     if (oldFileName !== "") {
       const oldFileNamePath = `${directory}/${oldFileName}`;
       await bucket.file(oldFileNamePath).delete();
-      // if (fileMetadata[0].contentType.includes("video")) {
-      //   const oldPosterPath = `${directory}/${oldFileName.replace(
-      //     "converted@",
-      //     "poster@"
-      //   ) + ".webp"}`;
-      //   await bucket.file(oldPosterPath).delete();
-      // }
+      if (fileMetadata[0].contentType.includes("video")) {
+        const oldPosterPath = `${directory}/${oldFileName.replace(
+          "converted@",
+          "poster@"
+        ) + ".webp"}`;
+        await bucket.file(oldPosterPath).delete();
+      }
     }
 
     await bucket.file(inputFilePath).download({
@@ -155,58 +159,51 @@ exports.uploadFile = functions
         }
       };
 
-      // posterTmpFilePath = path.join(
-      //   os.tmpdir(),
-      //   "poster@" + fileName + ".webp"
-      // );
-      // const posterFilePath = path.join(
-      //   directory,
-      //   "poster@" + fileName + ".webp"
-      // );
-
-      const command = ffmpeg(tmpFilePath)
+      const videoCommand = ffmpeg(tmpFilePath)
         .setFfmpegPath(ffmpeg_static)
+        .size("?x240")
         .audioChannels(1)
         .audioFrequency(16000)
         .videoCodec("libx264")
-        //.noAudio()
         .audioCodec("libmp3lame")
-        .size("426x240")
         .videoBitrate(512)
         .audioBitrate(64)
         .fps(29.7)
         .format("mp4")
-        // .screenshots({
-        //    timestamps: [0],
-        //    folder: os.tmpdir(),
-        //   filename: "poster@" + fileName + ".webp"
-        //    // size: "426x240"
-        //  })
         .output(newTmpFilePath);
 
-      await promisifyCommand(command);
+      await promisifyCommand(videoCommand);
 
-      // await bucket.upload(posterTmpFilePath, {
-      //   resumable: false,
-      //   gzip: true,
-      //   destination: posterFilePath,
-      //   metadata: {
-      //     contentType: "image/webp",
-      //     metadata: {
-      //       firebaseStorageDownloadTokens: uuid
-      //     }
-      //   }
-      // });
+      const posterCommand = ffmpeg(tmpFilePath)
+        .setFfmpegPath(ffmpeg_static)
+        .seekInput(0)
+        .size("?x240")
+        .frames(1)
+        .output(posterTmpFilePath);
 
-      // const posterFile = bucket.file(posterFilePath);
+      await promisifyCommand(posterCommand);
 
-      // posterUrl =
-      //   "https://firebasestorage.googleapis.com/v0/b/" +
-      //   bucket.name +
-      //   "/o/" +
-      //   encodeURIComponent(posterFile.name) +
-      //   "?alt=media&token=" +
-      //   uuid;
+      await bucket.upload(posterTmpFilePath, {
+        resumable: false,
+        gzip: true,
+        destination: posterFilePath,
+        metadata: {
+          contentType: "image/webp",
+          metadata: {
+            firebaseStorageDownloadTokens: uuid
+          }
+        }
+      });
+
+      const posterFile = bucket.file(posterFilePath);
+
+      posterUrl =
+        "https://firebasestorage.googleapis.com/v0/b/" +
+        bucket.name +
+        "/o/" +
+        encodeURIComponent(posterFile.name) +
+        "?alt=media&token=" +
+        uuid;
     } else if (fileMetadata[0].contentType.includes("image")) {
       const imageWidth = fileName.includes("avatar") ? 200 : 1500;
       const imageHeight = fileName.includes("avatar") ? 200 : 1500;
@@ -248,11 +245,10 @@ exports.uploadFile = functions
 
     fs.unlinkSync(tmpFilePath);
     fs.unlinkSync(newTmpFilePath);
-    // if (fileMetadata[0].contentType.includes("video") && oldFileName !== "") {
-    //   fs.unlinkSync(posterTmpFilePath);
-    // }
+    if (fileMetadata[0].contentType.includes("video")) {
+      fs.unlinkSync(posterTmpFilePath);
+    }
 
-    console.log("conversion finished");
     return Promise.resolve({ convertedUrl, posterUrl });
   });
 
