@@ -138,6 +138,7 @@ export const uploadFileToStorage = (
       },
       complete: async () => {
         // await documentFile.getDownloadURL().then(url => urlAction(url));
+        unsubscribe();
         const {
           data: { convertedUrl, posterUrl }
         } = await cloudUploadFile({
@@ -159,10 +160,12 @@ export const uploadFileToStorage = (
         if (additionalAction) additionalAction();
         setLoading(false);
         setFile(null);
-        unsubscribe();
       }
     });
   } catch (error) {
+    urlAction("", "");
+    setLoading(false);
+    setFile(null);
     console.log("Error while uploading your file", error);
     throw new Error("Ooops error while uploading your file");
   }
@@ -173,6 +176,7 @@ export const updateAvatarInFS = async url => {
   try {
     const userRef = firestore.doc(`users/${userId}`);
     await userRef.update({ photoURL: url });
+    if (url === "") throw new Error("error while uploading avatar");
   } catch (error) {
     console.log("error updating avatar url", error);
     throw new Error("Ooops something happened while updating your avatar");
@@ -470,6 +474,7 @@ export const updateProofInFs = async (
     await challengeInstanceRef.update({
       contenders: updatedContenders
     });
+    if (url === "") throw new Error("error while uploading proof");
   } catch (error) {
     console.log("Error while updating challenge instance proof", error);
     throw new Error(

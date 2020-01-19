@@ -127,129 +127,152 @@ exports.uploadFile = functions
     );
 
     const inputFilePath = directory + "/" + fileName;
-    const sharpFileName = path.basename(newTmpFilePath);
-    const sharpFilePath = path.join(directory, sharpFileName);
-    const posterFilePath = path.join(directory, "poster@" + fileName + ".webp");
+    const convertedFileName = path.basename(newTmpFilePath);
+    const convertedFilePath = path.join(directory, convertedFileName);
+    const posterFileName = "poster@" + fileName + ".webp";
+    const posterFilePath = path.join(directory, posterFileName);
     const fileMetadata = await bucket.file(inputFilePath).getMetadata();
 
     let convertedFileMetadata = {};
     let posterUrl = "";
+    let convertedUrl = "";
 
-    if (oldFileName !== "") {
-      const oldFileNamePath = `${directory}/${oldFileName}`;
-      await bucket.file(oldFileNamePath).delete();
-      if (fileMetadata[0].contentType.includes("video")) {
-        const oldPosterPath = `${directory}/${oldFileName.replace(
-          "converted@",
-          "poster@"
-        ) + ".webp"}`;
-        await bucket.file(oldPosterPath).delete();
-      }
-    }
-
-    await bucket.file(inputFilePath).download({
-      destination: tmpFilePath
-    });
-
-    if (fileMetadata[0].contentType.includes("video")) {
-      convertedFileMetadata = {
-        contentType: "video/mp4",
-        metadata: {
-          firebaseStorageDownloadTokens: uuid
+    try {
+      if (oldFileName !== "") {
+        const oldFileNamePath = `${directory}/${oldFileName}`;
+        await bucket.file(oldFileNamePath).delete();
+        if (fileMetadata[0].contentType.includes("video")) {
+          const oldPosterPath = `${directory}/${oldFileName.replace(
+            "converted@",
+            "poster@"
+          ) + ".webp"}`;
+          await bucket.file(oldPosterPath).delete();
         }
-      };
+      }
 
-      const videoCommand = ffmpeg(tmpFilePath)
-        .setFfmpegPath(ffmpeg_static)
-        .size("?x240")
-        .audioChannels(1)
-        .audioFrequency(16000)
-        .videoCodec("libx264")
-        .audioCodec("libmp3lame")
-        .videoBitrate(512)
-        .audioBitrate(64)
-        .fps(29.7)
-        .format("mp4")
-        .output(newTmpFilePath);
+      await bucket.file(inputFilePath).download({
+        destination: tmpFilePath
+      });
 
-      await promisifyCommand(videoCommand);
+      if (fileMetadata[0].contentType.includes("video")) {
+        convertedFileMetadata = {
+          contentType: "video/mp4",
+          metadata: {
+            firebaseStorageDownloadTokens: uuid
+          }
+        };
 
-      const posterCommand = ffmpeg(tmpFilePath)
-        .setFfmpegPath(ffmpeg_static)
-        .seekInput(0)
-        .size("?x240")
-        .frames(1)
-        .output(posterTmpFilePath);
+        const videoCommand = ffmpeg(tmpFilePath)
+          .setFfmpegPath(ffmpeg_static)
+          .size("?x240")
+          .audioChannels(1)
+          .audioFrequency(16000)
+          .videoCodec("libx264")
+          .audioCodec("libmp3lame")
+          .videoBitrate(512)
+          .audioBitrate(64)
+          .fps(29.7)
+          .format("mp4")
+          .output(newTmpFilePath);
 
-      await promisifyCommand(posterCommand);
+        await promisifyCommand(videoCommand);
 
-      await bucket.upload(posterTmpFilePath, {
-        resumable: false,
-        gzip: true,
-        destination: posterFilePath,
-        metadata: {
+        try {
+          const posterCommand = ffmpeg(tmpFilePath)
+            .setFfmpegPath(ffmpeg_static)
+            .seekInput(0)
+            .size("?x240")
+            .frames(1)
+            .output(posterTmpFilePath);
+
+          await promisifyCommand(posterCommand);
+        } catch (error) {
+          fs.unlinkSync(newTmpFilePath);
+          throw new Error(error.message);
+        }
+
+        try {
+          await bucket.upload(posterTmpFilePath, {
+            resumable: false,
+            gzip: true,
+            destination: posterFilePath,
+            metadata: {
+              contentType: "image/webp",
+              metadata: {
+                firebaseStorageDownloadTokens: uuid
+              }
+            }
+          });
+
+          posterUrl =
+            "https://firebasestorage.googleapis.com/v0/b/" +
+            bucket.name +
+            "/o/" +
+            encodeURIComponent(posterFilePath) +
+            "?alt=media&token=" +
+            uuid;
+        } catch (error) {
+          fs.unlinkSync(posterTmpFilePath);
+          throw new Error(error.message);
+        }
+      } else if (fileMetadata[0].contentType.includes("image")) {
+        const imageWidth = fileName.includes("avatar") ? 200 : 1500;
+        const imageHeight = fileName.includes("avatar") ? 200 : 1500;
+        convertedFileMetadata = {
           contentType: "image/webp",
           metadata: {
             firebaseStorageDownloadTokens: uuid
           }
+        };
+
+        await sharp(tmpFilePath)
+          .webp()
+          .resize({
+            width: imageWidth,
+            height: imageHeight,
+            fit: "inside"
+          })
+          .toFile(newTmpFilePath);
+      }
+
+      try {
+        await bucket.upload(newTmpFilePath, {
+          resumable: false,
+          gzip: true,
+          destination: convertedFilePath,
+          metadata: convertedFileMetadata
+        });
+
+        convertedUrl =
+          "https://firebasestorage.googleapis.com/v0/b/" +
+          bucket.name +
+          "/o/" +
+          encodeURIComponent(convertedFilePath) +
+          "?alt=media&token=" +
+          uuid;
+      } catch (error) {
+        if (fileMetadata[0].contentType.includes("video")) {
+          await bucket.file(posterFilePath).delete();
+          fs.unlinkSync(posterTmpFilePath);
         }
-      });
+        fs.unlinkSync(newTmpFilePath);
+        throw new Error(error.message);
+      }
 
-      const posterFile = bucket.file(posterFilePath);
+      await bucket.file(inputFilePath).delete();
 
-      posterUrl =
-        "https://firebasestorage.googleapis.com/v0/b/" +
-        bucket.name +
-        "/o/" +
-        encodeURIComponent(posterFile.name) +
-        "?alt=media&token=" +
-        uuid;
-    } else if (fileMetadata[0].contentType.includes("image")) {
-      const imageWidth = fileName.includes("avatar") ? 200 : 1500;
-      const imageHeight = fileName.includes("avatar") ? 200 : 1500;
-      convertedFileMetadata = {
-        contentType: "image/webp",
-        metadata: {
-          firebaseStorageDownloadTokens: uuid
-        }
-      };
+      fs.unlinkSync(tmpFilePath);
+      fs.unlinkSync(newTmpFilePath);
+      if (fileMetadata[0].contentType.includes("video")) {
+        fs.unlinkSync(posterTmpFilePath);
+      }
 
-      await sharp(tmpFilePath)
-        .webp()
-        .resize({
-          width: imageWidth,
-          height: imageHeight,
-          fit: "inside"
-        })
-        .toFile(newTmpFilePath);
+      return Promise.resolve({ convertedUrl, posterUrl });
+    } catch (error) {
+      await bucket.file(inputFilePath).delete();
+      fs.unlinkSync(tmpFilePath);
+      return Promise.resolve({ convertedUrl: "", posterUrl: "" });
     }
-
-    await bucket.upload(newTmpFilePath, {
-      resumable: false,
-      gzip: true,
-      destination: sharpFilePath,
-      metadata: convertedFileMetadata
-    });
-
-    await bucket.file(inputFilePath).delete();
-
-    const convertedFile = bucket.file(sharpFilePath);
-
-    const convertedUrl =
-      "https://firebasestorage.googleapis.com/v0/b/" +
-      bucket.name +
-      "/o/" +
-      encodeURIComponent(convertedFile.name) +
-      "?alt=media&token=" +
-      uuid;
-
-    fs.unlinkSync(tmpFilePath);
-    fs.unlinkSync(newTmpFilePath);
-    if (fileMetadata[0].contentType.includes("video")) {
-      fs.unlinkSync(posterTmpFilePath);
-    }
-
-    return Promise.resolve({ convertedUrl, posterUrl });
   });
 
 // exports.generateMonoAudio = functions.storage
