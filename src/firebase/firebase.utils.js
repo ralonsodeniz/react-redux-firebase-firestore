@@ -265,7 +265,9 @@ export const addNewChallengeInstanceInFs = async (
       ...defaultContenderProps
     }));
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + parseInt(daysToComplete));
+    // expiresAt.setDate(expiresAt.getDate() + parseInt(daysToComplete));
+    // this adds miliseconds instead of days
+    expiresAt.setTime(expiresAt.getTime() + 1000 * 30);
     enhancedContenders.push({
       id: userProfileId,
       status: "Accepted",

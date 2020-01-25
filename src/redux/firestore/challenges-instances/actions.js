@@ -29,7 +29,7 @@ export const acceptInstanceStarts = (
 });
 
 export const cancelInstanceStarts = (userProfileId, instanceId) => ({
-  type: INSTANCES.CANCEL_INSTANCE_START,
+  type: INSTANCES.CANCEL_INSTANCE_STARTS,
   payload: {
     userProfileId,
     instanceId

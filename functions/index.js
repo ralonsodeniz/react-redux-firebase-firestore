@@ -5,6 +5,7 @@ const path = require("path");
 const fs = require("fs");
 // const spawn = require("child-process-promise").spawn;
 const { Storage } = require("@google-cloud/storage");
+const { CloudTasksClient } = require("@google-cloud/tasks");
 const uuidv4 = require("uuid/v4");
 const sharp = require("sharp");
 const ffmpeg = require("fluent-ffmpeg");
@@ -275,63 +276,88 @@ exports.uploadFile = functions
     }
   });
 
-// exports.generateMonoAudio = functions.storage
-//   .object()
-//   .onFinalize(async object => {
-//     const fileBucket = object.bucket; // The Storage bucket that contains the file.
-//     const filePath = object.name; // File path in the bucket.
-//     const contentType = object.contentType; // File content type.
+exports.onCreateInstance = functions.firestore
+  .document("challengesInstances/{instance}")
+  .onCreate(async (snapshot, context) => {
+    // first we get the expiring date
+    const snapshotData = snapshot.data();
+    const { administrator, contenders } = snapshotData;
+    const administratorContender = contenders.find(
+      contender => contender.id === administrator
+    );
+    const { expiresAt } = administratorContender;
+    // we need the expiration expressed in epoch seconds, js internally stores dates as epoch ms so we / 1000
+    const expiresAtInSeconds = expiresAt.toDate().getTime() / 1000;
+    console.log("expiresAtInSeconds", expiresAtInSeconds);
 
-//     // Exit if this is triggered on a file that is not an audio.
-//     if (!contentType.startsWith("video/")) {
-//       console.log("This is not a video.");
-//       return null;
-//     }
+    // now we config the task queue
+    const project = "react-redux-firebase-fir-2fc76";
+    const functionLocation = "us-central1";
+    const taskLocation = "europe-west1";
+    const queue = "cancelifexpired";
+    // we create the new instance of the task
+    const taskClient = new CloudTasksClient();
+    const queuePath = taskClient.queuePath(project, taskLocation, queue);
+    // we need the url of the callback function to execute when the task is triggered
+    const url = `https://${functionLocation}-${project}.cloudfunctions.net/cancelIfExpired`;
+    // we generate the payload we are sending to the callback function
+    const instancePath = snapshot.ref.path;
+    const userId = administrator;
+    const payload = { instancePath, userId };
+    // we build up the configuration for the cloud task
+    const task = {
+      httpRequest: {
+        httpMethod: "POST",
+        url,
+        body: Buffer.from(JSON.stringify(payload)).toString("base64"),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      },
+      scheduleTime: {
+        seconds: expiresAtInSeconds
+      }
+    };
+    // we enqueue the task in the queue I created earlier
+    // we get the task id from the response that returns the createtask, inside the name property
+    const [response] = await taskClient.createTask({ parent: queuePath, task });
+    const expirationTask = response.name;
 
-//     // Get the file name.
-//     const fileName = path.basename(filePath);
-//     // Exit if the audio is already converted.
-//     if (fileName.endsWith("_output.mp4")) {
-//       console.log("Already a converted video.");
-//       return null;
-//     }
+    // we create the new contenders property to update it in the challenge instance
+    const newContenders = contenders.map(contender =>
+      contender.id === administrator
+        ? { ...contender, expirationTask }
+        : contender
+    );
+    await snapshot.ref.update({ contenders: newContenders });
+  });
 
-//     // Download file from bucket.
-//     const gcs = new Storage();
-//     const bucket = gcs.bucket(fileBucket);
-//     const tempFilePath = path.join(os.tmpdir(), fileName);
-//     // We add a '_output.flac' suffix to target audio file name. That's where we'll upload the converted audio.
-//     const targetTempFileName =
-//       fileName.replace(/\.[^/.]+$/, "") + "_output.mp4";
-//     const targetTempFilePath = path.join(os.tmpdir(), targetTempFileName);
-//     const targetStorageFilePath = path.join(
-//       path.dirname(filePath),
-//       targetTempFileName
-//     );
-
-//     await bucket.file(filePath).download({ destination: tempFilePath });
-//     console.log("Audio downloaded locally to", tempFilePath);
-//     // Convert the audio to mono channel using FFMPEG.
-
-//     let command = ffmpeg(tempFilePath)
-//       .setFfmpegPath(ffmpeg_static)
-//       .videoCodec("libx264")
-//       .noAudio()
-//       .size("320x240")
-//       .format("mp4")
-//       .output(targetTempFilePath);
-
-//     await promisifyCommand(command);
-//     console.log("Output audio created at", targetTempFilePath);
-//     // Uploading the audio.
-//     await bucket.upload(targetTempFilePath, {
-//       destination: targetStorageFilePath
-//     });
-//     console.log("Output audio uploaded to", targetStorageFilePath);
-
-//     // Once the audio has been uploaded delete the local file to free up disk space.
-//     fs.unlinkSync(tempFilePath);
-//     fs.unlinkSync(targetTempFilePath);
-
-//     return console.log("Temporary files removed.", targetTempFilePath);
-//   });
+exports.cancelIfExpired = functions.https.onRequest(async (req, res) => {
+  const payload = req.body;
+  const { instancePath, userId } = payload;
+  const firestore = admin.firestore();
+  try {
+    console.log("instancePath", instancePath);
+    console.log("userId", userId);
+    const userSnapshot = await firestore.doc(instancePath).get();
+    const userData = userSnapshot.data();
+    const { contenders } = userData;
+    const newContenders = contenders.map(contender =>
+      contender.id === userId && contender.status !== "Cancelled"
+        ? {
+            ...contender,
+            status: "Cancelled",
+            proof: {
+              ...contender.proof,
+              state: "Cancelled"
+            }
+          }
+        : contender
+    );
+    await firestore.doc(instancePath).update({ contenders: newContenders });
+    res.send(200);
+  } catch (error) {
+    console.log("Error", error);
+    res.status(500).send(error);
+  }
+});
