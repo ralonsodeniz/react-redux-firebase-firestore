@@ -267,7 +267,7 @@ export const addNewChallengeInstanceInFs = async (
     const expiresAt = new Date();
     // expiresAt.setDate(expiresAt.getDate() + parseInt(daysToComplete));
     // this adds miliseconds instead of days
-    expiresAt.setTime(expiresAt.getTime() + 1000 * 30);
+    expiresAt.setTime(expiresAt.getTime() + 1000 * 15);
     enhancedContenders.push({
       id: userProfileId,
       status: "Accepted",
@@ -385,7 +385,9 @@ export const acceptInstanceInFs = async (
     const challengeInstanceSnapshot = await challengeInstanceRef.get();
     const contenders = challengeInstanceSnapshot.data().contenders;
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + parseInt(daysToComplete));
+    // expiresAt.setDate(expiresAt.getDate() + parseInt(daysToComplete));
+    // this adds miliseconds instead of days
+    expiresAt.setTime(expiresAt.getTime() + 1000 * 15);
     const updatedContenders = contenders.map(contender => {
       if (contender.id === userProfileId) {
         return {
@@ -400,6 +402,7 @@ export const acceptInstanceInFs = async (
     await challengeInstanceRef.update({
       contenders: updatedContenders
     });
+    await cloudCreateTask({ instanceId, userId: userProfileId });
   } catch (error) {
     console.log("Error while accepting challenge instance", error);
     throw new Error(
@@ -433,6 +436,7 @@ export const cancelInstanceInFs = async (userProfileId, instanceId) => {
     await challengeInstanceRef.update({
       contenders: updatedContenders
     });
+    await cloudRemoveTask({ instanceId, userId: userProfileId });
   } catch (error) {
     console.log("Error while cancelling challenge instance", error);
     throw new Error(
@@ -600,6 +604,7 @@ export const validateProofInFs = async (
         }
       });
     }
+    await cloudRemoveTask({ instanceId, userId: userToValidateId });
   } catch (error) {
     console.log("Error while validating proof", error);
     throw new Error("Ooops something happened while validating proof");
@@ -1402,3 +1407,5 @@ export default firebase;
 
 // firebase https callable functions
 export const cloudUploadFile = functions.httpsCallable("uploadFile");
+export const cloudCreateTask = functions.httpsCallable("createTask");
+export const cloudRemoveTask = functions.httpsCallable("removeTask");
