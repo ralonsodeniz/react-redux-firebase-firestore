@@ -385,9 +385,9 @@ export const acceptInstanceInFs = async (
     const challengeInstanceSnapshot = await challengeInstanceRef.get();
     const contenders = challengeInstanceSnapshot.data().contenders;
     const expiresAt = new Date();
-    // expiresAt.setDate(expiresAt.getDate() + parseInt(daysToComplete));
+    expiresAt.setDate(expiresAt.getDate() + parseInt(daysToComplete));
     // this adds miliseconds instead of days
-    expiresAt.setTime(expiresAt.getTime() + 1000 * 60);
+    // expiresAt.setTime(expiresAt.getTime() + 1000 * 60);
     const updatedContenders = contenders.map(contender => {
       if (contender.id === userProfileId) {
         return {
