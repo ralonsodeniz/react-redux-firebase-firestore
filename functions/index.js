@@ -19,6 +19,17 @@ admin.initializeApp({
 const fbId = "react-redux-firebase-fir-2fc76";
 const gcs = new Storage();
 const firestore = admin.firestore();
+// now we config the task queue
+const project = "react-redux-firebase-fir-2fc76";
+const functionLocation = "us-central1";
+const taskLocation = "europe-west1";
+const queue = "cancelifexpired";
+// we create the new instance of the task
+const taskClient = new CloudTasksClient();
+const queuePath = taskClient.queuePath(project, taskLocation, queue);
+// we need the url of the callback function to execute when the task is triggered
+const url = `https://${functionLocation}-${project}.cloudfunctions.net/cancelIfExpired`;
+const serviceAccountEmail = `firebase-adminsdk-rbbm3@react-redux-firebase-fir-2fc76.iam.gserviceaccount.com`;
 
 const runtimeOpts = {
   timeoutSeconds: 540,
@@ -289,17 +300,6 @@ exports.onCreateInstance = functions.firestore
     const { expiresAt } = administratorContender;
     // we need the expiration expressed in epoch seconds, js internally stores dates as epoch ms so we / 1000
     const expiresAtInSeconds = expiresAt.toDate().getTime() / 1000;
-
-    // now we config the task queue
-    const project = "react-redux-firebase-fir-2fc76";
-    const functionLocation = "us-central1";
-    const taskLocation = "europe-west1";
-    const queue = "cancelifexpired";
-    // we create the new instance of the task
-    const taskClient = new CloudTasksClient();
-    const queuePath = taskClient.queuePath(project, taskLocation, queue);
-    // we need the url of the callback function to execute when the task is triggered
-    const url = `https://${functionLocation}-${project}.cloudfunctions.net/cancelIfExpired`;
     // we generate the payload we are sending to the callback function
     const instancePath = snapshot.ref.path;
     const userId = administrator;
@@ -309,6 +309,9 @@ exports.onCreateInstance = functions.firestore
       httpRequest: {
         httpMethod: "POST",
         url,
+        oidcToken: {
+          serviceAccountEmail
+        },
         body: Buffer.from(JSON.stringify(payload)).toString("base64"),
         headers: {
           "Content-Type": "application/json"
@@ -342,13 +345,6 @@ exports.createTask = functions.https.onCall(async (data, context) => {
   const { expiresAt } = userContender;
   const expiresAtInSeconds = expiresAt.toDate().getTime() / 1000;
 
-  const project = "react-redux-firebase-fir-2fc76";
-  const functionLocation = "us-central1";
-  const taskLocation = "europe-west1";
-  const queue = "cancelifexpired";
-  const taskClient = new CloudTasksClient();
-  const queuePath = taskClient.queuePath(project, taskLocation, queue);
-  const url = `https://${functionLocation}-${project}.cloudfunctions.net/cancelIfExpired`;
   const instancePath = `challengesInstances/${instanceId}`;
   const payload = { instancePath, userId };
 
@@ -356,6 +352,10 @@ exports.createTask = functions.https.onCall(async (data, context) => {
     httpRequest: {
       httpMethod: "POST",
       url,
+      // token to allow only auth users to trigger the cancelIfExpired function
+      oidcToken: {
+        serviceAccountEmail
+      },
       body: Buffer.from(JSON.stringify(payload)).toString("base64"),
       headers: {
         "Content-Type": "application/json"
@@ -408,19 +408,15 @@ exports.cancelIfExpired = functions.https.onRequest(async (req, res) => {
       newExpiresAt.setDate(newExpiresAt.getDate() + 1);
       const newExpiresAtInSeconds = newExpiresAt.getTime() / 1000;
 
-      const project = "react-redux-firebase-fir-2fc76";
-      const functionLocation = "us-central1";
-      const taskLocation = "europe-west1";
-      const queue = "cancelifexpired";
-      const taskClient = new CloudTasksClient();
-      const queuePath = taskClient.queuePath(project, taskLocation, queue);
-      const url = `https://${functionLocation}-${project}.cloudfunctions.net/cancelIfExpired`;
       const payload = { instancePath, userId };
 
       const task = {
         httpRequest: {
           httpMethod: "POST",
           url,
+          oidcToken: {
+            serviceAccountEmail
+          },
           body: Buffer.from(JSON.stringify(payload)).toString("base64"),
           headers: {
             "Content-Type": "application/json"
