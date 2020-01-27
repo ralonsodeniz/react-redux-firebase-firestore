@@ -265,9 +265,9 @@ export const addNewChallengeInstanceInFs = async (
       ...defaultContenderProps
     }));
     const expiresAt = new Date();
-    // expiresAt.setDate(expiresAt.getDate() + parseInt(daysToComplete));
+    expiresAt.setDate(expiresAt.getDate() + parseInt(daysToComplete));
     // this adds miliseconds instead of days
-    expiresAt.setTime(expiresAt.getTime() + 1000 * 15);
+    // expiresAt.setTime(expiresAt.getTime() + 1000 * 15);
     enhancedContenders.push({
       id: userProfileId,
       status: "Accepted",
@@ -387,7 +387,7 @@ export const acceptInstanceInFs = async (
     const expiresAt = new Date();
     // expiresAt.setDate(expiresAt.getDate() + parseInt(daysToComplete));
     // this adds miliseconds instead of days
-    expiresAt.setTime(expiresAt.getTime() + 1000 * 15);
+    expiresAt.setTime(expiresAt.getTime() + 1000 * 60);
     const updatedContenders = contenders.map(contender => {
       if (contender.id === userProfileId) {
         return {
@@ -436,7 +436,13 @@ export const cancelInstanceInFs = async (userProfileId, instanceId) => {
     await challengeInstanceRef.update({
       contenders: updatedContenders
     });
-    await cloudRemoveTask({ instanceId, userId: userProfileId });
+    const contender = contenders.find(
+      contender => contender.id === userProfileId
+    );
+    const { expirationTask } = contender;
+    if (expirationTask) {
+      await cloudRemoveTask({ instanceId, userId: userProfileId });
+    }
   } catch (error) {
     console.log("Error while cancelling challenge instance", error);
     throw new Error(

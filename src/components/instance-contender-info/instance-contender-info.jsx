@@ -199,10 +199,13 @@ const InstanceContenderInfo = ({
                     </InstanceContenderInfoTitle>
                     <InstanceContenderInfoText>
                       <InstanceContenderValidatorContainer>
-                        {contender.proof.validatedBy.name}
+                        {contender.proof.validatedBy.id === ""
+                          ? "Expired"
+                          : contender.proof.validatedBy.name}
                         {contender.id === userProfileId &&
                           !selfValidation &&
-                          !contender.proof.validatedBy.reported && (
+                          !contender.proof.validatedBy.reported &&
+                          contender.proof.validatedBy.id !== "" && (
                             <CustomButton
                               type="button"
                               text="Report validator"

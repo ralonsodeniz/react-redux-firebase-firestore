@@ -30,12 +30,6 @@ const UpdateUserData = () => {
         ...userData,
         [name]: value
       });
-      setUserData({
-        displayName: "",
-        age: "",
-        gender: "",
-        country: ""
-      });
     },
     [userData]
   );
