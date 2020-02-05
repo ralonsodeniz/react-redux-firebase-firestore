@@ -1402,8 +1402,9 @@ export const firestore = firebase.firestore();
 firebase.firestore();
 export const storage = firebase.storage();
 firebase.storage();
-export const functions = firebase.functions();
+export const functions = firebase.app().functions("europe-west1");
 firebase.functions();
+firebase.app().functions("europe-west1");
 
 // google auth config
 export const googleAuthProvider = new firebase.auth.GoogleAuthProvider();
