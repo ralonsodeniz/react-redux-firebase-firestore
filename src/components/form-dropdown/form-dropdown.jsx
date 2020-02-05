@@ -25,7 +25,10 @@ const FormDropdown = ({
       {...otherProps}
       size={size}
     >
-      <FormDropdownOption disabled value="default">
+      <FormDropdownOption
+        disabled
+        value={defaultValue ? defaultValue : "default"}
+      >
         {multiple
           ? `select one or more using ctrl / cmd`
           : `select your option`}
