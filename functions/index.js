@@ -21,7 +21,7 @@ const gcs = new Storage();
 const firestore = admin.firestore();
 // now we config the task queue
 const project = "react-redux-firebase-fir-2fc76";
-const functionLocation = "us-central1";
+const functionLocation = "europe-west1";
 const taskLocation = "europe-west1";
 const queue = "cancelifexpired";
 // we create the new instance of the task
@@ -126,6 +126,7 @@ const promisifyCommand = command => {
 // });
 
 exports.uploadFile = functions
+  .region("europe-west1")
   .runWith(runtimeOpts)
   .https.onCall(async (data, context) => {
     const { directory, fileName, oldFileName } = data;
@@ -288,8 +289,9 @@ exports.uploadFile = functions
     }
   });
 
-exports.onCreateInstance = functions.firestore
-  .document("challengesInstances/{instance}")
+exports.onCreateInstance = functions
+  .region("europe-west1")
+  .firestore.document("challengesInstances/{instance}")
   .onCreate(async (snapshot, context) => {
     // first we get the expiring date
     const snapshotData = snapshot.data();
@@ -335,131 +337,139 @@ exports.onCreateInstance = functions.firestore
     await snapshot.ref.update({ contenders: newContenders });
   });
 
-exports.createTask = functions.https.onCall(async (data, context) => {
-  const { instanceId, userId } = data;
-  const instanceRef = firestore.doc(`challengesInstances/${instanceId}`);
-  const instanceSnapshot = await instanceRef.get();
-  const instanceData = instanceSnapshot.data();
-  const { contenders } = instanceData;
-  const userContender = contenders.find(contender => contender.id === userId);
-  const { expiresAt } = userContender;
-  const expiresAtInSeconds = expiresAt.toDate().getTime() / 1000;
-
-  const instancePath = `challengesInstances/${instanceId}`;
-  const payload = { instancePath, userId };
-
-  const task = {
-    httpRequest: {
-      httpMethod: "POST",
-      url,
-      // token to allow only auth users to trigger the cancelIfExpired function
-      oidcToken: {
-        serviceAccountEmail
-      },
-      body: Buffer.from(JSON.stringify(payload)).toString("base64"),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    },
-    scheduleTime: {
-      seconds: expiresAtInSeconds
-    }
-  };
-
-  const [response] = await taskClient.createTask({ parent: queuePath, task });
-  const expirationTask = response.name;
-  const newContenders = contenders.map(contender =>
-    contender.id === userId ? { ...contender, expirationTask } : contender
-  );
-  await instanceRef.update({ contenders: newContenders });
-});
-
-exports.removeTask = functions.https.onCall(async (data, context) => {
-  const { instanceId, userId } = data;
-  const instanceRef = firestore.doc(`challengesInstances/${instanceId}`);
-  const instanceSnapshot = await instanceRef.get();
-  const instanceData = instanceSnapshot.data();
-  const { contenders } = instanceData;
-  const userContender = contenders.find(contender => contender.id === userId);
-  const { expirationTask } = userContender;
-  const newUserContender = userContender;
-  delete newUserContender["expirationTask"];
-  const newContenders = contenders.map(contender =>
-    contender.id === userId ? newUserContender : contender
-  );
-  const tasksClient = new CloudTasksClient();
-  await tasksClient.deleteTask({ name: expirationTask });
-  await instanceRef.update({
-    contenders: newContenders
-  });
-});
-
-exports.cancelIfExpired = functions.https.onRequest(async (req, res) => {
-  const payload = req.body;
-  const { instancePath, userId } = payload;
-  try {
-    const userSnapshot = await firestore.doc(instancePath).get();
-    const userData = userSnapshot.data();
-    const { contenders } = userData;
+exports.createTask = functions
+  .region("europe-west1")
+  .https.onCall(async (data, context) => {
+    const { instanceId, userId } = data;
+    const instanceRef = firestore.doc(`challengesInstances/${instanceId}`);
+    const instanceSnapshot = await instanceRef.get();
+    const instanceData = instanceSnapshot.data();
+    const { contenders } = instanceData;
     const userContender = contenders.find(contender => contender.id === userId);
-    let newUserContender = {};
-    if (userContender.proof.state === "Pending") {
-      const newExpiresAt = new Date();
-      newExpiresAt.setDate(newExpiresAt.getDate() + 1);
-      const newExpiresAtInSeconds = newExpiresAt.getTime() / 1000;
+    const { expiresAt } = userContender;
+    const expiresAtInSeconds = expiresAt.toDate().getTime() / 1000;
 
-      const payload = { instancePath, userId };
+    const instancePath = `challengesInstances/${instanceId}`;
+    const payload = { instancePath, userId };
 
-      const task = {
-        httpRequest: {
-          httpMethod: "POST",
-          url,
-          oidcToken: {
-            serviceAccountEmail
-          },
-          body: Buffer.from(JSON.stringify(payload)).toString("base64"),
-          headers: {
-            "Content-Type": "application/json"
-          }
+    const task = {
+      httpRequest: {
+        httpMethod: "POST",
+        url,
+        // token to allow only auth users to trigger the cancelIfExpired function
+        oidcToken: {
+          serviceAccountEmail
         },
-        scheduleTime: {
-          seconds: newExpiresAtInSeconds
+        body: Buffer.from(JSON.stringify(payload)).toString("base64"),
+        headers: {
+          "Content-Type": "application/json"
         }
-      };
+      },
+      scheduleTime: {
+        seconds: expiresAtInSeconds
+      }
+    };
 
-      const [response] = await taskClient.createTask({
-        parent: queuePath,
-        task
-      });
-      const expirationTask = response.name;
+    const [response] = await taskClient.createTask({ parent: queuePath, task });
+    const expirationTask = response.name;
+    const newContenders = contenders.map(contender =>
+      contender.id === userId ? { ...contender, expirationTask } : contender
+    );
+    await instanceRef.update({ contenders: newContenders });
+  });
 
-      newUserContender = {
-        ...userContender,
-        expirationTask,
-        expiresAt: newExpiresAt
-      };
-    } else if (
-      userContender.status !== "Cancelled" &&
-      userContender.status !== "Completed"
-    ) {
-      newUserContender = {
-        ...userContender,
-        status: "Cancelled",
-        proof: {
-          ...userContender.proof,
-          state: "Cancelled"
-        }
-      };
-    }
-
+exports.removeTask = functions
+  .region("europe-west1")
+  .https.onCall(async (data, context) => {
+    const { instanceId, userId } = data;
+    const instanceRef = firestore.doc(`challengesInstances/${instanceId}`);
+    const instanceSnapshot = await instanceRef.get();
+    const instanceData = instanceSnapshot.data();
+    const { contenders } = instanceData;
+    const userContender = contenders.find(contender => contender.id === userId);
+    const { expirationTask } = userContender;
+    const newUserContender = userContender;
+    delete newUserContender["expirationTask"];
     const newContenders = contenders.map(contender =>
       contender.id === userId ? newUserContender : contender
     );
+    const tasksClient = new CloudTasksClient();
+    await tasksClient.deleteTask({ name: expirationTask });
+    await instanceRef.update({
+      contenders: newContenders
+    });
+  });
 
-    await firestore.doc(instancePath).update({ contenders: newContenders });
-    res.send(200);
-  } catch (error) {
-    console.log("Error", error);
-    res.status(500).send(error);
-  }
-});
+exports.cancelIfExpired = functions
+  .region("europe-west1")
+  .https.onRequest(async (req, res) => {
+    const payload = req.body;
+    const { instancePath, userId } = payload;
+    try {
+      const userSnapshot = await firestore.doc(instancePath).get();
+      const userData = userSnapshot.data();
+      const { contenders } = userData;
+      const userContender = contenders.find(
+        contender => contender.id === userId
+      );
+      let newUserContender = {};
+      if (userContender.proof.state === "Pending") {
+        const newExpiresAt = new Date();
+        newExpiresAt.setDate(newExpiresAt.getDate() + 1);
+        const newExpiresAtInSeconds = newExpiresAt.getTime() / 1000;
+
+        const payload = { instancePath, userId };
+
+        const task = {
+          httpRequest: {
+            httpMethod: "POST",
+            url,
+            oidcToken: {
+              serviceAccountEmail
+            },
+            body: Buffer.from(JSON.stringify(payload)).toString("base64"),
+            headers: {
+              "Content-Type": "application/json"
+            }
+          },
+          scheduleTime: {
+            seconds: newExpiresAtInSeconds
+          }
+        };
+
+        const [response] = await taskClient.createTask({
+          parent: queuePath,
+          task
+        });
+        const expirationTask = response.name;
+
+        newUserContender = {
+          ...userContender,
+          expirationTask,
+          expiresAt: newExpiresAt
+        };
+      } else if (
+        userContender.status !== "Cancelled" &&
+        userContender.status !== "Completed"
+      ) {
+        newUserContender = {
+          ...userContender,
+          status: "Cancelled",
+          proof: {
+            ...userContender.proof,
+            state: "Cancelled"
+          }
+        };
+      }
+
+      const newContenders = contenders.map(contender =>
+        contender.id === userId ? newUserContender : contender
+      );
+
+      await firestore.doc(instancePath).update({ contenders: newContenders });
+      res.send(200);
+    } catch (error) {
+      console.log("Error", error);
+      res.status(500).send(error);
+    }
+  });
