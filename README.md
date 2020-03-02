@@ -11,11 +11,11 @@ Users can register and access to a catalog of challenges distributed by categori
 
 - [React](https://es.reactjs.org/) - JavaScript library for building user interfaces.
 - [React Redux](https://react-redux.js.org/) - Predictable state container for JavaScript applications.
-- [Redux Saga](https://react-redux.js.org/) - Side effects management with redux integration.
+- [Redux Saga](https://redux-saga.js.org/) - Side effects management with redux integration.
 - [React Router](https://reacttraining.com/react-router/) - Handle React single page applications routes.
-- [React Redux Firestor](http://react-redux-firebase.com/) - Redux bindings for Firebase and Firestore.
+- [React Redux Firestore](http://react-redux-firebase.com/) - Redux bindings for Firebase and Firestore.
 - [Reselect](https://github.com/reduxjs/reselect) - Simple “selector” library for Redux using memoization.
-- [Styled Components](https://github.com/reduxjs/reselect) - Utilising tagged template literals and the power of CSS, allows you to write actual CSS code to style your components.
+- [Styled Components](https://styled-components.com/) - Utilising tagged template literals and the power of CSS, allows you to write actual CSS code to style your components.
 
 ### Back-End
 
